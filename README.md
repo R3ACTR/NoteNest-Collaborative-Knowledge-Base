@@ -47,15 +47,25 @@ open-source development workflows.
 ## 📁 Repository Structure
 
 notenest/
+
 ├── frontend/ # Next.js frontend application
+
 ├── backend/ # Backend APIs (REST / GraphQL)
+
 ├── docs/ # Project documentation
+
 ├── .github/ # GitHub workflows & templates
+
 ├── README.md
+
 ├── CONTRIBUTING.md
+
 ├── CODE_OF_CONDUCT.md
+
 ├── SECURITY.md
+
 ├── ROADMAP.md
+
 └── OSQ.md
 
 
