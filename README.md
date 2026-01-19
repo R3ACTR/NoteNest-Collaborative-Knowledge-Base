@@ -91,8 +91,8 @@ Each issue is labeled with:
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/<org-or-user>/notenest.git
-cd notenest
+git clone https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base.git
+cd NoteNest-Collaborative-Knowledge-Base
 ```
 ## Setup Frontend
 ```
@@ -113,20 +113,20 @@ Create a .env file using .env.example and add required variables.
 
 Detailed documentation is available in the /docs folder:
 
-setup.md – Local setup instructions
+[Setup](setup.md) – Local setup instructions
 
 
-[](architecture.md) – System architecture overview
+[Architecture](architecture.md) – System architecture overview
 
-[](api.md) – API documentation
+[API](api.md) – API documentation
 
-[](roles-access.md) – Role-based access control
+[Roles-Access](roles-access.md) – Role-based access control
 
-[](faq.md) – Common questions
+[FAQ](faq.md) – Common questions
 
 ### Security
 
-Please read our [](SECURITY.md) to learn how to responsibly report
+Please read our [Security](SECURITY.md) to learn how to responsibly report
 security vulnerabilities.
 
 ❌ Do not report security issues via public GitHub issues.
@@ -147,7 +147,7 @@ Quality and learning matter more than quantity.
 
 ### Roadmap
 
-The planned roadmap can be found in [](ROADMAP.md)
+The planned roadmap can be found in [Roadmap](ROADMAP.md)
 , covering:
 
 Core features
@@ -161,7 +161,7 @@ Advanced role management.
 ### License
 
 This project is licensed under the MIT License.
-See the [](LICENSE.md) file for details.
+See the [License](LICENSE.md) file for details.
 
 ### Acknowledgements
 
