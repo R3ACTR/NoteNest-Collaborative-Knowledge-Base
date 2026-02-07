@@ -10,6 +10,7 @@ export default function Home() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loadingButtons, setLoadingButtons] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setMounted(true);
@@ -52,17 +53,45 @@ export default function Home() {
     };
   }, []);
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: string, buttonId?: string) => {
     const element = document.getElementById(id);
     if (element) {
+      const loadingId = buttonId || `scroll-${id}`;
+      setLoadingButtons(prev => new Set(prev).add(loadingId));
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       setMobileMenuOpen(false);
+      // Clear loading after scroll animation (approximately 800ms)
+      setTimeout(() => {
+        setLoadingButtons(prev => {
+          const next = new Set(prev);
+          next.delete(loadingId);
+          return next;
+        });
+      }, 800);
     }
   };
 
   const scrollToTop = () => {
+    setLoadingButtons(prev => new Set(prev).add('scroll-top'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setLoadingButtons(prev => {
+        const next = new Set(prev);
+        next.delete('scroll-top');
+        return next;
+      });
+    }, 800);
   };
+
+  const handleNavigation = (url: string, buttonId: string) => {
+    setLoadingButtons(prev => new Set(prev).add(buttonId));
+    // Simulate navigation delay (in real app, this would be actual navigation)
+    setTimeout(() => {
+      window.location.href = url;
+    }, 300);
+  };
+
+  const isLoading = (buttonId: string) => loadingButtons.has(buttonId);
 
   return (
     <main 
@@ -71,6 +100,19 @@ export default function Home() {
         background: 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 25%, #faf5ff 50%, #ffffff 75%, #f0f9ff 100%)'
       }}
     >
+      {/* Skip to main content link for keyboard navigation */}
+      <a 
+        href="#hero" 
+        className="skip-to-main"
+        onFocus={(e) => {
+          e.currentTarget.style.top = '0';
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.top = '-40px';
+        }}
+      >
+        Skip to main content
+      </a>
       {/* Scroll Progress Indicator */}
       <div 
         className="fixed top-0 left-0 right-0 h-1 z-50 transition-opacity duration-300"
@@ -118,7 +160,7 @@ export default function Home() {
         }}
       >
         <div 
-          className="max-w-7xl mx-auto"
+          className="max-w-7xl mx-auto w-full"
           style={{ 
             paddingLeft: 'clamp(var(--space-md), 4vw, var(--space-xl))',
             paddingRight: 'clamp(var(--space-md), 4vw, var(--space-xl))',
@@ -126,16 +168,22 @@ export default function Home() {
             paddingBottom: 'clamp(var(--space-md), 3vw, var(--space-lg))'
           }}
         >
-          <div className="flex items-center justify-between w-full">
+          <div className="flex items-center justify-between w-full" style={{ alignItems: 'center', width: '100%', gap: 0 }}>
+            {/* Logo Section - Left */}
             <Link 
               href="/"
-              className="group flex items-center transition-all duration-300 hover:scale-105 active:scale-95 flex-shrink-0"
+              className="group flex items-center transition-all duration-300 hover:scale-105 active:scale-95"
               onClick={(e) => {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
+              style={{ 
+                minWidth: 'fit-content',
+                alignItems: 'center',
+                flexShrink: 0
+              }}
             >
-              <div className="flex flex-col">
+              <div className="flex flex-col items-start justify-center" style={{ lineHeight: '1.2' }}>
                 <h1 
                   className="font-bold tracking-tight transition-all duration-300"
                   style={{ 
@@ -150,7 +198,8 @@ export default function Home() {
                     lineHeight: '1.2',
                     letterSpacing: '-0.02em',
                     margin: 0,
-                    padding: 0
+                    padding: 0,
+                    display: 'block'
                   }}
                 >
                   NoteNest
@@ -164,37 +213,46 @@ export default function Home() {
                     marginTop: 'clamp(0.125rem, 0.5vw, 0.25rem)',
                     lineHeight: '1.4',
                     margin: 0,
-                    padding: 0
+                    padding: 0,
+                    display: 'block',
+                    whiteSpace: 'nowrap'
                   }}
                 >
-                  Collaborative Knowledge Base for Teams
-                </p>
+            Collaborative Knowledge Base for Teams
+          </p>
               </div>
             </Link>
-            <nav 
-              className="hidden md:flex items-center flex-shrink-0"
-              style={{ gap: 'clamp(var(--space-sm), 2.5vw, var(--space-md))' }}
-            >
-              <button
-                onClick={() => scrollToSection('features')}
-                className="relative font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md group flex items-center"
+            
+            {/* Navigation Section - Right */}
+            <div className="flex items-center" style={{ gap: 'clamp(var(--space-md), 2vw, var(--space-lg))', alignItems: 'center', flexShrink: 0, marginLeft: 'auto' }}>
+              <nav 
+                className="hidden md:flex items-center"
                 style={{ 
-                  color: 'var(--color-text-secondary)',
+                  gap: 'clamp(var(--space-lg), 3vw, var(--space-xl))',
+                  alignItems: 'center',
+                  height: '100%',
+                  flexShrink: 0
+                }}
+              >
+              <button
+                onClick={() => scrollToSection('features', 'scroll-features-nav')}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    scrollToSection('features', 'scroll-features-nav');
+                  }
+                }}
+                disabled={isLoading('scroll-features-nav')}
+                aria-busy={isLoading('scroll-features-nav')}
+                className={`btn-nav relative group flex items-center justify-center text-underline ${isLoading('scroll-features-nav') ? 'loading' : ''}`}
+                style={{ 
                   fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
-                  fontWeight: 'var(--font-weight-medium)',
-                  padding: 'clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1rem)',
-                  minHeight: '40px',
-                  position: 'relative',
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  height: '44px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--color-info)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
+                aria-label="Navigate to Features section"
               >
                 Features
                 <span 
@@ -204,23 +262,13 @@ export default function Home() {
               </button>
               <Link 
                 href="/login" 
-                className="relative font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md group flex items-center"
+                className="link-nav relative group flex items-center justify-center text-underline"
                 style={{ 
-                  color: 'var(--color-text-secondary)',
                   fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
-                  fontWeight: 'var(--font-weight-medium)',
-                  padding: 'clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1rem)',
-                  minHeight: '40px',
-                  position: 'relative',
-                  whiteSpace: 'nowrap'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--color-info)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--color-text-secondary)';
-                  e.currentTarget.style.transform = 'translateY(0)';
+                  whiteSpace: 'nowrap',
+                  height: '44px',
+                  display: 'flex',
+                  alignItems: 'center'
                 }}
               >
                 Sign In
@@ -231,48 +279,36 @@ export default function Home() {
               </Link>
               <Link 
                 href="/login" 
-                className="relative rounded-lg font-semibold transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 overflow-hidden group flex items-center justify-center"
+                className="link-primary button-ripple button-glow magnetic-button group flex items-center justify-center"
                 style={{ 
-                  background: 'linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%)',
-                  color: 'white',
                   fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  padding: 'clamp(0.625rem, 2vw, 0.75rem) clamp(1.25rem, 4vw, 1.5rem)',
-                  boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2)',
-                  minHeight: '40px',
                   minWidth: '120px',
-                  marginLeft: 'clamp(var(--space-xs), 1vw, var(--space-sm))'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)';
-                  e.currentTarget.style.transform = 'translateY(-2px) scale(1.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2)';
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  minHeight: '44px',
+                  height: '44px'
                 }}
               >
                 <span className="relative z-10 whitespace-nowrap">Get Started</span>
                 <div 
                   className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                 ></div>
+                <div 
+                  className="absolute inset-0 button-shimmer opacity-0 group-hover:opacity-100"
+                ></div>
               </Link>
-            </nav>
-            
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden rounded-lg transition-all duration-200 hover:bg-gray-100 active:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center flex-shrink-0"
-              style={{ 
-                color: 'var(--color-text-primary)',
-                padding: 'clamp(0.5rem, 2vw, 0.625rem)',
-                minWidth: '44px',
-                minHeight: '44px',
-                marginLeft: 'clamp(var(--space-sm), 2vw, var(--space-md))'
-              }}
-              aria-label="Toggle menu"
-              aria-expanded={mobileMenuOpen}
-            >
+              </nav>
+              
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="btn-icon md:hidden flex-shrink-0 flex items-center justify-center"
+                style={{ 
+                  height: '44px',
+                  width: '44px',
+                  flex: '0 0 auto'
+                }}
+                aria-label="Toggle menu"
+                aria-expanded={mobileMenuOpen}
+              >
               <svg 
                 className="w-6 h-6 transition-transform duration-300" 
                 style={{ transform: mobileMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}
@@ -286,72 +322,73 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
-            </button>
-          </div>
-          
-          {/* Mobile Menu */}
-          <nav 
-            className={`md:hidden border-t transition-all duration-300 overflow-hidden ${
-              mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-            }`}
-            style={{ 
-              borderColor: 'var(--color-border-light)',
-              marginTop: mobileMenuOpen ? 'var(--space-md)' : '0',
-              paddingTop: mobileMenuOpen ? 'var(--space-md)' : '0',
-              paddingBottom: mobileMenuOpen ? 'var(--space-md)' : '0',
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)'
-            }}
-          >
-            <div 
-              className="flex flex-col"
-              style={{ gap: 'clamp(var(--space-sm), 2vw, var(--space-md))' }}
-            >
-              <button
-                onClick={() => scrollToSection('features')}
-                className="text-left font-medium transition-all duration-200 hover:text-blue-600 active:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md px-4 py-3"
-                style={{ 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
-                  minHeight: '44px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                Features
               </button>
-              <Link 
-                href="/login"
-                className="font-medium transition-all duration-200 hover:text-blue-600 active:text-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-md px-4 py-3"
-                style={{ 
-                  color: 'var(--color-text-secondary)',
-                  fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
-                  minHeight: '44px',
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                Sign In
-              </Link>
-              <Link 
-                href="/login"
-                className="rounded-lg font-semibold transition-all duration-200 hover:opacity-90 active:opacity-95 text-center shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                style={{ 
-                  background: 'linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%)',
-                  color: 'white',
-                  fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
-                  padding: 'clamp(0.75rem, 3vw, 0.875rem) clamp(1rem, 4vw, 1.25rem)',
-                  minHeight: '44px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginTop: 'var(--space-xs)'
-                }}
-              >
-                Get Started
-              </Link>
             </div>
-          </nav>
+            
+            {/* Mobile Menu */}
+            <nav 
+              className={`md:hidden border-t transition-all duration-300 overflow-hidden ${
+                mobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+              }`}
+              style={{ 
+                borderColor: 'var(--color-border-light)',
+                marginTop: mobileMenuOpen ? 'var(--space-md)' : '0',
+                paddingTop: mobileMenuOpen ? 'var(--space-md)' : '0',
+                paddingBottom: mobileMenuOpen ? 'var(--space-md)' : '0',
+                background: 'rgba(255, 255, 255, 0.95)',
+                backdropFilter: 'blur(10px)',
+                width: '100%'
+              }}
+            >
+              <div 
+                className="flex flex-col"
+                style={{ gap: 'clamp(var(--space-sm), 2vw, var(--space-md))' }}
+              >
+                <button
+                  onClick={() => scrollToSection('features', 'scroll-features-mobile')}
+                  disabled={isLoading('scroll-features-mobile')}
+                  aria-busy={isLoading('scroll-features-mobile')}
+                  className={`btn-nav text-left px-4 py-3 ${isLoading('scroll-features-mobile') ? 'loading' : ''}`}
+                  style={{ 
+                    fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: isLoading('scroll-features-mobile') ? 'wait' : 'pointer'
+                  }}
+                >
+                  Features
+                </button>
+                <Link 
+                  href="/login"
+                  className="link-nav px-4 py-3"
+                  style={{ 
+                    fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  Sign In
+                </Link>
+                <Link 
+                  href="/login"
+                  className="link-primary text-center"
+                  style={{ 
+                    fontSize: 'clamp(var(--font-size-sm), 2vw, var(--font-size-base))',
+                    padding: 'clamp(0.75rem, 3vw, 0.875rem) clamp(1rem, 4vw, 1.25rem)',
+                    minHeight: '44px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginTop: 'var(--space-xs)'
+                  }}
+                >
+                  Get Started
+                </Link>
+              </div>
+            </nav>
+          </div>
         </div>
       </header>
 
@@ -415,8 +452,8 @@ export default function Home() {
               }}
             >
               Share Knowledge
-            </span>
-          </h2>
+          </span>
+        </h2>
 
           <p 
             className="leading-relaxed"
@@ -434,7 +471,7 @@ export default function Home() {
               marginRight: 'auto'
             }}
           >
-            NoteNest helps teams document ideas, decisions, and learnings
+          NoteNest helps teams document ideas, decisions, and learnings
             in a shared, searchable space. Build your team's collective intelligence.
           </p>
 
@@ -446,23 +483,30 @@ export default function Home() {
               maxWidth: '600px'
             }}
           >
-            <button
-              disabled
-              className="group relative rounded-xl text-white font-semibold cursor-not-allowed transition-all duration-300 overflow-hidden shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 flex items-center justify-center gap-2"
-              style={{ 
-                background: 'linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%)',
-                fontSize: 'clamp(var(--font-size-base), 2vw, var(--font-size-lg))',
-                fontWeight: 'var(--font-weight-semibold)',
-                padding: 'clamp(0.875rem, 2.5vw, 1rem) clamp(1.75rem, 5vw, 2rem)',
-                boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)',
-                opacity: 0.95,
-                minHeight: '48px',
-                minWidth: 'clamp(200px, 40vw, 240px)',
-                width: '100%',
-                maxWidth: '280px'
-              }}
-              aria-label="Create your first note (Coming soon)"
-            >
+        <button
+          onClick={() => handleNavigation('/login', 'create-note')}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleNavigation('/login', 'create-note');
+            }
+          }}
+          disabled={isLoading('create-note')}
+          aria-busy={isLoading('create-note')}
+          className={`btn-primary button-ripple button-glow magnetic-button group flex items-center justify-center gap-2 ${isLoading('create-note') ? 'loading' : ''}`}
+          style={{ 
+            fontSize: 'clamp(var(--font-size-base), 2vw, var(--font-size-lg))',
+            padding: 'clamp(0.875rem, 2.5vw, 1rem) clamp(1.75rem, 5vw, 2rem)',
+            boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)',
+            opacity: isLoading('create-note') ? 0.75 : 1,
+            minHeight: '48px',
+            minWidth: 'clamp(200px, 40vw, 240px)',
+            width: '100%',
+            maxWidth: '280px',
+            cursor: isLoading('create-note') ? 'wait' : 'pointer'
+          }}
+          aria-label={isLoading('create-note') ? 'Loading...' : 'Create your first note'}
+        >
               <span className="relative z-10 flex items-center gap-2 justify-center">
                 <span className="whitespace-nowrap">Create Your First Note</span>
                 <span className="text-xs sm:text-sm font-normal" style={{ color: 'rgba(255, 255, 255, 0.85)' }}>(Coming Soon)</span>
@@ -471,10 +515,31 @@ export default function Home() {
                 </svg>
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </button>
-            <button 
-              onClick={() => scrollToSection('features')}
-              className="group relative rounded-xl font-semibold transition-all duration-300 hover:shadow-lg active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 overflow-hidden flex items-center justify-center gap-2"
+        </button>
+             <button 
+               onClick={() => scrollToSection('features')}
+               onKeyDown={(e) => {
+                 if (e.key === 'Enter' || e.key === ' ') {
+                   e.preventDefault();
+                   scrollToSection('features');
+                 }
+               }}
+               disabled={isLoading('scroll-features')}
+               aria-busy={isLoading('scroll-features')}
+               className={`group relative rounded-xl font-semibold transition-all duration-300 focus:outline-none overflow-hidden flex items-center justify-center gap-2 button-ripple hover-lift magnetic-button ${isLoading('scroll-features') ? 'loading' : ''}`}
+               aria-label={isLoading('scroll-features') ? 'Loading...' : 'Learn more about features'}
+              onFocus={(e) => {
+                e.currentTarget.style.background = 'var(--color-info)';
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                e.currentTarget.style.boxShadow = '0 8px 20px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
+                e.currentTarget.style.color = 'var(--color-info)';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.02)';
+              }}
               style={{ 
                 border: '2px solid var(--color-info)',
                 color: 'var(--color-info)',
@@ -486,26 +551,36 @@ export default function Home() {
                 minHeight: '48px',
                 minWidth: 'clamp(200px, 40vw, 240px)',
                 width: '100%',
-                maxWidth: '280px'
+                maxWidth: '280px',
+                cursor: 'pointer'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'var(--color-info)';
                 e.currentTarget.style.color = 'white';
                 e.currentTarget.style.borderColor = 'var(--color-info)';
-                e.currentTarget.style.boxShadow = '0 8px 20px -5px rgba(59, 130, 246, 0.3)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 20px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1)';
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                e.currentTarget.style.cursor = 'pointer';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
                 e.currentTarget.style.color = 'var(--color-info)';
                 e.currentTarget.style.borderColor = 'var(--color-info)';
-                e.currentTarget.style.boxShadow = '0 2px 8px -2px rgba(59, 130, 246, 0.1)';
-                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.02)';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(0.97)';
+                e.currentTarget.style.boxShadow = '0 2px 4px -1px rgba(59, 130, 246, 0.2)';
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+                e.currentTarget.style.boxShadow = '0 8px 20px -5px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1)';
               }}
             >
               <span className="relative z-10 flex items-center gap-2">
                 Learn More
-                <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-y-0.5 icon-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </span>
@@ -523,7 +598,7 @@ export default function Home() {
             }}
           >
             <div 
-              className="flex items-center gap-2.5 sm:gap-3 rounded-lg transition-all duration-200 hover:scale-[1.02] cursor-default"
+              className="flex items-center gap-2.5 sm:gap-3 rounded-lg transition-all duration-200 cursor-default"
               style={{ 
                 background: 'rgba(255, 255, 255, 0.9)',
                 border: '1px solid rgba(0, 0, 0, 0.08)',
@@ -550,7 +625,7 @@ export default function Home() {
               </span>
             </div>
             <div 
-              className="flex items-center gap-2.5 sm:gap-3 rounded-lg transition-all duration-200 hover:scale-[1.02] cursor-default"
+              className="flex items-center gap-2.5 sm:gap-3 rounded-lg transition-all duration-200 cursor-default"
               style={{ 
                 background: 'rgba(255, 255, 255, 0.9)',
                 border: '1px solid rgba(0, 0, 0, 0.08)',
@@ -621,12 +696,25 @@ export default function Home() {
           }}
         >
           <div 
-            className={`text-center transition-all duration-1000 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-            style={{ marginBottom: 'var(--space-3xl)' }}
+            className={`transition-all duration-1000 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+            style={{ 
+              marginBottom: 'var(--space-3xl)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              width: '100%'
+            }}
           >
-            <div className="flex justify-center mb-6">
+            <div 
+              style={{ 
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+                marginBottom: 'var(--space-xl)'
+              }}
+            >
               <h3 
-                className="inline-block rounded-2xl relative overflow-hidden group"
+                className="rounded-2xl relative overflow-hidden group"
                 style={{ 
                   background: 'linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%)',
                   color: 'white',
@@ -643,7 +731,8 @@ export default function Home() {
                   display: 'inline-block',
                   width: 'auto',
                   maxWidth: '100%',
-                  textAlign: 'center'
+                  textAlign: 'center',
+                  margin: '0 auto'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.transform = 'scale(1.05)';
@@ -658,20 +747,22 @@ export default function Home() {
                 <div 
                   className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"
                 ></div>
-              </h3>
+          </h3>
             </div>
             <p 
-              className="mx-auto font-medium"
+              className="font-medium"
               style={{ 
                 color: '#4b5563',
                 fontSize: 'clamp(var(--font-size-lg), 2vw, var(--font-size-xl))',
                 maxWidth: '720px',
                 lineHeight: '1.7',
-                marginTop: 'var(--space-xl)',
+                marginTop: 0,
                 fontWeight: 'var(--font-weight-medium)',
                 letterSpacing: '-0.01em',
                 textAlign: 'center',
-                width: '100%'
+                width: '100%',
+                marginLeft: 'auto',
+                marginRight: 'auto'
               }}
             >
               Everything you need to build and share knowledge with your team
@@ -1066,53 +1157,39 @@ export default function Home() {
             >
               <Link 
                 href="/login"
-                className="rounded-xl font-semibold transition-all duration-300 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-lg relative overflow-hidden group text-center flex items-center justify-center w-full sm:w-auto"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavigation('/login', 'get-started-cta');
+                }}
+                aria-busy={isLoading('get-started-cta')}
+                className={`link-primary button-ripple button-glow magnetic-button group text-center flex items-center justify-center w-full sm:w-auto ${isLoading('get-started-cta') ? 'loading' : ''}`}
                 style={{ 
-                  background: 'linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%)',
-                  color: 'white',
                   fontSize: 'clamp(var(--font-size-base), 2vw, var(--font-size-lg))',
                   padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem)',
                   boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)',
                   minWidth: 'clamp(180px, 30vw, 220px)',
                   minHeight: '44px',
-                  flex: '1 1 auto'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = '0 15px 35px -5px rgba(59, 130, 246, 0.5), 0 6px 10px -2px rgba(59, 130, 246, 0.4)';
-                  e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)';
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  flex: '1 1 auto',
+                  cursor: isLoading('get-started-cta') ? 'wait' : 'pointer',
+                  opacity: isLoading('get-started-cta') ? 0.75 : 1
                 }}
               >
                 <span className="relative z-10">Get Started for Free</span>
+                <div className="absolute inset-0 button-shimmer opacity-0 group-hover:opacity-100"></div>
               </Link>
               <button
-                onClick={() => scrollToSection('features')}
-                className="rounded-xl font-semibold transition-all duration-300 hover:shadow-lg active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 relative overflow-hidden text-center flex items-center justify-center w-full sm:w-auto"
+                onClick={() => scrollToSection('features', 'scroll-features-cta')}
+                disabled={isLoading('scroll-features-cta')}
+                aria-busy={isLoading('scroll-features-cta')}
+                className={`btn-secondary button-ripple magnetic-button text-center flex items-center justify-center w-full sm:w-auto ${isLoading('scroll-features-cta') ? 'loading' : ''}`}
                 style={{ 
-                  border: '2px solid var(--color-info)',
-                  color: 'var(--color-info)',
                   fontSize: 'clamp(var(--font-size-base), 2vw, var(--font-size-lg))',
                   padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem)',
-                  background: 'rgba(255, 255, 255, 0.95)',
                   minWidth: 'clamp(180px, 30vw, 220px)',
                   minHeight: '44px',
-                  fontWeight: 'var(--font-weight-semibold)',
-                  flex: '1 1 auto'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--color-info)';
-                  e.currentTarget.style.color = 'white';
-                  e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 10px 20px -5px rgba(59, 130, 246, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.95)';
-                  e.currentTarget.style.color = 'var(--color-info)';
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = 'none';
+                  flex: '1 1 auto',
+                  cursor: isLoading('scroll-features-cta') ? 'wait' : 'pointer',
+                  opacity: isLoading('scroll-features-cta') ? 0.75 : 1
                 }}
               >
                 Learn More
@@ -1258,27 +1335,50 @@ export default function Home() {
 
       {/* Scroll to Top Button */}
       {showScrollTop && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-4 right-4 sm:bottom-8 sm:right-8 z-50 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 group"
+         <button
+           onClick={scrollToTop}
+           disabled={isLoading('scroll-top')}
+           aria-busy={isLoading('scroll-top')}
+           className={`fixed rounded-full shadow-2xl transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500 group button-ripple button-glow cta-pulse ${isLoading('scroll-top') ? 'loading' : ''}`}
           style={{
             background: 'linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%)',
             color: 'white',
             padding: 'clamp(0.75rem, 2vw, 1rem)',
             minWidth: '44px',
             minHeight: '44px',
-            boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 4px 6px -2px rgba(59, 130, 246, 0.3)'
+            width: '44px',
+            height: '44px',
+            boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 4px 6px -2px rgba(59, 130, 246, 0.3)',
+            cursor: 'pointer',
+            bottom: 'clamp(1rem, 4vw, 2rem)',
+            right: 'clamp(1rem, 4vw, 2rem)',
+            zIndex: 9999,
+            position: 'fixed',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
           aria-label="Scroll to top"
           onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = '0 15px 35px -5px rgba(59, 130, 246, 0.6), 0 6px 10px -2px rgba(59, 130, 246, 0.4)';
+            e.currentTarget.style.boxShadow = '0 15px 35px -5px rgba(59, 130, 246, 0.6), 0 6px 10px -2px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.4)';
+            e.currentTarget.style.transform = 'scale(1.15) translateY(-3px)';
+            e.currentTarget.style.cursor = 'pointer';
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.boxShadow = '0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 4px 6px -2px rgba(59, 130, 246, 0.3)';
+            e.currentTarget.style.transform = 'scale(1) translateY(0)';
+          }}
+          onMouseDown={(e) => {
+            e.currentTarget.style.transform = 'scale(0.9) translateY(0)';
+            e.currentTarget.style.boxShadow = '0 4px 12px -2px rgba(59, 130, 246, 0.4), 0 2px 4px -1px rgba(59, 130, 246, 0.3)';
+          }}
+          onMouseUp={(e) => {
+            e.currentTarget.style.transform = 'scale(1.15) translateY(-3px)';
+            e.currentTarget.style.boxShadow = '0 15px 35px -5px rgba(59, 130, 246, 0.6), 0 6px 10px -2px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.4)';
           }}
         >
           <svg 
-            className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:-translate-y-1" 
+            className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:-translate-y-1 icon-bounce" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -1308,23 +1408,23 @@ function Feature({
 
   return (
     <article
-      className={`group relative rounded-2xl transition-all duration-300 cursor-pointer focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 overflow-hidden ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+      className={`group relative rounded-2xl transition-all duration-300 overflow-hidden card-enter ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
       style={{ 
         transitionDelay: `${delay}ms`,
         background: isHovered 
           ? 'rgba(255, 255, 255, 1)'
           : 'rgba(255, 255, 255, 0.95)',
-        border: `1px solid ${isHovered ? 'rgba(59, 130, 246, 0.2)' : 'rgba(0, 0, 0, 0.08)'}`,
+        border: `1px solid ${isHovered ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 0, 0, 0.08)'}`,
         boxShadow: isHovered 
-          ? '0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(59, 130, 246, 0.1)'
+          ? '0 4px 12px -4px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04)'
           : '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
-        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-        padding: 'var(--space-2xl)',
-        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)'
+        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+        padding: 'clamp(var(--space-lg), 4vw, var(--space-2xl))',
+        transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+        cursor: 'default'
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      tabIndex={0}
       role="article"
       aria-label={title}
     >
@@ -1332,7 +1432,7 @@ function Feature({
       <div 
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-2xl"
         style={{
-          background: 'rgba(59, 130, 246, 0.03)',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.03) 50%, rgba(59, 130, 246, 0.05) 100%)',
           transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       ></div>
@@ -1341,15 +1441,24 @@ function Feature({
       <div 
         className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none rounded-2xl"
         style={{
-          background: 'linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%)',
+          background: 'linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100%)',
           transform: 'translateX(-100%)',
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+          transition: 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateX(100%)';
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'translateX(-100%)';
+        }}
+      ></div>
+      
+      {/* Glow effect on hover */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none rounded-2xl"
+        style={{
+          background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%)',
+          transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       ></div>
 
@@ -1371,7 +1480,7 @@ function Feature({
             }}
           >
             {icon}
-          </div>
+    </div>
         </div>
         
         <h4 
@@ -1407,11 +1516,12 @@ function Feature({
           
           {/* Decorative arrow on hover - positioned at end of text */}
           <div 
-            className="absolute bottom-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-300 inline-flex items-center"
+            className="absolute bottom-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-300 inline-flex items-center icon-bounce"
             style={{ 
               color: 'var(--color-info)',
-              transform: 'translateY(0)',
-              marginLeft: '0.5rem'
+              transform: 'translateX(-4px)',
+              marginLeft: '0.5rem',
+              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1441,7 +1551,7 @@ function StatCard({
 
   return (
     <div 
-      className={`group relative text-center transition-all duration-500 cursor-pointer overflow-hidden ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+      className={`group relative text-center transition-all duration-300 overflow-hidden card-enter ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
         style={{ 
           transitionDelay: `${delay}ms`,
           padding: 'clamp(var(--space-md), 3vw, var(--space-lg))',
@@ -1449,16 +1559,16 @@ function StatCard({
           ? 'rgba(255, 255, 255, 1)'
           : 'rgba(255, 255, 255, 0.9)',
           borderRadius: 'var(--space-md)',
-          border: `1px solid ${isHovered ? 'rgba(59, 130, 246, 0.15)' : 'rgba(0, 0, 0, 0.08)'}`,
+          border: `1px solid ${isHovered ? 'rgba(0, 0, 0, 0.1)' : 'rgba(0, 0, 0, 0.08)'}`,
           boxShadow: isHovered
-          ? '0 2px 8px -2px rgba(0, 0, 0, 0.06), 0 1px 3px -1px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(59, 130, 246, 0.08)'
+          ? '0 2px 8px -2px rgba(0, 0, 0, 0.06), 0 1px 3px -1px rgba(0, 0, 0, 0.04)'
           : '0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 1px 3px 0 rgba(0, 0, 0, 0.02)',
-          transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+          transform: isHovered ? 'translateY(-1px)' : 'translateY(0)',
+          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+          cursor: 'default'
         }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      tabIndex={0}
       role="article"
       aria-label={`${number} ${label}`}
     >
@@ -1466,17 +1576,27 @@ function StatCard({
       <div 
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-md"
         style={{
-          background: 'rgba(59, 130, 246, 0.03)',
+          background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.03) 50%, rgba(59, 130, 246, 0.05) 100%)',
+          transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
+      ></div>
+      
+      {/* Glow effect on hover */}
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none rounded-md"
+        style={{
+          background: 'radial-gradient(circle at center, rgba(59, 130, 246, 0.08) 0%, transparent 70%)',
           transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       ></div>
       
       <div className="relative z-10">
         <div 
-          className="text-4xl mb-2 transition-transform duration-300"
+          className="text-4xl mb-2 transition-transform duration-300 icon-bounce"
           style={{
-            transform: isHovered ? 'scale(1.15) rotate(5deg)' : 'scale(1) rotate(0deg)',
-            transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+            transform: isHovered ? 'scale(1.2) rotate(8deg)' : 'scale(1) rotate(0deg)',
+            transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            display: 'inline-block'
           }}
         >
           {icon}
@@ -1491,15 +1611,20 @@ function StatCard({
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)'
+            transform: isHovered ? 'scale(1.1) translateY(-2px)' : 'scale(1) translateY(0)',
+            transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            display: 'inline-block'
           }}
         >
           {number}
         </div>
         <div 
-          className="text-sm font-medium transition-colors duration-300"
+          className="text-sm font-medium transition-all duration-300"
           style={{ 
-            color: isHovered ? 'var(--color-text-primary)' : 'var(--color-text-secondary)'
+            color: isHovered ? 'var(--color-info)' : 'var(--color-text-secondary)',
+            transform: isHovered ? 'translateY(-1px) scale(1.05)' : 'translateY(0) scale(1)',
+            fontWeight: isHovered ? 'var(--font-weight-semibold)' : 'var(--font-weight-medium)',
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
           {label}
