@@ -2,9 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePermissions } from "@/hooks/usePermissions";
+import { useUserRole } from "@/contexts/UserRoleContext";
+import { type UserRole } from "@/lib/permissions";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { canAccessManagement } = usePermissions();
+  const { role, setRole } = useUserRole();
   const linkBase =
     "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200";
   const linkActive = {
@@ -58,11 +63,42 @@ export default function Sidebar() {
         >
           Notes
         </Link>
+        {canAccessManagement && (
+          <Link
+            href="/management"
+            className={`${linkBase} flex items-center gap-2`}
+            style={pathname === "/management" ? linkActive : linkInactive}
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Management
+          </Link>
+        )}
       </nav>
       <div
-        className="p-4 border-t flex items-center justify-center"
+        className="p-4 border-t flex flex-col items-center gap-3"
         style={{ borderColor: "var(--color-border-light)" }}
       >
+        <label className="w-full">
+          <span className="sr-only">Role (for testing)</span>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value as UserRole)}
+            className="w-full rounded-lg border px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-offset-1"
+            style={{
+              borderColor: "var(--color-border-light)",
+              color: "var(--color-text-primary)",
+              background: "var(--color-background)",
+            }}
+            title="Switch role for testing (saved in localStorage)"
+          >
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </label>
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0"
           style={{

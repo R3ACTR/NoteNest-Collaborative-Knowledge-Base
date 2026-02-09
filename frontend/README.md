@@ -63,6 +63,19 @@ The palette is built to be **extensible**: you can pass a custom `commands` prop
 
 ---
 
+## Role-based UI (testing)
+
+The UI hides or disables Create / Edit / Delete and Management actions based on the current user role (**Viewer**, **Editor**, **Admin**). Role is stored in the browser for demo purposes (no backend).
+
+- **Switch role:** Use the **Role** dropdown in the sidebar footer. Choices: Viewer, Editor, Admin. The value is saved in `localStorage` under `notenest-user-role`.
+- **Viewer:** Cannot create, edit, or delete notes; cannot open Management. Create Note appears disabled with a tooltip; delete is replaced by a lock icon.
+- **Editor:** Can create, edit, and delete notes; cannot see the Management link.
+- **Admin:** Full access, including the Management page (workspace settings placeholder).
+
+See `docs/roles-access.md` for the full permission matrix.
+
+---
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

@@ -63,30 +63,28 @@ Before you begin, ensure you have the following installed:
    cd NoteNest-Collaborative-Knowledge-Base
    ```
 
-2. **Set up the Backend**
+2. **Install dependencies (root + backend + frontend)**
 
    ```bash
-   cd backend
-   npm install
-   
-   # Create environment file
-   cp .env.example .env
-   # Edit .env with your MongoDB connection string and other settings
-   
+   npm run install:all
+   ```
+
+   Or install manually: `npm install` at the repo root, then `npm install` in both `backend/` and `frontend/`.
+
+3. **Run backend and frontend with one command**
+
+   From the **repository root**:
+
+   ```bash
    npm run dev
    ```
 
-   The backend will start at `http://localhost:5000`
+   This starts both the backend and the frontend in parallel. Backend runs at `http://localhost:5000`, frontend at `http://localhost:3000`.
 
-3. **Set up the Frontend** (in a new terminal)
+   To run them separately: `npm run dev:backend` or `npm run dev:frontend` from the root, or run `npm run dev` inside `backend/` or `frontend/`.
 
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
-
-   The frontend will start at `http://localhost:3000`
+4. **Backend environment (optional)**  
+   If the backend needs a `.env` file (e.g. MongoDB URI), create `backend/.env` from `backend/.env.example` and edit as needed.
 
 ### Environment Variables
 

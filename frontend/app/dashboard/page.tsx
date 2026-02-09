@@ -7,8 +7,12 @@ import Header from "@/components/Header";
 import EmptyState from "@/components/EmptyState";
 import ErrorState from "@/components/ErrorState";
 import { SkeletonList } from "@/components/Skeleton";
+import { usePermissions } from "@/hooks/usePermissions";
+
+const CREATE_RESTRICTED_TITLE = "You need Editor or Admin role to create notes.";
 
 export default function DashboardPage() {
+  const { canCreateNote } = usePermissions();
   const [recentActivity, setRecentActivity] = useState<Array<{ id: number; action: string; timestamp: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -51,18 +55,32 @@ export default function DashboardPage() {
           title="Dashboard"
           showSearch
           action={
-            <Link
-              href="/notes?new=1"
-              className="btn-primary"
-              data-shortcut="create-note"
-              style={{
-                fontSize: "var(--font-size-sm)",
-                padding: "var(--space-sm) var(--space-md)",
-                minHeight: "36px",
-              }}
-            >
-              Create Note
-            </Link>
+            canCreateNote ? (
+              <Link
+                href="/notes?new=1"
+                className="btn-primary"
+                data-shortcut="create-note"
+                style={{
+                  fontSize: "var(--font-size-sm)",
+                  padding: "var(--space-sm) var(--space-md)",
+                  minHeight: "36px",
+                }}
+              >
+                Create Note
+              </Link>
+            ) : (
+              <span
+                className="inline-flex items-center rounded-lg border px-3 py-2 text-sm opacity-70 cursor-not-allowed"
+                style={{
+                  minHeight: "36px",
+                  borderColor: "var(--color-border-light)",
+                  color: "var(--color-text-muted)",
+                }}
+                title={CREATE_RESTRICTED_TITLE}
+              >
+                Create Note
+              </span>
+            )
           }
         />
         <main
@@ -149,19 +167,35 @@ export default function DashboardPage() {
                   </h3>
                 </div>
                 <div className="flex-1 px-5 py-4 flex flex-wrap items-center gap-3">
-                  <Link
-                    href="/notes?new=1"
-                    className="btn-primary inline-flex items-center gap-2 min-h-[40px]"
-                    style={{
-                      fontSize: "var(--font-size-sm)",
-                      padding: "var(--space-sm) var(--space-md)",
-                    }}
-                  >
-                    <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Create Note
-                  </Link>
+                  {canCreateNote ? (
+                    <Link
+                      href="/notes?new=1"
+                      className="btn-primary inline-flex items-center gap-2 min-h-[40px]"
+                      style={{
+                        fontSize: "var(--font-size-sm)",
+                        padding: "var(--space-sm) var(--space-md)",
+                      }}
+                    >
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Create Note
+                    </Link>
+                  ) : (
+                    <span
+                      className="inline-flex items-center gap-2 min-h-[40px] rounded-lg border px-3 py-2 text-sm opacity-70 cursor-not-allowed"
+                      style={{
+                        borderColor: "var(--color-border-light)",
+                        color: "var(--color-text-muted)",
+                      }}
+                      title={CREATE_RESTRICTED_TITLE}
+                    >
+                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Create Note
+                    </span>
+                  )}
                   <Link
                     href="/notes"
                     className="btn-secondary inline-flex items-center gap-2 min-h-[40px]"

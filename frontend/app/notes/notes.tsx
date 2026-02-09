@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import EmptyState from "@/components/EmptyState";
 import ErrorState from "@/components/ErrorState";
 import { SkeletonList } from "@/components/Skeleton";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const STORAGE_KEY = "notenest-notes";
 const TITLE_MAX_LENGTH = 200;
@@ -42,8 +43,12 @@ function saveNotesToStorage(notes: Note[]) {
   }
 }
 
+const CREATE_RESTRICTED_TITLE = "You need Editor or Admin role to create notes.";
+const DELETE_RESTRICTED_TITLE = "You need Editor or Admin role to delete notes.";
+
 export default function NotesPage() {
   const searchParams = useSearchParams();
+  const { canCreateNote, canDeleteNote, isViewer } = usePermissions();
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -83,16 +88,15 @@ export default function NotesPage() {
     }
   }, [notes, isLoading]);
 
-  // Open create modal when landing from "Create Your First Note" (e.g. /notes?new=1)
+  // Open create modal when landing from "Create Your First Note" (e.g. /notes?new=1) — only if allowed
   useEffect(() => {
-    if (searchParams.get("new") === "1") {
+    if (searchParams.get("new") === "1" && canCreateNote) {
       setShowCreateModal(true);
-      // Remove query param from URL without reload so refresh doesn't reopen modal
       if (typeof window !== "undefined") {
         window.history.replaceState({}, "", window.location.pathname);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, canCreateNote]);
 
   // Close view modal on Escape
   useEffect(() => {
@@ -120,12 +124,13 @@ export default function NotesPage() {
   };
 
   const handleCreateNote = useCallback(() => {
+    if (!canCreateNote) return;
     setActionError(null);
     setCreateTitle("");
     setCreateContent("");
     setCreateTitleError("");
     setShowCreateModal(true);
-  }, []);
+  }, [canCreateNote]);
 
   const handleCloseCreateModal = useCallback(() => {
     if (isSubmittingCreate) return;
@@ -190,20 +195,34 @@ export default function NotesPage() {
           title="Notes"
           showSearch
           action={
-            <button
-              ref={createButtonRef}
-              type="button"
-              onClick={handleCreateNote}
-              className="btn-primary"
-              data-shortcut="create-note"
-              style={{
-                fontSize: "var(--font-size-sm)",
-                padding: "var(--space-sm) var(--space-md)",
-                minHeight: "36px",
-              }}
-            >
-              Create Note
-            </button>
+            canCreateNote ? (
+              <button
+                ref={createButtonRef}
+                type="button"
+                onClick={handleCreateNote}
+                className="btn-primary"
+                data-shortcut="create-note"
+                style={{
+                  fontSize: "var(--font-size-sm)",
+                  padding: "var(--space-sm) var(--space-md)",
+                  minHeight: "36px",
+                }}
+              >
+                Create Note
+              </button>
+            ) : (
+              <span
+                className="inline-flex items-center rounded-lg border px-3 py-2 text-sm opacity-70 cursor-not-allowed"
+                style={{
+                  minHeight: "36px",
+                  borderColor: "var(--color-border-light)",
+                  color: "var(--color-text-muted)",
+                }}
+                title={CREATE_RESTRICTED_TITLE}
+              >
+                Create Note
+              </span>
+            )
           }
         />
       <main
@@ -282,19 +301,33 @@ export default function NotesPage() {
               </svg>
             }
             title="No notes yet"
-            description="Get started by creating your first note. Organize your thoughts, ideas, and knowledge in one place."
+            description={
+              isViewer
+                ? "You can view notes only. Ask an Editor or Admin to create notes for you."
+                : "Get started by creating your first note. Organize your thoughts, ideas, and knowledge in one place."
+            }
             action={
-              <button
-                type="button"
-                onClick={handleCreateNote}
-                className="btn-primary"
-                style={{
-                  fontSize: "var(--font-size-base)",
-                  padding: "var(--space-sm) var(--space-lg)",
-                }}
-              >
-                Create Your First Note
-              </button>
+              canCreateNote ? (
+                <button
+                  type="button"
+                  onClick={handleCreateNote}
+                  className="btn-primary"
+                  style={{
+                    fontSize: "var(--font-size-base)",
+                    padding: "var(--space-sm) var(--space-lg)",
+                  }}
+                >
+                  Create Your First Note
+                </button>
+              ) : (
+                <span
+                  className="text-sm"
+                  style={{ color: "var(--color-text-muted)" }}
+                  title={CREATE_RESTRICTED_TITLE}
+                >
+                  View only — create not allowed
+                </span>
+              )
             }
           />
           </div>
@@ -343,24 +376,39 @@ export default function NotesPage() {
                     </span>
                   )}
                 </button>
-                <div className="flex items-center gap-1 pr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteNote(note.id);
-                    }}
-                    className="btn-icon rounded-lg"
-                    style={{
-                      padding: "var(--space-sm)",
-                      color: "var(--color-error)",
-                    }}
-                    aria-label={`Delete ${note.title}`}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </button>
-                </div>
+                {(canDeleteNote && (
+                  <div className="flex items-center gap-1 pr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteNote(note.id);
+                      }}
+                      className="btn-icon rounded-lg"
+                      style={{
+                        padding: "var(--space-sm)",
+                        color: "var(--color-error)",
+                      }}
+                      aria-label={`Delete ${note.title}`}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                )) || (
+                  <div className="pr-3 flex items-center">
+                    <span
+                      className="inline-block w-8 h-8 rounded-lg flex items-center justify-center cursor-not-allowed opacity-50"
+                      style={{ color: "var(--color-text-muted)" }}
+                      title={DELETE_RESTRICTED_TITLE}
+                      aria-hidden
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </span>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -369,8 +417,8 @@ export default function NotesPage() {
       </main>
       </div>
 
-      {/* Create Note Modal – placeholder flow (frontend-only, local state) */}
-      {showCreateModal && (
+      {/* Create Note Modal – only when user can create */}
+      {showCreateModal && canCreateNote && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
           style={{ background: "rgba(0, 0, 0, 0.5)" }}
