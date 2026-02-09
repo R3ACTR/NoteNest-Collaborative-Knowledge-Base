@@ -4,6 +4,7 @@ import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { usePermissions } from "@/hooks/usePermissions";
+import FeatureFlagExample from "@/components/FeatureFlagExample";
 
 export default function ManagementPage() {
   const { canAccessManagement, isAdmin } = usePermissions();
@@ -56,7 +57,7 @@ export default function ManagementPage() {
         >
           <div className="max-w-3xl mx-auto">
             <section
-              className="rounded-2xl border p-6"
+              className="rounded-2xl border p-6 mb-6"
               style={{
                 background: "var(--color-background)",
                 borderColor: "var(--color-border-light)",
@@ -73,6 +74,22 @@ export default function ManagementPage() {
                   You are signed in as Admin — full access.
                 </p>
               )}
+            </section>
+
+            <section
+              className="rounded-2xl border p-6"
+              style={{
+                background: "var(--color-background)",
+                borderColor: "var(--color-border-light)",
+              }}
+            >
+              <h2 className="text-lg font-semibold mb-4" style={{ color: "var(--color-text-primary)" }}>
+                Feature Flags
+              </h2>
+              <p className="text-sm mb-4" style={{ color: "var(--color-text-secondary)" }}>
+                Control experimental and optional features. Changes are saved automatically.
+              </p>
+              <FeatureFlagExample />
             </section>
           </div>
         </main>

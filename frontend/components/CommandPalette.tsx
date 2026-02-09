@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useFeatureFlag } from "@/hooks/useFeatureFlags";
 
 export type CommandPaletteCommand = {
   id: string;

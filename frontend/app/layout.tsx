@@ -6,6 +6,7 @@ import CommandPalette from "@/components/CommandPalette";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { UserRoleProvider } from "@/contexts/UserRoleContext";
 import { WorkspaceProvider } from "@/contexts/WorkspaceContext";
+import { FeatureFlagProvider } from "@/contexts/FeatureFlagContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -38,9 +39,11 @@ export default function RootLayout({
         <ErrorBoundary>
           <WorkspaceProvider>
             <UserRoleProvider>
-              <KeyboardShortcuts />
-              <CommandPalette />
-              {children}
+              <FeatureFlagProvider>
+                <KeyboardShortcuts />
+                <CommandPalette />
+                {children}
+              </FeatureFlagProvider>
             </UserRoleProvider>
           </WorkspaceProvider>
         </ErrorBoundary>
