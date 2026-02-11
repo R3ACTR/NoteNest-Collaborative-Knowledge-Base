@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
+import Features from "@/components/landing/Features";
 import { useUserRole } from "@/contexts/UserRoleContext";
 import Link from "next/link";
 
@@ -12,6 +13,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#F3F0E6] selection:bg-[#FF6B6B]/20">
       <Navbar />
       <Hero />
+      <Features />
       
       {/* 
         Legacy sections commented out to focus on the new Design Request.
