@@ -1,10 +1,17 @@
 import request from 'supertest';
 import mongoose from 'mongoose';
-import app from '../src/index';
+import express from 'express';
+import jwt from 'jsonwebtoken';
 import User from '../src/models/User';
 import Group from '../src/models/Group';
 import Permission from '../src/models/Permission';
-import { setupTestDB, teardownTestDB } from './setup';
+import Workspace from '../src/models/Workspace';
+
+// Create a test app instance
+const app = express();
+app.use(express.json());
+app.use('/api/groups', require('../src/routes/groups'));
+app.use('/api/permissions', require('../src/routes/permissions'));
 
 describe('RBAC System', () => {
   let adminUser: any;
@@ -15,7 +22,18 @@ describe('RBAC System', () => {
   let testGroup: any;
 
   beforeAll(async () => {
-    await setupTestDB();
+    // Set JWT secret for tests
+    process.env.JWT_SECRET = 'test-jwt-secret';
+
+    // Create test workspace
+    const workspace = new Workspace({
+      name: 'Test Workspace',
+      description: 'A test workspace',
+      owner: 'admin-user-id',
+      members: []
+    });
+    await workspace.save();
+    testWorkspace = workspace._id.toString();
 
     // Create test users
     adminUser = new User({
@@ -23,7 +41,7 @@ describe('RBAC System', () => {
       password: 'hashedpassword',
       name: 'Admin User',
       role: 'admin',
-      workspaces: [],
+      workspaces: [testWorkspace],
       groups: []
     });
     await adminUser.save();
@@ -33,18 +51,21 @@ describe('RBAC System', () => {
       password: 'hashedpassword',
       name: 'Regular User',
       role: 'viewer',
-      workspaces: [],
+      workspaces: [testWorkspace],
       groups: []
     });
     await regularUser.save();
 
-    adminToken = 'mock-admin-token';
-    regularToken = 'mock-regular-token';
-    testWorkspace = 'test-workspace-id';
-  });
+    // Add users to workspace
+    workspace.members = [
+      { userId: adminUser._id.toString(), role: 'admin' },
+      { userId: regularUser._id.toString(), role: 'viewer' }
+    ];
+    await workspace.save();
 
-  afterAll(async () => {
-    await teardownTestDB();
+    // Generate real JWT tokens
+    adminToken = jwt.sign({ userId: adminUser._id.toString() }, process.env.JWT_SECRET!);
+    regularToken = jwt.sign({ userId: regularUser._id.toString() }, process.env.JWT_SECRET!);
   });
 
   describe('Group Management', () => {

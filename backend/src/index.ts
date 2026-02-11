@@ -9,6 +9,8 @@ import { YjsProvider } from './yjsProvider';
 import workspaceRoutes from './routes/workspaces';
 import noteRoutes from './routes/notes';
 import userRoutes from './routes/users';
+import groupRoutes from './routes/groups';
+import permissionRoutes from './routes/permissions';
 import { requestLoggingMiddleware } from './middleware/logging';
 import { authenticateToken } from './middleware/auth';
 

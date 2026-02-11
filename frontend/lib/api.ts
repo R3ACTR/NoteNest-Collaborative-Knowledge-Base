@@ -32,6 +32,12 @@ if (!API_BASE_URL) {
 }
 
 class ApiService {
+  private token: string | null = null;
+
+  setToken(token: string) {
+    this.token = token;
+  }
+
   private async request(endpoint: string, options: RequestInit = {}): Promise<any> {
     const url = `${API_BASE_URL}${endpoint}`;
     const config: RequestInit = {

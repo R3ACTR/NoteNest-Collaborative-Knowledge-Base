@@ -1,4 +1,5 @@
-import { Doc, Awareness } from 'yjs';
+import { Doc, encodeStateAsUpdate, applyUpdate } from 'yjs';
+import { Awareness, applyAwarenessUpdate } from 'y-protocols/awareness';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { PersistenceManager } from './persistence';
 import Workspace from './models/Workspace';
@@ -57,38 +58,40 @@ export class YjsProvider {
         }
 
         // Send initial document state
-        const update = doc.getUpdate();
+        const update = encodeStateAsUpdate(doc);
         socket.emit('yjs-init', { noteId, update });
-
-        // Handle Y.js updates
-        socket.on('yjs-update', (updateData: { noteId: string; update: Uint8Array }) => {
-          if (updateData.noteId !== noteId) return;
-
-          const doc = this.docs.get(noteId);
-          if (doc) {
-            doc.applyUpdate(updateData.update);
-            // Broadcast to other clients
-            socket.to(`note-${noteId}`).emit('yjs-update', updateData);
-          }
-        });
-
-        // Handle awareness updates
-        socket.on('awareness-update', (awarenessData: { noteId: string; update: Uint8Array }) => {
-          if (awarenessData.noteId !== noteId) return;
-
-          const awareness = this.awareness.get(noteId);
-          if (awareness) {
-            awareness.applyAwarenessUpdate(awarenessData.update);
-            // Broadcast awareness to room (excluding sender)
-            socket.to(`note-${noteId}`).emit('awareness-update', awarenessData);
-          }
-        });
 
         // Send current awareness states
         const awareness = this.awareness.get(noteId);
         if (awareness) {
           const awarenessStates = awareness.getStates();
           socket.emit('awareness-init', { noteId, states: Array.from(awarenessStates.entries()) });
+        }
+      });
+
+      // Handle Y.js updates
+      socket.on('yjs-update', (updateData: { noteId: string; update: Uint8Array }) => {
+        const { noteId, update } = updateData;
+        if (!socket.rooms.has(`note-${noteId}`)) return;
+
+        const doc = this.docs.get(noteId);
+        if (doc) {
+          applyUpdate(doc, update);
+          // Broadcast to other clients
+          socket.to(`note-${noteId}`).emit('yjs-update', updateData);
+        }
+      });
+
+      // Handle awareness updates
+      socket.on('awareness-update', (awarenessData: { noteId: string; update: Uint8Array }) => {
+        const { noteId, update } = awarenessData;
+        if (!socket.rooms.has(`note-${noteId}`)) return;
+
+        const awareness = this.awareness.get(noteId);
+        if (awareness) {
+          awareness.applyAwarenessUpdate(update);
+          // Broadcast awareness to room (excluding sender)
+          socket.to(`note-${noteId}`).emit('awareness-update', awarenessData);
         }
       });
 
