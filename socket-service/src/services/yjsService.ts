@@ -1,12 +1,16 @@
 import * as Y from 'yjs';
 import * as syncProtocol from 'y-protocols/sync';
-import * as awarenessProtocol from 'y-protocols/awareness';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import Note from '../models/Note';
 
 // In-memory storage for active YDocs 
 // In a real production app, this might need Redis or a more robust scaling strat
+// For this microservice, we will use this map, but since we are enabling multiple instances,
+// we might run into issues if users are connected to different instances for the SAME note.
+// With Socket.IO Redis Adapter, messages are broadcasted, but Y.js state needs to be consistent.
+// Startups usually stick to Sticky Sessions for WS to ensure same doc instance.
+// For now, we assume sticky sessions or single instance for state + Redis for broadcast.
 const docs: Map<string, Y.Doc> = new Map();
 
 /**

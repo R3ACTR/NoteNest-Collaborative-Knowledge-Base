@@ -850,7 +850,6 @@ article:not([tabindex]):not([onclick]):hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(var(--space-lg), 4vw, var(--space-xl));
   border-radius: var(--space-md);
   margin: var(--space-md) 0;
   border: 1px solid;
