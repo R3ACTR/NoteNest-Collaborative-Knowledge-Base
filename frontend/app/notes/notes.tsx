@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
@@ -72,9 +72,9 @@ export default function NotesPage() {
         stored.length > 0
           ? stored
           : [
-              { id: 1, title: "Project Overview", content: "A high-level overview of the project." },
-              { id: 2, title: "Meeting Notes", content: "Key points from the last team sync." },
-            ]
+            { id: 1, title: "Project Overview", content: "A high-level overview of the project." },
+            { id: 2, title: "Meeting Notes", content: "Key points from the last team sync." },
+          ]
       );
       setLoadError(null);
       setIsLoading(false);
@@ -115,9 +115,9 @@ export default function NotesPage() {
         stored.length > 0
           ? stored
           : [
-              { id: 1, title: "Project Overview", content: "A high-level overview of the project." },
-              { id: 2, title: "Meeting Notes", content: "Key points from the last team sync." },
-            ]
+            { id: 1, title: "Project Overview", content: "A high-level overview of the project." },
+            { id: 2, title: "Meeting Notes", content: "Key points from the last team sync." },
+          ]
       );
       setIsLoading(false);
     }, 600);
@@ -227,242 +227,249 @@ export default function NotesPage() {
             )
           }
         />
-    <main
-      className="flex-1 overflow-auto relative flex justify-center"
-      style={{
-        background: "var(--color-background)",
-        backgroundImage: "linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%)"
-      }}
-    >
-        {/* Background decorative elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div
-            className="absolute top-32 right-20 w-64 h-64 rounded-full blur-3xl opacity-15"
-            style={{ background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)" }}
-          ></div>
-          <div
-            className="absolute bottom-40 left-20 w-80 h-80 rounded-full blur-3xl opacity-12"
-            style={{ background: "radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)" }}
-          ></div>
-        </div>
-
-        <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 relative z-10">
-      <div
-        className="overflow-auto"
-        style={{
-          background: "var(--color-background)",
-        }}
-      >
-        {createSuccessMessage && (
-          <div
-            className="animate-fade-in-up mb-4 rounded-lg border flex items-center gap-3 px-4 py-3"
-            style={{
-              borderColor: "var(--color-success)",
-              background: "rgba(34, 197, 94, 0.08)",
-              color: "var(--color-success)",
-            }}
-            role="status"
-            aria-live="polite"
-          >
-            <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="font-medium">{createSuccessMessage}</span>
+        <main
+          className="flex-1 overflow-auto relative flex justify-center"
+          style={{
+            background: "var(--color-background)",
+            backgroundImage: "linear-gradient(135deg, rgba(59, 130, 246, 0.02) 0%, rgba(139, 92, 246, 0.02) 100%)"
+          }}
+        >
+          {/* Background decorative elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div
+              className="absolute top-32 right-20 w-64 h-64 rounded-full blur-3xl opacity-15"
+              style={{ background: "radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%)" }}
+            ></div>
+            <div
+              className="absolute bottom-40 left-20 w-80 h-80 rounded-full blur-3xl opacity-12"
+              style={{ background: "radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)" }}
+            ></div>
           </div>
-        )}
 
-        {loadError && (
-          <ErrorState
-            title="Couldn't load notes"
-            message={loadError}
-            variant="error"
-            onDismiss={() => setLoadError(null)}
-            action={
-              <button type="button" onClick={retryLoad} className="btn-primary" style={{ fontSize: "var(--font-size-sm)", padding: "var(--space-sm) var(--space-md)" }}>
-                Try again
-              </button>
-            }
-            className="mb-6"
-          />
-        )}
-
-        {actionError && (
-          <ErrorState
-            title="Something went wrong"
-            message={actionError}
-            variant="warning"
-            onDismiss={() => setActionError(null)}
-            action={
-              <button type="button" onClick={() => setActionError(null)} className="btn-secondary" style={{ fontSize: "var(--font-size-sm)", padding: "var(--space-sm) var(--space-md)" }}>
-                Dismiss
-              </button>
-            }
-            className="mb-4"
-          />
-        )}
-
-        {isLoading ? (
-          <div
-            className="animate-fade-in rounded-xl border p-6"
-            style={{
-              background: "var(--color-background)",
-              borderColor: "var(--color-border-light)",
-              boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)",
-            }}
-          >
-            <SkeletonList count={4} variant="list-item" />
-          </div>
-        ) : notes.length === 0 ? (
-          <div className="state-content-enter">
-          <EmptyState
-            size="large"
-            icon={
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)" }}>
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--color-info)" }}>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-            }
-            title="No notes yet"
-            description={
-              isViewer
-                ? "You can view notes only. Ask an Editor or Admin to create notes for you."
-                : "Get started by creating your first note. Organize your thoughts, ideas, and knowledge in one place."
-            }
-            action={
-              canCreateNote ? (
-                <button
-                  type="button"
-                  onClick={handleCreateNote}
-                  className="btn-primary button-glow magnetic-button group"
+          <div className="max-w-3xl mx-auto p-4 sm:p-6 md:p-8 relative z-10">
+            <div
+              className="overflow-auto"
+              style={{
+                background: "var(--color-background)",
+              }}
+            >
+              {createSuccessMessage && (
+                <div
+                  className="animate-fade-in-up mb-4 rounded-lg border flex items-center gap-3 px-4 py-3"
                   style={{
-                    fontSize: "var(--font-size-base)",
-                    padding: "var(--space-sm) var(--space-lg)",
-                    boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+                    borderColor: "var(--color-success)",
+                    background: "rgba(34, 197, 94, 0.08)",
+                    color: "var(--color-success)",
                   }}
+                  role="status"
+                  aria-live="polite"
                 >
-                  <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                    Create Your First Note
-                  </span>
-                </button>
-              ) : (
-                <span
-                  className="text-sm"
-                  style={{ color: "var(--color-text-muted)" }}
-                  title={CREATE_RESTRICTED_TITLE}
-                >
-                  View only — create not allowed
-                </span>
-              )
-            }
-          />
-          </div>
-        ) : (
-          <div className="state-content-enter">
-            {/* Notes header with count */}
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                  Your Notes
-                </h3>
-                <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                  {notes.length} note{notes.length !== 1 ? 's' : ''} total
-                </p>
-              </div>
-            </div>
+                  <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="font-medium">{createSuccessMessage}</span>
+                </div>
+              )}
 
-            <ul className="space-y-3">
-              {notes.map((note, index) => (
-                <li
-                  key={note.id}
-                  className="animate-fade-in-up rounded-xl border flex items-stretch gap-4 group hover-lift overflow-hidden transition-all duration-200 hover:shadow-md"
+              {loadError && (
+                <ErrorState
+                  title="Couldn't load notes"
+                  message={loadError}
+                  variant="error"
+                  onDismiss={() => setLoadError(null)}
+                  action={
+                    <button type="button" onClick={retryLoad} className="btn-primary" style={{ fontSize: "var(--font-size-sm)", padding: "var(--space-sm) var(--space-md)" }}>
+                      Try again
+                    </button>
+                  }
+                  className="mb-6"
+                />
+              )}
+
+              {actionError && (
+                <ErrorState
+                  title="Something went wrong"
+                  message={actionError}
+                  variant="warning"
+                  onDismiss={() => setActionError(null)}
+                  action={
+                    <button type="button" onClick={() => setActionError(null)} className="btn-secondary" style={{ fontSize: "var(--font-size-sm)", padding: "var(--space-sm) var(--space-md)" }}>
+                      Dismiss
+                    </button>
+                  }
+                  className="mb-4"
+                />
+              )}
+
+              {isLoading ? (
+                <div
+                  className="animate-fade-in rounded-xl border p-6"
                   style={{
                     background: "var(--color-background)",
                     borderColor: "var(--color-border-light)",
-                    boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.04)",
-                    animationDelay: `${index * 50}ms`,
-                    animationFillMode: "backwards",
+                    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)",
                   }}
                 >
-                  <div
-                    className="shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
-                    style={{
-                      background: "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)",
-                      color: "var(--color-info)"
-                    }}
-                    aria-hidden
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                  <SkeletonList count={4} variant="list-item" />
+                </div>
+              ) : notes.length === 0 ? (
+                <div className="state-content-enter">
+                  <EmptyState
+                    size="large"
+                    icon={
+                      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)" }}>
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: "var(--color-info)" }}>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                    }
+                    title="No notes yet"
+                    description={
+                      isViewer
+                        ? "You can view notes only. Ask an Editor or Admin to create notes for you."
+                        : "Get started by creating your first note. Organize your thoughts, ideas, and knowledge in one place."
+                    }
+                    action={
+                      canCreateNote ? (
+                        <button
+                          type="button"
+                          onClick={handleCreateNote}
+                          className="btn-primary button-glow magnetic-button group"
+                          style={{
+                            fontSize: "var(--font-size-base)",
+                            padding: "var(--space-sm) var(--space-lg)",
+                            boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
+                          }}
+                        >
+                          <span className="flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Create Your First Note
+                          </span>
+                        </button>
+                      ) : (
+                        <span
+                          className="text-sm"
+                          style={{ color: "var(--color-text-muted)" }}
+                          title={CREATE_RESTRICTED_TITLE}
+                        >
+                          View only — create not allowed
+                        </span>
+                      )
+                    }
+                  />
+                </div>
+              ) : (
+                <div className="state-content-enter">
+                  {/* Notes header with count */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="text-lg font-semibold" style={{ color: "var(--color-text-primary)" }}>
+                        Your Notes
+                      </h3>
+                      <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+                        {notes.length} note{notes.length !== 1 ? 's' : ''} total
+                      </p>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setViewingNote(note)}
-                    className="flex-1 min-w-0 py-4 pr-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 rounded-lg"
-                    style={{ "--tw-ring-color": "var(--color-info)" } as React.CSSProperties}
-                    aria-label={`View note: ${note.title}`}
-                  >
-                    <span className="font-semibold block truncate" style={{ color: "var(--color-text-primary)", fontSize: "var(--font-size-base)" }}>
-                      {note.title}
-                    </span>
-                    {note.content ? (
-                      <span
-                        className="text-sm block truncate mt-1"
-                        style={{ color: "var(--color-text-muted)", lineHeight: "var(--line-height-normal)" }}
-                      >
-                        {note.content.length > 80 ? `${note.content.slice(0, 80)}…` : note.content}
-                      </span>
-                    ) : (
-                      <span className="text-sm block mt-1 italic" style={{ color: "var(--color-text-muted)" }}>
-                        No content
-                      </span>
-                    )}
-                  </button>
-                  {(canDeleteNote && (
-                    <div className="flex items-center gap-1 pr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteNote(note.id);
-                        }}
-                        className="btn-icon rounded-lg hover:bg-red-50"
+
+                  <ul className="space-y-3">
+                    {notes.map((note, index) => (
+                      <li
+                        key={note.id}
+                        className="animate-fade-in-up rounded-xl border flex items-stretch gap-4 group hover-lift overflow-hidden transition-all duration-200 hover:shadow-md"
                         style={{
-                          padding: "var(--space-sm)",
-                          color: "var(--color-error)",
+                          background: "var(--color-background)",
+                          borderColor: "var(--color-border-light)",
+                          boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.04)",
+                          animationDelay: `${index * 50}ms`,
+                          animationFillMode: "backwards",
                         }}
-                        aria-label={`Delete ${note.title}`}
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  )) || (
-                    <div className="pr-3 flex items-center">
-                      <span
-                        className="inline-block w-8 h-8 rounded-lg flex items-center justify-center cursor-not-allowed opacity-50"
-                        style={{ color: "var(--color-text-muted)" }}
-                        title={DELETE_RESTRICTED_TITLE}
-                        aria-hidden
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                      </span>
-                    </div>
-                  )}
-                </li>
-              ))}
-            </ul>
+                        <div
+                          className="shrink-0 flex items-center justify-center w-12 h-12 rounded-xl"
+                          style={{
+                            background: "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)",
+                            color: "var(--color-info)"
+                          }}
+                          aria-hidden
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setViewingNote(note)}
+                          className="flex-1 min-w-0 py-4 pr-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 rounded-lg"
+                          style={{ "--tw-ring-color": "var(--color-info)" } as React.CSSProperties}
+                          aria-label={`View note: ${note.title}`}
+                        >
+                          <span
+                            className="font-semibold block truncate"
+                            style={{
+                              color: "var(--color-text-strong, #111827)",
+                              fontSize: "var(--font-size-base)",
+                            }}
+                          >
+                            {note.title}
+                          </span>
+
+                          {note.content ? (
+                            <span
+                              className="text-sm block truncate mt-1"
+                              style={{ color: "var(--color-text-muted)", lineHeight: "var(--line-height-normal)" }}
+                            >
+                              {note.content.length > 80 ? `${note.content.slice(0, 80)}…` : note.content}
+                            </span>
+                          ) : (
+                            <span className="text-sm block mt-1 italic" style={{ color: "var(--color-text-muted)" }}>
+                              No content
+                            </span>
+                          )}
+                        </button>
+                        {(canDeleteNote && (
+                          <div className="flex items-center gap-1 pr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteNote(note.id);
+                              }}
+                              className="btn-icon rounded-lg hover:bg-red-50"
+                              style={{
+                                padding: "var(--space-sm)",
+                                color: "var(--color-error)",
+                              }}
+                              aria-label={`Delete ${note.title}`}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        )) || (
+                            <div className="pr-3 flex items-center">
+                              <span
+                                className="inline-block w-8 h-8 rounded-lg flex items-center justify-center cursor-not-allowed opacity-50"
+                                style={{ color: "var(--color-text-muted)" }}
+                                title={DELETE_RESTRICTED_TITLE}
+                                aria-hidden
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                              </span>
+                            </div>
+                          )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
-        )}
-        </div>
-      </div>
-      </main>
+        </main>
       </div>
 
       {/* Create Note Modal – only when user can create */}
