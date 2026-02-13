@@ -97,6 +97,23 @@ export default function NotesPage() {
     }
   }, [searchParams, canCreateNote]);
 
+  // Close view modal on Escape
+  useEffect(() => {
+    if (!viewingNote) return;
+    const handleEsc = () => setViewingNote(null);
+    window.addEventListener("shortcut-esc", handleEsc);
+    return () => window.removeEventListener("shortcut-esc", handleEsc);
+  }, [viewingNote]);
+
+  const retryLoad = () => {
+    setLoadError(null);
+    setIsLoading(true);
+    setTimeout(() => {
+      setNotes(loadNotesFromStorage());
+      setIsLoading(false);
+    }, 600);
+  };
+
   const handleCreateNote = useCallback(() => {
     if (!canCreateNote) return;
     setActionError(null);
@@ -109,6 +126,7 @@ export default function NotesPage() {
   const handleSubmitCreate = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
+
       const title = createTitle.trim();
       if (!title) {
         setCreateTitleError("Title is required");
@@ -119,8 +137,6 @@ export default function NotesPage() {
         return;
       }
 
-      setIsSubmittingCreate(true);
-
       const newNote: Note = {
         id: Date.now(),
         title,
@@ -129,21 +145,17 @@ export default function NotesPage() {
       };
 
       setNotes((prev) => [...prev, newNote]);
-      setCreateSuccessMessage("Note created");
       setShowCreateModal(false);
-      setCreateTitle("");
-      setCreateContent("");
-      setIsSubmittingCreate(false);
-      createButtonRef.current?.focus();
+      setCreateSuccessMessage("Note created");
+
       setTimeout(() => setCreateSuccessMessage(null), 2000);
     },
     [createTitle, createContent]
   );
 
   const handleDeleteNote = (id: number) => {
-    setActionError(null);
     if (viewingNote?.id === id) setViewingNote(null);
-    setNotes(notes.filter((note) => note.id !== id));
+    setNotes((prev) => prev.filter((n) => n.id !== id));
   };
 
   return (
@@ -190,7 +202,7 @@ export default function NotesPage() {
               />
             ) : (
               <ul className="space-y-3">
-                {notes.map((note, index) => (
+                {notes.map((note) => (
                   <li
                     key={note.id}
                     className="rounded-xl border flex gap-4 p-4 bg-white shadow-sm hover:shadow-md transition"
@@ -198,11 +210,15 @@ export default function NotesPage() {
                     <button
                       type="button"
                       onClick={() => setViewingNote(note)}
-                      title={note.title} // ✅ TOOLTIP FIX
+                      title={note.title}
                       className="flex-1 min-w-0 text-left"
                       aria-label={`View note: ${note.title}`}
                     >
-                      <h4 className="font-semibold truncate">
+                      {/* ✅ CONTRAST FIX HERE */}
+                      <h4
+                        className="font-semibold truncate"
+                        style={{ color: "var(--color-text-strong, #111827)" }}
+                      >
                         {note.title}
                       </h4>
 
