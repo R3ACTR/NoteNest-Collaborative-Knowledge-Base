@@ -1,291 +1,125 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  FileText, 
-  Users, 
-  Shield, 
-  Search, 
-  Layout, 
-  Server,
-  Smartphone,
-  Sparkles,
-  ChevronRight,
-  MoreHorizontal,
+import {
+  Users,
+  Search,
   Folder,
-  File,
-  Hash
+  FileText,
+  ShieldCheck,
+  Zap,
+  Image as ImageIcon
 } from "lucide-react";
-
-// Mock Components for Visuals
-const MockEditor = () => (
-  <div className="w-full h-full bg-[#FAFAFA] rounded-xl border border-black/5 p-4 flex gap-4 overflow-hidden relative">
-    <div className="w-1/2 space-y-3">
-      <div className="h-4 w-3/4 bg-black/10 rounded-full" />
-      <div className="h-3 w-full bg-black/5 rounded-full" />
-      <div className="h-3 w-5/6 bg-black/5 rounded-full" />
-      <div className="h-3 w-4/5 bg-black/5 rounded-full" />
-    </div>
-    <div className="w-px bg-black/5 h-full" />
-    <div className="w-1/2 space-y-3 opacity-60">
-      <div className="h-4 w-3/4 bg-black/10 rounded-full" />
-      <div className="h-3 w-full bg-black/5 rounded-full" />
-      <div className="h-3 w-5/6 bg-black/5 rounded-full" />
-    </div>
-    {/* Floating Tag */}
-    <motion.div 
-      initial={{ scale: 0 }}
-      whileInView={{ scale: 1 }}
-      transition={{ delay: 0.5, type: "spring" }}
-      className="absolute bottom-4 right-4 bg-[#1A1A1A] text-white text-[10px] px-2 py-1 rounded-md font-mono"
-    >
-      Markdown
-    </motion.div>
-  </div>
-);
-
-const AvatarStack = () => (
-  <div className="flex items-center justify-center h-full">
-    <div className="flex -space-x-4">
-      {[1, 2, 3, 4].map((i) => (
-        <motion.div 
-          key={i}
-          initial={{ x: -20, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
-          transition={{ delay: i * 0.1 }}
-          className="w-12 h-12 rounded-full border-4 border-white bg-gray-200 shadow-md flex items-center justify-center text-xs font-bold text-[#1A1A1A]"
-          style={{ backgroundColor: ['#FFD93D', '#FF6B6B', '#EAE8DD', '#B2EBF2'][i-1] }}
-        >
-          {['JD', 'AS', 'MK', '+'][i-1]}
-        </motion.div>
-      ))}
-    </div>
-  </div>
-);
-
-const BadgeUI = () => (
-  <div className="flex flex-col gap-2 justify-center h-full px-4">
-    {['Admin', 'Editor', 'Viewer'].map((role, i) => (
-      <motion.div 
-        key={role}
-        initial={{ x: -20, opacity: 0 }}
-        whileInView={{ x: 0, opacity: 1 }}
-        transition={{ delay: i * 0.1 }}
-        className="flex items-center justify-between bg-white border border-black/5 p-2 rounded-lg shadow-sm"
-      >
-        <span className="text-sm font-medium">{role}</span>
-        <div className={`w-2 h-2 rounded-full ${i === 0 ? 'bg-red-500' : i === 1 ? 'bg-yellow-500' : 'bg-green-500'}`} />
-      </motion.div>
-    ))}
-  </div>
-);
-
-const SearchBarAnim = () => (
-  <div className="flex items-center justify-center h-full px-6">
-    <div className="w-full bg-white rounded-xl shadow-lg border border-black/5 p-3 flex items-center gap-3">
-      <Search className="w-5 h-5 text-[#1A1A1A]/40" />
-      <div className="h-4 w-1 bg-[#1A1A1A] animate-pulse" />
-      <span className="text-sm text-[#1A1A1A]/40">Search knowledge base...</span>
-    </div>
-  </div>
-);
-
-const FolderTree = () => (
-  <div className="h-full bg-white rounded-xl border border-black/5 p-4 flex flex-col gap-3 relative overflow-hidden">
-    <div className="flex items-center gap-2 text-sm font-bold text-[#1A1A1A]">
-      <Folder className="w-4 h-4 text-[#FFD93D] fill-current" />
-      <span>Engineering</span>
-    </div>
-    <div className="pl-4 flex flex-col gap-2">
-      <div className="flex items-center gap-2 text-xs text-[#1A1A1A]/70">
-        <ChevronRight className="w-3 h-3" />
-        <Folder className="w-3 h-3" />
-        <span>Backend</span>
-      </div>
-      <div className="pl-5 flex flex-col gap-2 border-l border-black/5">
-        <div className="flex items-center gap-2 text-xs text-[#1A1A1A]/60 px-2 py-1 bg-gray-50 rounded">
-          <File className="w-3 h-3" />
-          <span>API Docs</span>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-[#1A1A1A]/60 px-2">
-          <File className="w-3 h-3" />
-          <span>Schema</span>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
-const ServerGraph = () => (
-  <div className="flex items-end justify-center gap-1 h-3/4 px-6 pb-4">
-    {[40, 70, 50, 90, 60, 80].map((h, i) => (
-      <motion.div 
-        key={i}
-        initial={{ height: 0 }}
-        whileInView={{ height: `${h}%` }}
-        transition={{ delay: i * 0.1, type: "spring" }}
-        className="w-full bg-[#1A1A1A] rounded-t-sm opacity-20 hover:opacity-100 transition-opacity"
-      />
-    ))}
-  </div>
-);
-
-const features = [
-  {
-    title: "Rich Note Editor",
-    description: "Structured documentation with Markdown support.",
-    className: "md:col-span-2 md:row-span-2",
-    visual: <MockEditor />,
-    icon: FileText
-  },
-  {
-    title: "Team Workspaces",
-    description: "Collaborative spaces for your team.",
-    className: "md:col-span-1 md:row-span-1",
-    visual: <AvatarStack />,
-    icon: Users
-  },
-  {
-    title: "Role-Based Access",
-    description: "Fine-grained permissions.",
-    className: "md:col-span-1 md:row-span-1",
-    visual: <BadgeUI />,
-    icon: Shield
-  },
-  {
-    title: "Fast Search",
-    description: "Find notes quickly with powerful navigation.",
-    className: "md:col-span-1 md:row-span-1",
-    visual: <SearchBarAnim />,
-    icon: Search
-  },
-  {
-    title: "Organization",
-    description: "Folders and tags to keep notes organized.",
-    className: "md:col-span-1 md:row-span-2",
-    visual: <FolderTree />,
-    icon: Layout
-  },
-  {
-    title: "Scalable Backend",
-    description: "Built for performance and growth.",
-    className: "md:col-span-1 md:row-span-1",
-    visual: <ServerGraph />,
-    icon: Server
-  },
-];
-
-const FeatureCard = ({ feature, index }: { feature: any, index: number }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-50px" }}
-    transition={{ delay: index * 0.05, duration: 0.5 }}
-    whileHover={{ y: -5, boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1)" }}
-    className={`group relative flex flex-col overflow-hidden rounded-[2rem] bg-white border border-black/5 shadow-sm transition-all duration-300 ${feature.className}`}
-  >
-    {/* Content */}
-    <div className="p-6 md:p-8 flex flex-col h-full relative z-10">
-      <div className="flex items-start justify-between mb-4">
-        <div className="w-10 h-10 rounded-full bg-[#F3F0E6] flex items-center justify-center text-[#1A1A1A] mb-2 group-hover:bg-[#1A1A1A] group-hover:text-white transition-colors duration-300">
-          <feature.icon className="w-5 h-5" />
-        </div>
-        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <ArrowUpRightIcon className="w-5 h-5 text-[#1A1A1A]" />
-        </div>
-      </div>
-      
-      <h3 className="text-xl font-serif font-bold text-[#1A1A1A] mb-2">
-        {feature.title}
-      </h3>
-      <p className="text-sm text-[#1A1A1A]/60 font-medium mb-6">
-        {feature.description}
-      </p>
-
-      {/* Visual Container */}
-      <div className="flex-1 w-full relative min-h-[120px] rounded-xl bg-[#F9F9F9] border border-black/5 overflow-hidden group-hover:border-black/10 transition-colors">
-        {feature.visual}
-      </div>
-    </div>
-  </motion.div>
-);
-
-const ArrowUpRightIcon = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
-    className={className}
-  >
-    <path d="M7 7h10v10" />
-    <path d="M7 17 17 7" />
-  </svg>
-);
+import { Section, FeatureCard } from "@/components/ui";
+import { SPACING } from "@/lib/design-tokens";
+import { cn } from "@/lib/utils";
 
 const Features = () => {
   return (
-    <section id="features" className="py-32 bg-[#F3F0E6] relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm text-sm font-bold uppercase tracking-wider mb-6"
-          >
-            Capabilities
-          </motion.div>
-          
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-serif font-black text-[#1A1A1A] mb-6"
-          >
-            Everything you need to <br />
-            <span className="italic relative inline-block">
-              build knowledge.
-              <svg className="absolute w-full h-3 -bottom-1 left-0 text-[#FF6B6B] -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
-                <path d="M0 5 Q 50 15 100 5" stroke="currentColor" strokeWidth="8" fill="none" opacity="0.6" />
-              </svg>
-            </span>
-          </motion.h2>
-        </div>
-
-        {/* Bento Grid layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 auto-rows-[minmax(280px,auto)] gap-6">
-          {features.map((feature, index) => (
-            <FeatureCard key={index} feature={feature} index={index} />
-          ))}
-        </div>
-
-        {/* Roadmap / Coming Soon */}
-        <div className="mt-20 border-t border-black/5 pt-10">
-           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <p className="font-serif font-bold text-lg text-[#1A1A1A]">Coming Soon on Roadmap</p>
-              <div className="flex flex-wrap justify-center gap-3">
-                 {[
-                   { icon: Search, text: "Full-text Search" },
-                   { icon: Sparkles, text: "AI Summaries" },
-                   { icon: Smartphone, text: "Mobile App" }
-                 ].map((item, i) => (
-                   <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/5 shadow-sm text-sm font-medium text-[#1A1A1A]/70">
-                      <item.icon className="w-4 h-4" />
-                      {item.text}
-                   </div>
-                 ))}
-              </div>
-           </div>
-        </div>
-
+    <Section spacing="large" background="bg-white" id="features">
+      {/* Section Header */}
+      <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-24">
+        <motion.span
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="inline-block py-1 px-3 rounded-full bg-brand-beige text-brand-dark text-sm font-bold tracking-wide uppercase mb-4"
+        >
+          Powerful Features
+        </motion.span>
+        <motion.h2
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1 }}
+          className="text-4xl md:text-5xl font-serif font-bold text-gray-900 mb-6"
+        >
+          Everything you need to <br /> build knowledge.
+        </motion.h2>
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="text-lg md:text-xl text-gray-600 leading-relaxed"
+        >
+          NoteNest is built for speed and collaboration. Experience a new way of organizing your team's collective intelligence.
+        </motion.p>
       </div>
-    </section>
+
+      {/* Bento Grid */}
+      <div className={cn(
+        'grid md:grid-cols-3',
+        SPACING.GAP.md
+      )}>
+        {/* Card 1: Real-time Collaboration (Large) */}
+        <FeatureCard
+          title="Real-time Collaboration"
+          description="Create, organize, and collaborate on documentation in real-time. See cursor movements and edits as they happen."
+          icon={<Users className="w-8 h-8 text-blue-600" />}
+          className="md:col-span-2 bg-[#F3F0E6]"
+          illustration={
+            <div className="relative h-48 rounded-xl bg-white border border-gray-100 overflow-hidden shadow-sm p-4">
+              <div className="flex items-center gap-2 mb-3 border-b border-gray-100 pb-2">
+                <div className="flex -space-x-1">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 border border-white" />
+                  <div className="w-6 h-6 rounded-full bg-green-100 border border-white" />
+                </div>
+                <div className="text-xs text-gray-400">3 users editing...</div>
+              </div>
+              <div className="space-y-2">
+                <div className="w-3/4 h-2 bg-gray-100 rounded animate-pulse" />
+                <div className="w-full h-2 bg-gray-100 rounded animate-pulse delay-75" />
+                <div className="w-5/6 h-2 bg-gray-100 rounded animate-pulse delay-150" />
+              </div>
+              <div className="absolute bottom-4 right-4 bg-blue-600 text-white text-xs px-2 py-1 rounded shadow-lg">
+                Typing...
+              </div>
+            </div>
+          }
+        />
+
+        {/* Card 2: Fast Search */}
+        <FeatureCard
+          title="Instant Search"
+          description="Find anything in seconds with our powerful full-text search engine."
+          icon={<Search className="w-8 h-8 text-orange-500" />}
+          background="bg-orange-50/50"
+        />
+
+        {/* Card 3: Organization */}
+        <FeatureCard
+          title="Smart Organization"
+          description="Nested folders, tags, and bi-directional linking for better structure."
+          icon={<Folder className="w-8 h-8 text-yellow-500" />}
+          background="bg-yellow-50/50"
+        />
+
+        {/* Card 4: Rich Text Editor */}
+        <FeatureCard
+          title="Rich Text Editor"
+          description="A distraction-free editor with markdown support and slash commands."
+          icon={<FileText className="w-8 h-8 text-gray-700" />}
+          background="bg-gray-50"
+        />
+
+        {/* Card 5: Security (Large) */}
+        <FeatureCard
+          title="Enterprise Security"
+          description="Your data is secure with end-to-end encryption and granular permissions."
+          icon={<ShieldCheck className="w-8 h-8 text-green-600" />}
+          className="md:col-span-1 bg-green-50/30"
+        />
+
+        {/* Card 6: Lightning Fast */}
+        <FeatureCard
+          title="Lightning Fast"
+          description="Built on modern tech stack for optimal performance."
+          icon={<Zap className="w-8 h-8 text-purple-600" />}
+          background="bg-purple-50/30"
+        />
+      </div>
+    </Section>
   );
 };
 
