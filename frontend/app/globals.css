@@ -391,7 +391,7 @@ select:focus-visible {
   top: -40px;
   left: 0;
   background: var(--color-info);
-  color: white;
+  color: gray-200;
   padding: 8px 16px;
   text-decoration: none;
   z-index: 10000;
@@ -439,7 +439,7 @@ button:active:not(:disabled):not(.loading) {
   font-weight: var(--font-weight-medium);
   padding: clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1rem);
   min-height: 40px;
-  color: var(--color-text-secondary);
+color: var(--color-text-primary);
   background: transparent;
   border: none;
   border-radius: 0.375rem;
@@ -470,7 +470,7 @@ button:active:not(:disabled):not(.loading) {
   padding: clamp(0.625rem, 2vw, 0.75rem) clamp(1.25rem, 4vw, 1.5rem);
   min-height: 40px;
   background: linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%);
-  color: white;
+  color: gray-200;
   border: none;
   border-radius: 0.5rem;
   box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);
@@ -596,7 +596,7 @@ a:active:not([aria-disabled="true"]):not(.loading) {
   font-weight: var(--font-weight-medium);
   padding: clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1rem);
   min-height: 40px;
-  color: var(--color-text-secondary);
+color: var(--color-text-primary);
   background: transparent;
   border-radius: 0.375rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1593,3 +1593,32 @@ a:not([aria-disabled="true"]):not(.loading) {
 .text-underline:hover::after {
   width: 100%;
 }
+/* =====================================================
+   FIX: Workspace top navigation contrast (light theme)
+   ===================================================== */
+
+/* Top workspace navigation links */
+nav a,
+nav button {
+  color: var(--color-text-primary);
+  opacity: 1;
+}
+
+/* Workspace dropdown / title text */
+nav [role="button"],
+nav select {
+  color: var(--color-text-primary);
+}
+
+/* Search input in top navigation */
+nav input {
+  color: var(--color-text-primary);
+  background: var(--color-background);
+}
+
+nav input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 1;
+}
+
+st
