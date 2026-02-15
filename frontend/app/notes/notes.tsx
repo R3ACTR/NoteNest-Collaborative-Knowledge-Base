@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
@@ -16,22 +16,33 @@ interface Note {
   id: number;
   title: string;
   content?: string;
-  updatedAt: string;
 }
 
 function loadNotesFromStorage(): Note[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (n): n is Note =>
+        n != null &&
+        typeof n === "object" &&
+        typeof n.id === "number" &&
+        typeof n.title === "string"
+    );
   } catch {
     return [];
   }
 }
 
 function saveNotesToStorage(notes: Note[]) {
-  if (typeof window !== "undefined") {
+  if (typeof window === "undefined") return;
+  try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+  } catch {
+    // ignore
   }
 }
 
@@ -67,18 +78,8 @@ export default function NotesPage() {
         stored.length > 0
           ? stored
           : [
-              {
-                id: 1,
-                title: "Project Overview",
-                content: "A high-level overview of the project.",
-                updatedAt: "2 hours ago",
-              },
-              {
-                id: 2,
-                title: "Meeting Notes",
-                content: "Key points from the last team sync.",
-                updatedAt: "Yesterday",
-              },
+              { id: 1, title: "Project Overview", content: "A high-level overview of the project." },
+              { id: 2, title: "Meeting Notes", content: "Key points from the last team sync." },
             ]
       );
       setIsLoading(false);
@@ -146,12 +147,11 @@ export default function NotesPage() {
         id: Date.now(),
         title,
         content: createContent.trim() || undefined,
-        updatedAt: "Just now",
       };
 
       setNotes((prev) => [...prev, newNote]);
-      setShowCreateModal(false);
       setCreateSuccessMessage("Note created successfully.");
+      setShowCreateModal(false);
       setTimeout(() => setCreateSuccessMessage(null), 2000);
     },
     [createTitle, createContent]
@@ -185,7 +185,6 @@ export default function NotesPage() {
           }
         />
 
-        {/* ✅ aria-busy added here */}
         <main
           className="flex-1 overflow-auto flex justify-center"
           aria-busy={isLoading}
@@ -244,14 +243,9 @@ export default function NotesPage() {
                       className="flex-1 text-left"
                       aria-label={`View note: ${note.title}`}
                     >
-                      <h4 className="font-semibold truncate">
-                        {note.title}
-                      </h4>
+                      <h4 className="font-semibold truncate">{note.title}</h4>
                       <p className="text-sm truncate mt-1">
                         {note.content || "No content"}
-                      </p>
-                      <p className="text-xs mt-1 text-gray-500">
-                        Updated {note.updatedAt}
                       </p>
                     </button>
 
