@@ -59,7 +59,7 @@ export default function NotesPage() {
   const [viewingNote, setViewingNote] = useState<Note | null>(null);
   const createButtonRef = useRef<HTMLButtonElement>(null);
 
-  /* ---------- Initial load ---------- */
+  /* ---------- Initial Load ---------- */
   useEffect(() => {
     const stored = loadNotesFromStorage();
     const timer = setTimeout(() => {
@@ -108,6 +108,14 @@ export default function NotesPage() {
       window.history.replaceState({}, "", window.location.pathname);
     }
   }, [searchParams, canCreateNote]);
+
+  /* ---------- Keyboard ---------- */
+  useEffect(() => {
+    if (!viewingNote) return;
+    const esc = () => setViewingNote(null);
+    window.addEventListener("shortcut-esc", esc);
+    return () => window.removeEventListener("shortcut-esc", esc);
+  }, [viewingNote]);
 
   /* ---------- Create Note ---------- */
   const handleCreateNote = useCallback(() => {
@@ -177,7 +185,11 @@ export default function NotesPage() {
           }
         />
 
-        <main className="flex-1 overflow-auto flex justify-center">
+        {/* ✅ aria-busy added here */}
+        <main
+          className="flex-1 overflow-auto flex justify-center"
+          aria-busy={isLoading}
+        >
           <div className="max-w-3xl w-full p-6">
             {createSuccessMessage && (
               <div className="mb-4 text-green-600 font-medium">
@@ -230,8 +242,11 @@ export default function NotesPage() {
                       type="button"
                       onClick={() => setViewingNote(note)}
                       className="flex-1 text-left"
+                      aria-label={`View note: ${note.title}`}
                     >
-                      <h4 className="font-semibold truncate">{note.title}</h4>
+                      <h4 className="font-semibold truncate">
+                        {note.title}
+                      </h4>
                       <p className="text-sm truncate mt-1">
                         {note.content || "No content"}
                       </p>
@@ -248,6 +263,7 @@ export default function NotesPage() {
                           handleDeleteNote(note.id);
                         }}
                         title="Delete note"
+                        aria-label={`Delete ${note.title}`}
                       >
                         🗑
                       </button>
