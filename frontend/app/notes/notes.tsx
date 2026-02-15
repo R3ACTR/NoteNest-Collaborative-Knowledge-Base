@@ -185,7 +185,7 @@ export default function NotesPage() {
         content: createContent.trim() || undefined,
       };
       setNotes((prev) => [...prev, newNote]);
-      setCreateSuccessMessage("Note created");
+setCreateSuccessMessage("Note created successfully.");
       setShowCreateModal(false);
       setCreateTitle("");
       setCreateContent("");
@@ -284,7 +284,7 @@ export default function NotesPage() {
 
               {loadError && (
                 <ErrorState
-                  title="Couldn't load notes"
+title="Unable to load notes. Please try again."
                   message={loadError}
                   variant="error"
                   onDismiss={() => setLoadError(null)}
