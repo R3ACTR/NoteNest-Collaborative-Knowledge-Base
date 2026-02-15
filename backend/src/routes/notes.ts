@@ -388,7 +388,7 @@ router.get('/:id/diff', authenticateToken, requirePermission('read'), async (req
         to: toContent.title,
         changed: fromContent.title !== toContent.title,
         patches: dmp.patch_make(fromContent.title, toContent.title),
-        diff: titleDiff.map(([op, text]) => ({
+        diff: titleDiff.map(([op, text]: [number, string]) => ({
           operation: op === -1 ? 'delete' : op === 1 ? 'insert' : 'equal',
           text
         }))
@@ -398,7 +398,7 @@ router.get('/:id/diff', authenticateToken, requirePermission('read'), async (req
         to: toContent.content,
         changed: fromContent.content !== toContent.content,
         patches: dmp.patch_make(fromContent.content, toContent.content),
-        diff: contentDiff.map(([op, text]) => ({
+        diff: contentDiff.map(([op, text]: [number, string]) => ({
           operation: op === -1 ? 'delete' : op === 1 ? 'insert' : 'equal',
           text
         }))

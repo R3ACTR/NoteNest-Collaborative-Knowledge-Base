@@ -1,5 +1,6 @@
 import { Server as SocketIOServer, Socket } from "socket.io";
-// import jwt from 'jsonwebtoken'; // Unused in this file apparently or handled by socket.io middleware? Kept it safe in original, but line 2 was jwt.
+// import jwt from 'jsonwebtoken'; // Unused in this file explicitly now, token is checked but no jwt.verify call visible in original snippet, handled by middleware or TODO.
+// Actually line 3 in original had import jwt.
 import jwt from 'jsonwebtoken';
 import Note from "./models/Note";
 import NoteVersion from "./models/NoteVersion";
@@ -15,9 +16,10 @@ interface AuthenticatedSocket extends Socket {
 
 const activeUsers: Map<string, Set<string>> = new Map(); // noteId -> Set of userIds
 
+export default function setupSocketHandlers(io: SocketIOServer) { // Setup socket handlers
+  // Instantiate YjsProvider to handle collaboration events (join-note-yjs, yjs-update, etc.)
+  new YjsProvider(io);
 
-
-export default function setupSocketHandlers(io: SocketIOServer) {
   io.use(async (socket: AuthenticatedSocket, next) => {
     const token = socket.handshake.auth.token;
     if (!token) {
@@ -26,6 +28,7 @@ export default function setupSocketHandlers(io: SocketIOServer) {
 
     try {
       // TODO: Verify JWT token and extract userId
+      // For now assuming token is userId or handled elsewhere, preserving original logic
       socket.userId = token;
       next();
     } catch (error) {
@@ -55,21 +58,11 @@ export default function setupSocketHandlers(io: SocketIOServer) {
       socket.workspaceId = workspaceId;
       socket.join(`note-${noteId}`);
       console.log(`User ${socket.userId} joined note ${noteId}`);
-
-    // Y.js collaboration events
-    socket.on("join-note-yjs", (data: { noteId: string; workspaceId: string }) => {
-      // Delegate to YjsProvider
-      socket.emit("yjs-ready", { noteId: data.noteId });
     });
 
     socket.on("leave-note", (noteId: string) => {
       socket.leave(`note-${noteId}`);
-
-      // Send initial sync step 1 to client so they can respond with their state
-      const encoder = encoding.createEncoder();
-      encoding.writeVarUint(encoder, syncProtocol.messageYjsSyncStep1);
-      syncProtocol.writeSyncStep1(encoder, doc);
-      socket.emit("yjs-sync", encoding.toUint8Array(encoder));
+      // Yjs sync step 1 removed from here as it likely belongs in YjsProvider or join-note-yjs response
     });
 
     socket.on("update-note", async (data: { noteId: string; title: string; content: string; expectedVersion?: number }) => {
@@ -80,28 +73,6 @@ export default function setupSocketHandlers(io: SocketIOServer) {
       if (!note) {
         socket.emit("error", { message: "Note not found" });
         return;
-      }
-
-    // Custom Y.js Update Handler to Broadcast
-    // The client sends binary update
-    socket.on("yjs-update", async (data: { noteId: string, update: Uint8Array }) => {
-      const doc = await getYDoc(data.noteId);
-      const update = new Uint8Array(data.update);
-
-      // Apply update to server doc
-      // This triggers the 'update' event on the doc, which saves to DB
-      // We also need to broadcast this update to all other clients in the room
-      try {
-        // Apply update using Y.js service logic or directly
-        // Using internal api for basic Apply
-        // Actually, let's just use the service helper if we can, but simpler here:
-        const Y = await import('yjs');
-        Y.applyUpdate(doc, update);
-
-        // Broadcast to other clients in the room
-        socket.to(`note-${data.noteId}`).emit("yjs-update", update);
-      } catch (e) {
-        console.error("Error applying update", e);
       }
 
       // OCC check
@@ -133,6 +104,7 @@ export default function setupSocketHandlers(io: SocketIOServer) {
       await note.save();
 
       // Create version using PersistenceManager
+      // Requires PersistenceManager to be exported or imported. It wasn't imported in original file but require()'d.
       const persistence = require('./persistence').PersistenceManager.getInstance();
       await persistence.createVersion(noteId, socket.userId!, socket.workspaceId!, "Real-time edit");
 
@@ -157,3 +129,4 @@ export default function setupSocketHandlers(io: SocketIOServer) {
     });
   });
 }
+

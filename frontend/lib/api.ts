@@ -187,7 +187,7 @@ class ApiService {
 
 import { io } from "socket.io-client";
 
-export const socket = io(process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001", {
+export const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5002", {
   autoConnect: false,
   auth: (cb) => {
     // We'll insert the token here when connecting

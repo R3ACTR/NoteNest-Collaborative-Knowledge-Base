@@ -57,7 +57,8 @@ export default function Header({
               data-shortcut="search"
               placeholder="Search notes…"
               aria-label="Search notes"
-              className="w-full rounded-lg border px-3 py-2 text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+className="w-full rounded-lg border px-3 py-2 text-sm transition-colors placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+
               style={{
                 borderColor: "var(--color-border-light)",
                 color: "var(--color-text-primary)",
@@ -69,14 +70,16 @@ export default function Header({
         )}
         <nav className="shrink-0 ml-auto flex items-center gap-3" aria-label="User actions">
           {isAuthenticated && (
-            <Button
-              onClick={logout}
-              variant="secondary"
-              size="sm"
-              aria-label="Logout from your account"
-            >
-              Logout
-            </Button>
+          <Button
+  onClick={logout}
+  variant="secondary"
+  size="sm"
+  aria-label="Logout from your account"
+  title="Sign out of your account"
+>
+  Logout
+</Button>
+
           )}
           {action}
         </nav>
