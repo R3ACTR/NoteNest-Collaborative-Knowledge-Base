@@ -20,8 +20,22 @@ export interface Note {
   title: string;
   content: string;
   workspaceId: string;
+  folderId?: string;
   author: string;
   tags?: string[];
+  isPinned?: boolean;
+  isFavorite?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Folder {
+  _id: string;
+  name: string;
+  workspaceId: string;
+  parentId?: string;
+  path: string;
+  createdBy: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -74,12 +88,17 @@ export interface CreateNoteRequest {
   title: string;
   content: string;
   workspaceId: string;
+  folderId?: string;
+  tags?: string[];
   authorId: string;
 }
 
 export interface UpdateNoteRequest {
   title: string;
   content: string;
+  folderId?: string;
+  tags?: string[];
+  isPinned?: boolean;
   authorId: string;
 }
 

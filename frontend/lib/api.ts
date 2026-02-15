@@ -4,6 +4,7 @@ import {
   Note,
   NoteVersion,
   User,
+  Folder,
   CreateWorkspaceRequest,
   AddMemberRequest,
   UpdateMemberRoleRequest,
@@ -29,6 +30,9 @@ import {
   ErrorResponse,
 } from '../../shared/types';
 // import { io } from "socket.io-client"; // Added at bottom
+
+// Re-export types for convenience
+export type { AuditLog, Workspace, Note, NoteVersion, User, Folder };
 
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -181,6 +185,44 @@ class ApiService {
     if (fromVersion !== undefined) params.append('fromVersion', fromVersion.toString());
     if (toVersion !== undefined) params.append('toVersion', toVersion.toString());
     return this.request(`/api/notes/${noteId}/diff?${params.toString()}`);
+  }
+
+  // Folders
+  async getFolders(workspaceId: string): Promise<any[]> {
+    return this.request(`/api/folders/workspace/${workspaceId}`);
+  }
+
+  async createFolder(data: { name: string; workspaceId: string; parentId?: string; createdBy: string }): Promise<any> {
+    return this.request('/api/folders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateFolder(id: string, data: { name?: string; parentId?: string }): Promise<any> {
+    return this.request(`/api/folders/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteFolder(id: string): Promise<void> {
+    return this.request(`/api/folders/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Tags
+  async getWorkspaceTags(workspaceId: string): Promise<string[]> {
+    return this.request(`/api/notes/workspace/${workspaceId}/tags`);
+  }
+
+  // Pin note
+  async toggleNotePin(noteId: string, isPinned: boolean): Promise<Note> {
+    return this.request(`/api/notes/${noteId}/pin`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isPinned }),
+    });
   }
 }
 

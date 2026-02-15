@@ -16,21 +16,35 @@ const router = express.Router();
 router.get('/workspace/:workspaceId', authenticateToken, validateAccessLink, requirePermission('read'), async (req: AuthRequest, res: Response) => {
   try {
     const { workspaceId } = req.params;
+    const { folderId, tag, pinned } = req.query;
     const cacheService = getCacheService();
-    const cacheKey = CacheKeys.workspaceNotes(workspaceId);
+    
+    // Build query based on filters
+    const query: any = { workspaceId };
+    if (folderId) {
+      query.folderId = folderId;
+    }
+    if (tag) {
+      query.tags = tag as string;
+    }
+    if (pinned === 'true') {
+      query.isPinned = true;
+    }
+
+    const cacheKey = folderId ? `${CacheKeys.workspaceNotes(workspaceId)}-${folderId}` : CacheKeys.workspaceNotes(workspaceId);
 
     // Try to get from cache first
-    if (cacheService) {
+    if (cacheService && !folderId && !tag && pinned !== 'true') {
       const cachedNotes = await cacheService.get(cacheKey);
       if (cachedNotes) {
         return res.json(cachedNotes);
       }
     }
 
-    const notes = await Note.find({ workspaceId });
+    const notes = await Note.find(query).sort({ isPinned: -1, updatedAt: -1 });
 
-    // Cache the result
-    if (cacheService) {
+    // Cache the result (only for unfiltered requests)
+    if (cacheService && !folderId && !tag && pinned !== 'true') {
       await cacheService.set(cacheKey, notes);
     }
 
@@ -58,11 +72,13 @@ router.get('/:id', async (req: Request, res: Response) => {
 // Create a new note
 router.post('/', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
   try {
-    const { title, content, workspaceId, authorId } = req.body;
+    const { title, content, workspaceId, authorId, folderId, tags } = req.body;
     const note = new Note({
       title,
       content,
       workspaceId,
+      folderId: folderId || null,
+      tags: tags || [],
       author: authorId,
       version: 1,
     });
@@ -114,13 +130,25 @@ router.post('/', authenticateToken, requirePermission('write'), async (req: Auth
 router.put('/:id', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { title, content, authorId, expectedVersion } = req.body;
+    const { title, content, authorId, expectedVersion, folderId, tags, isPinned } = req.body;
 
     // Fetch the current note
     const note = await Note.findById(id) as any;
     if (!note) {
       return res.status(404).json({ error: 'Note not found' });
     }
+
+    // Build update object with optional fields
+    const updateData: any = {
+      version: note.version + 1,
+      updatedAt: new Date()
+    };
+    
+    if (title !== undefined) updateData.title = title;
+    if (content !== undefined) updateData.content = content;
+    if (folderId !== undefined) updateData.folderId = folderId;
+    if (tags !== undefined) updateData.tags = tags;
+    if (isPinned !== undefined) updateData.isPinned = isPinned;
 
     // Check version for OCC
     if (expectedVersion !== undefined && note.version !== expectedVersion) {
@@ -142,12 +170,7 @@ router.put('/:id', authenticateToken, requirePermission('write'), async (req: Au
     // Update the note with incremented version
     const updatedNote = await Note.findByIdAndUpdate(
       id,
-      {
-        title,
-        content,
-        version: note.version + 1,
-        updatedAt: new Date()
-      },
+      updateData,
       { new: true }
     ) as any;
 
@@ -460,6 +483,45 @@ router.post('/:id/merge', async (req: Request, res: Response) => {
     res.json({ note: updatedNote });
   } catch (error) {
     res.status(500).json({ error: 'Failed to merge note' });
+  }
+});
+
+// Get all unique tags for a workspace
+router.get('/workspace/:workspaceId/tags', authenticateToken, requirePermission('read'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { workspaceId } = req.params;
+    
+    // Get all unique tags from notes in the workspace
+    const notes = await Note.distinct('tags', { workspaceId });
+    
+    // Filter out null/undefined and flatten
+    const tags = notes.filter(tag => tag !== null && tag !== undefined);
+    
+    res.json(tags);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch tags' });
+  }
+});
+
+// Toggle pin status for a note
+router.patch('/:id/pin', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { isPinned } = req.body;
+    
+    const note = await Note.findByIdAndUpdate(
+      id,
+      { isPinned: isPinned, updatedAt: new Date() },
+      { new: true }
+    );
+    
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found' });
+    }
+    
+    res.json(note);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to toggle pin status' });
   }
 });
 

@@ -20,7 +20,7 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Features", href: "#features" },
-    { name: "Community", href: "https://github.com/shubhamjh15/NoteNest-Collaborative-Knowledge-Base" },
+    { name: "Community", href: "https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base" },
     { name: "Docs", href: "#docs" },
   ];
 

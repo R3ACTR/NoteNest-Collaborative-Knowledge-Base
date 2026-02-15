@@ -6,6 +6,7 @@ import { createServer } from "http";
 import jwt from 'jsonwebtoken';
 import workspaceRoutes from './routes/workspaces';
 import noteRoutes from './routes/notes';
+import folderRoutes from './routes/folders';
 import userRoutes from './routes/users';
 import groupRoutes from './routes/groups';
 import permissionRoutes from './routes/permissions';
@@ -54,6 +55,7 @@ registerEventListeners();
 app.use('/api/users', userRoutes);
 app.use('/api/workspaces', authenticateToken, workspaceRoutes);
 app.use('/api/notes', authenticateToken, noteRoutes);
+app.use('/api/folders', authenticateToken, folderRoutes);
 app.use('/api/groups', authenticateToken, groupRoutes);
 app.use('/api/permissions', authenticateToken, permissionRoutes);
 
