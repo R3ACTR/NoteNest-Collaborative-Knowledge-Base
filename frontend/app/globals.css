@@ -215,6 +215,25 @@
   animation-delay: 1s;
 }
 
+/* Logo ticker infinite scroll animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 40s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
@@ -233,22 +252,11 @@ html {
     min-width: 44px;
   }
 
-  /* Better spacing on mobile */
-  section {
-    padding-left: clamp(1rem, 4vw, 2rem) !important;
-    padding-right: clamp(1rem, 4vw, 2rem) !important;
-  }
+  /* Section padding handled by Container (px-6 sm:px-8 lg:px-12) */
+  /* Removed !important section padding override that was stacking */
 }
 
-/* Tablet optimizations */
-@media (min-width: 641px) and (max-width: 1024px) {
-
-  /* Optimize for tablet viewport */
-  .max-w-7xl {
-    padding-left: clamp(1.5rem, 3vw, 2rem);
-    padding-right: clamp(1.5rem, 3vw, 2rem);
-  }
-}
+/* Tablet: Container handles padding — no extra overrides needed */
 
 /* Large screen optimizations */
 @media (min-width: 1280px) {

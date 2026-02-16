@@ -12,33 +12,22 @@ import { Container } from './Container';
 
 interface SectionProps {
     children: ReactNode;
-    /**
-     * Vertical spacing size
-     * Default: 'medium'
-     */
+    /** Vertical spacing size (default: 'medium') */
     spacing?: keyof typeof LAYOUT.SECTION_SPACING;
-    /**
-     * Background color className
-     * Default: transparent
-     */
+    /** Background color className (default: transparent) */
     background?: string;
-    /**
-     * Additional CSS classes for the section wrapper
-     */
+    /** Additional CSS classes for the section wrapper */
     className?: string;
-    /**
-     * Override container max-width
-     */
+    /** Override container max-width */
     containerWidth?: string;
-    /**
-     * Pass className directly to Container (for internal layout)
-     */
+    /** Pass className directly to Container */
     containerClassName?: string;
-    /**
-     * Use full width without Container wrapper
-     * Useful for full-bleed backgrounds with nested Container
-     */
+    /** Use full width without Container wrapper */
     fullWidth?: boolean;
+    /** HTML id attribute for anchor links (e.g. id="features" enables #features) */
+    id?: string;
+    /** Inline styles for the section element */
+    style?: React.CSSProperties;
 }
 
 /**
@@ -65,6 +54,8 @@ export function Section({
     containerWidth,
     containerClassName,
     fullWidth = false,
+    id,
+    style,
 }: SectionProps) {
     const content = fullWidth ? (
         children
@@ -76,14 +67,11 @@ export function Section({
 
     return (
         <section
+            id={id}
+            style={style}
             className={cn(
-                // Apply vertical spacing from design tokens
                 LAYOUT.SECTION_SPACING[spacing],
-
-                // Apply background if provided
                 background,
-
-                // Additional classes
                 className
             )}
         >

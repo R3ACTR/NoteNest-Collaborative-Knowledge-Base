@@ -19,11 +19,12 @@ export const LAYOUT = {
     CONTAINER_PADDING: 'px-6 sm:px-8 lg:px-12',
 
     // Section vertical spacing scale
-    // Creates consistent rhythm between major page sections
+    // Reduced to prevent excessive stacking between adjacent sections
+    // Adjacent sections share edges: pb + pt = total gap
     SECTION_SPACING: {
-        small: 'py-16 md:py-20',      // Tight sections (CTAs, small content)
-        medium: 'py-20 md:py-24',     // Standard sections (features, content)
-        large: 'py-24 md:py-32',      // Hero, major sections
+        small: 'py-12 md:py-16',      // 48-64px each → 96-128px gaps
+        medium: 'py-16 md:py-20',     // 64-80px each → 128-160px gaps
+        large: 'py-20 md:py-24',      // 80-96px each → 160-192px gaps
     },
 } as const;
 
