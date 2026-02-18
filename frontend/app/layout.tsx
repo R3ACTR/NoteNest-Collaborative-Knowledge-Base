@@ -21,8 +21,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "NoteNest - Collaborative Knowledge Base for Teams",
-  description:
-    "NoteNest is an open-source, team-based knowledge base that allows users to create, organize, and collaborate on notes and documentation in real time.",
+  description: "NoteNest is an open-source, team-based knowledge base that allows users to create, organize, and collaborate on notes and documentation in real time.",
 };
 
 export default function RootLayout({
@@ -43,15 +42,15 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <AuthProvider>
-            <WorkspaceProvider>
-              <UserRoleProvider>
-                <FeatureFlagProvider>
-                  <KeyboardShortcuts />
-                  <CommandPalette />
-                  {children}
-                </FeatureFlagProvider>
-              </UserRoleProvider>
-            </WorkspaceProvider>
+          <WorkspaceProvider>
+            <UserRoleProvider>
+              <FeatureFlagProvider>
+                <KeyboardShortcuts />
+                <CommandPalette />
+                {children}
+              </FeatureFlagProvider>
+            </UserRoleProvider>
+          </WorkspaceProvider>
           </AuthProvider>
         </ErrorBoundary>
       </body>
