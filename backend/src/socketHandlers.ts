@@ -68,12 +68,38 @@ export default function setupSocketHandlers(io: SocketIOServer) { // Setup socke
 
       socket.workspaceId = workspaceId;
       socket.join(`note-${noteId}`);
+
+      // Track active user
+      if (!activeUsers.has(noteId)) {
+        activeUsers.set(noteId, new Set());
+      }
+      activeUsers.get(noteId)!.add(socket.userId!);
+
+      // Broadcast active users
+      io.to(`note-${noteId}`).emit("active-users", {
+        noteId,
+        users: Array.from(activeUsers.get(noteId)!)
+      });
+
       console.log(`User ${socket.userId} joined note ${noteId}`);
     });
 
     socket.on("leave-note", (noteId: string) => {
       socket.leave(`note-${noteId}`);
-      // Yjs sync step 1 removed from here as it likely belongs in YjsProvider or join-note-yjs response
+
+      // Remove user from active tracking
+      if (activeUsers.has(noteId)) {
+        activeUsers.get(noteId)!.delete(socket.userId!);
+        if (activeUsers.get(noteId)!.size === 0) {
+          activeUsers.delete(noteId);
+        } else {
+          // Broadcast update
+          io.to(`note-${noteId}`).emit("active-users", {
+            noteId,
+            users: Array.from(activeUsers.get(noteId)!)
+          });
+        }
+      }
     });
 
     socket.on("update-note", async (data: { noteId: string; title: string; content: string; expectedVersion?: number }) => {
@@ -137,6 +163,24 @@ export default function setupSocketHandlers(io: SocketIOServer) { // Setup socke
 
     socket.on("disconnect", () => {
       console.log(`User ${socket.userId} disconnected`);
+
+      // Remove user from all active notes they might be in
+      if (socket.userId) {
+        activeUsers.forEach((users, noteId) => {
+          if (users.has(socket.userId!)) {
+            users.delete(socket.userId!);
+
+            if (users.size === 0) {
+              activeUsers.delete(noteId);
+            } else {
+              io.to(`note-${noteId}`).emit("active-users", {
+                noteId,
+                users: Array.from(users)
+              });
+            }
+          }
+        });
+      }
     });
   });
 }
