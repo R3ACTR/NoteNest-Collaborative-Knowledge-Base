@@ -77,6 +77,34 @@ export default function DashboardPage() {
           <main style={{ background: "#000", minHeight: "100vh", padding: 32 }}>
             <div style={{ maxWidth: 900, margin: "0 auto" }}>
 
+              {/* ✅ Welcome Section */}
+              <section
+                className={sectionCardClass}
+                style={{ ...cardStyle, padding: "24px" }}
+              >
+                <h2
+                  className="text-xl font-semibold mb-2"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  Welcome back!
+                </h2>
+
+                <p
+                  className="text-sm mb-3"
+                  style={{ color: "var(--color-text-secondary)" }}
+                >
+                  This is your NoteNest dashboard. Get started by creating your first note
+                  and organizing your team's knowledge.
+                </p>
+
+                <p
+                  className="text-xs"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
+                  Last updated: {lastUpdated}
+                </p>
+              </section>
+
               {/* Quick Actions */}
               <section style={{ ...cardStyle, borderRadius: 16 }}>
                 <div style={{ padding: 20, borderBottom: "1px solid #222" }}>

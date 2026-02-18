@@ -37,7 +37,7 @@ function saveNotesToStorage(notes: Note[]) {
 
 export default function NotesPage() {
   const searchParams = useSearchParams();
-  const { canCreateNote, canDeleteNote, isViewer } = usePermissions();
+  const { canCreateNote, isViewer } = usePermissions();
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -100,6 +100,7 @@ export default function NotesPage() {
         setCreateTitleError("Title is required");
         return;
       }
+
       if (title.length > TITLE_MAX_LENGTH) {
         setCreateTitleError(
           `Title must be ${TITLE_MAX_LENGTH} characters or less`
@@ -146,12 +147,11 @@ export default function NotesPage() {
         <main className="flex-1 overflow-auto" aria-busy={isLoading}>
           <div className="max-w-3xl mx-auto p-6">
             {createSuccessMessage && (
-             <div
-  role="status"
-  aria-live="polite"
-  className="mb-4 text-green-600 font-medium"
->
-
+              <div
+                role="status"
+                aria-live="polite"
+                className="mb-4 text-green-600 font-medium"
+              >
                 {createSuccessMessage}
               </div>
             )}
@@ -237,15 +237,13 @@ export default function NotesPage() {
               />
 
               <div className="flex justify-end gap-3">
-                {/* ✅ REQUIRED FIX */}
                 <button
-  type="button"
-  onClick={() => setShowCreateModal(false)}
-  className="btn-secondary"
->
-  Cancel
-</button>
-
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
 
                 <button type="submit" className="btn-primary">
                   Create note
