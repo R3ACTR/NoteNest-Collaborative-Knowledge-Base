@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { apiService, NoteVersion, Note } from "@/lib/api";
+import { apiService } from "@/lib/api";
+import { NoteVersion, Note, NoteDiff } from "../../shared/types";
 import { usePermissions } from "@/hooks/usePermissions";
 
 interface VersionHistoryModalProps {
@@ -21,8 +22,13 @@ export default function VersionHistoryModal({
   const [versions, setVersions] = useState<NoteVersion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedVersion, setSelectedVersion] = useState<NoteVersion | null>(null);
+  const [selectedFromVersion, setSelectedFromVersion] = useState<NoteVersion | null>(null);
   const [isRestoring, setIsRestoring] = useState(false);
+  const [isForking, setIsForking] = useState(false);
+  const [isMerging, setIsMerging] = useState(false);
+  const [diff, setDiff] = useState<NoteDiff | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [currentSliderValue, setCurrentSliderValue] = useState(0);
 
   useEffect(() => {
     const loadVersions = async () => {
@@ -30,6 +36,7 @@ export default function VersionHistoryModal({
         const fetchedVersions = await apiService.getNoteVersions(noteId);
         setVersions(fetchedVersions);
         setSelectedVersion(fetchedVersions[0] || null); // Select latest version
+        setCurrentSliderValue(fetchedVersions.length - 1); // Set slider to latest version
       } catch (err) {
         setError("Failed to load version history");
       } finally {
@@ -38,6 +45,33 @@ export default function VersionHistoryModal({
     };
     loadVersions();
   }, [noteId]);
+
+  useEffect(() => {
+    if (versions.length > 0) {
+      const version = versions[currentSliderValue];
+      setSelectedVersion(version);
+    }
+  }, [currentSliderValue, versions]);
+
+  useEffect(() => {
+    const loadDiff = async () => {
+      if (selectedFromVersion && selectedVersion) {
+        try {
+          const diffData = await apiService.getNoteDiff(
+            noteId,
+            selectedFromVersion.versionNumber,
+            selectedVersion.versionNumber
+          );
+          setDiff(diffData);
+        } catch (err) {
+          setError("Failed to load diff");
+        }
+      } else {
+        setDiff(null);
+      }
+    };
+    loadDiff();
+  }, [selectedFromVersion, selectedVersion, noteId]);
 
   const handleRestore = async () => {
     if (!selectedVersion || !canEditNote) return;
@@ -153,6 +187,27 @@ export default function VersionHistoryModal({
 
         {/* Version Preview */}
         <div className="flex-1 flex flex-col">
+          {/* Time Travel Slider */}
+          {versions.length > 1 && (
+            <div className="p-4 border-b" style={{ borderColor: "var(--color-border-light)" }}>
+              <label className="block text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
+                Time Travel: Version {selectedVersion?.versionNumber || 1}
+              </label>
+              <input
+                type="range"
+                min="0"
+                max={versions.length - 1}
+                value={currentSliderValue}
+                onChange={(e) => setCurrentSliderValue(parseInt(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div className="flex justify-between text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+                <span>Version 1</span>
+                <span>Latest</span>
+              </div>
+            </div>
+          )}
+
           <div className="p-4 border-b flex items-center justify-between" style={{ borderColor: "var(--color-border-light)" }}>
             <div>
               <h3 className="text-lg font-medium" style={{ color: "var(--color-text-primary)" }}>
@@ -190,6 +245,55 @@ export default function VersionHistoryModal({
           <div className="flex-1 overflow-y-auto p-4">
             {selectedVersion ? (
               <div className="space-y-4">
+                {/* Diff Visualization */}
+                {diff && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
+                      Changes from Version {selectedFromVersion?.versionNumber}
+                    </h4>
+                    <div className="space-y-2">
+                      {diff.title.changed && (
+                        <div>
+                          <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>Title:</p>
+                          <div className="text-xs p-2 rounded border" style={{ background: "var(--color-background)", borderColor: "var(--color-border-light)" }}>
+                            {diff.title.diff.map((part: { operation: string; text: string }, index: number) => (
+                              <span
+                                key={index}
+                                style={{
+                                  backgroundColor: part.operation === 'delete' ? '#fee2e2' : part.operation === 'insert' ? '#d1fae5' : 'transparent',
+                                  textDecoration: part.operation === 'delete' ? 'line-through' : 'none',
+                                  color: part.operation === 'delete' ? '#dc2626' : part.operation === 'insert' ? '#16a34a' : 'inherit'
+                                }}
+                              >
+                                {part.text}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {diff.content.changed && (
+                        <div>
+                          <p className="text-xs font-medium" style={{ color: "var(--color-text-primary)" }}>Content:</p>
+                          <div className="text-xs p-2 rounded border whitespace-pre-wrap" style={{ background: "var(--color-background)", borderColor: "var(--color-border-light)" }}>
+                            {diff.content.diff.map((part: { operation: string; text: string }, index: number) => (
+                              <span
+                                key={index}
+                                style={{
+                                  backgroundColor: part.operation === 'delete' ? '#fee2e2' : part.operation === 'insert' ? '#d1fae5' : 'transparent',
+                                  textDecoration: part.operation === 'delete' ? 'line-through' : 'none',
+                                  color: part.operation === 'delete' ? '#dc2626' : part.operation === 'insert' ? '#16a34a' : 'inherit'
+                                }}
+                              >
+                                {part.text}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h4 className="text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
                     Title
@@ -212,6 +316,70 @@ export default function VersionHistoryModal({
                   >
                     {selectedVersion.contentSnapshot.content || 'No content'}
                   </div>
+                </div>
+
+                {/* Fork and Merge Actions */}
+                <div className="flex gap-2 pt-4 border-t" style={{ borderColor: "var(--color-border-light)" }}>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedFromVersion(selectedVersion)}
+                    className="btn-secondary text-xs"
+                    style={{ padding: "var(--space-xs) var(--space-sm)" }}
+                  >
+                    Compare From Here
+                  </button>
+                  {canEditNote && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setIsForking(true);
+                          try {
+                            await apiService.forkNote(noteId, {
+                              authorId: "current-user-id", // TODO: get current user ID
+                              branchName: `branch-${Date.now()}`
+                            });
+                            // TODO: refresh notes list
+                            setError("Note forked successfully!");
+                          } catch (err) {
+                            setError("Failed to fork note");
+                          } finally {
+                            setIsForking(false);
+                          }
+                        }}
+                        disabled={isForking}
+                        className="btn-primary text-xs"
+                        style={{ padding: "var(--space-xs) var(--space-sm)" }}
+                      >
+                        {isForking ? "Forking…" : "Fork"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!selectedFromVersion) return;
+                          setIsMerging(true);
+                          try {
+                            await apiService.mergeNote(noteId, {
+                              forkedNoteId: selectedFromVersion._id,
+                              authorId: "current-user-id", // TODO: get current user ID
+                              mergeStrategy: "overwrite"
+                            });
+                            onNoteRestored({ ...currentNote }); // TODO: get updated note
+                            setError("Merge completed successfully!");
+                          } catch (err) {
+                            setError("Failed to merge note");
+                          } finally {
+                            setIsMerging(false);
+                          }
+                        }}
+                        disabled={isMerging || !selectedFromVersion}
+                        className="btn-primary text-xs"
+                        style={{ padding: "var(--space-xs) var(--space-sm)" }}
+                      >
+                        {isMerging ? "Merging…" : "Merge"}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ) : (

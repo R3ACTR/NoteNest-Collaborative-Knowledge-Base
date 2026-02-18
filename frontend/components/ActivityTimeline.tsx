@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { apiService, AuditLog } from '../lib/api';
+import { apiService, type AuditLog } from '../lib/api';
 
 interface ActivityTimelineProps {
   workspaceId: string;

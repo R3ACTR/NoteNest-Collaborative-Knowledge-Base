@@ -4,8 +4,9 @@ export interface IUser extends Document {
   email: string;
   password: string;
   name: string;
-  role: 'admin' | 'editor' | 'viewer';
+  role: 'admin' | 'editor' | 'viewer'; // kept for backward compatibility, but will deprecate
   workspaces: string[]; // workspace IDs
+  groups: string[]; // group IDs for hierarchical RBAC
   createdAt: Date;
 }
 

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
+import { authenticateToken } from '../middleware/auth';
 import { AuditService } from '../services/auditService';
 import {
   RegisterRequest,
@@ -48,7 +49,7 @@ router.post('/login', async (req: Request, res: Response<LoginResponse | ErrorRe
       return res.status(401).json(errorResponse);
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
     // Log the event
     await AuditService.logEvent(
@@ -69,8 +70,11 @@ router.post('/login', async (req: Request, res: Response<LoginResponse | ErrorRe
 });
 
 // Get user profile
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
   try {
+    if ((req as any).user._id.toString() !== req.params.id && (req as any).user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
       return res.status(404).json({ error: 'User not found' });

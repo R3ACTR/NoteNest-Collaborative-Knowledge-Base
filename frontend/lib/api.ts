@@ -4,6 +4,7 @@ import {
   Note,
   NoteVersion,
   User,
+  Folder,
   CreateWorkspaceRequest,
   AddMemberRequest,
   UpdateMemberRoleRequest,
@@ -11,6 +12,9 @@ import {
   UpdateNoteRequest,
   DeleteNoteRequest,
   RestoreNoteRequest,
+  ForkNoteRequest,
+  MergeNoteRequest,
+  NoteDiff,
   RegisterRequest,
   LoginRequest,
   RegisterResponse,
@@ -26,12 +30,56 @@ import {
   ErrorResponse,
 } from '../../shared/types';
 
+export type {
+  AuditLog,
+  Workspace,
+  Note,
+  NoteVersion,
+  User,
+  CreateWorkspaceRequest,
+  AddMemberRequest,
+  UpdateMemberRoleRequest,
+  CreateNoteRequest,
+  UpdateNoteRequest,
+  DeleteNoteRequest,
+  RestoreNoteRequest,
+  ForkNoteRequest,
+  MergeNoteRequest,
+  NoteDiff,
+  RegisterRequest,
+  LoginRequest,
+  RegisterResponse,
+  LoginResponse,
+  UserProfileResponse,
+  NotesResponse,
+  NoteResponse,
+  NoteVersionsResponse,
+  RestoreNoteResponse,
+  WorkspacesResponse,
+  WorkspaceResponse,
+  AuditLogsResponse,
+  ErrorResponse,
+};
+// import { io } from "socket.io-client"; // Added at bottom
+
+// Re-export types for convenience
+export type { AuditLog, Workspace, Note, NoteVersion, User, Folder };
+
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5002';
+
 if (!API_BASE_URL) {
   throw new Error('NEXT_PUBLIC_API_URL environment variable is not set. Please create a .env file based on .env.example.');
 }
 
 class ApiService {
+  private token: string | null = null;
+
+  setToken(token: string) {
+    this.token = token;
+  }
+
   private async request(endpoint: string, options: RequestInit = {}): Promise<any> {
     const url = `${API_BASE_URL}${endpoint}`;
     const config: RequestInit = {
@@ -93,6 +141,10 @@ class ApiService {
     return this.request(`/api/notes/workspace/${workspaceId}`);
   }
 
+  async getNote(id: string): Promise<Note> {
+    return this.request(`/api/notes/${id}`);
+  }
+
   async createNote(data: CreateNoteRequest): Promise<Note> {
     return this.request('/api/notes', {
       method: 'POST',
@@ -138,12 +190,84 @@ class ApiService {
     return this.request(`/api/notes/${noteId}/versions`);
   }
 
-  async restoreNoteVersion(noteId: string, data: RestoreNoteRequest): Promise<RestoreNoteResponse> {
+  async restoreNoteVersion(noteId: string, versionNumber: number, authorId: string): Promise<RestoreNoteResponse> {
     return this.request(`/api/notes/${noteId}/restore`, {
+      method: 'POST',
+      body: JSON.stringify({ versionNumber, authorId }),
+    });
+  }
+
+  async forkNote(noteId: string, data: ForkNoteRequest): Promise<Note> {
+    return this.request(`/api/notes/${noteId}/fork`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
+
+  async mergeNote(noteId: string, data: MergeNoteRequest): Promise<RestoreNoteResponse> {
+    return this.request(`/api/notes/${noteId}/merge`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getNoteDiff(noteId: string, fromVersion?: number, toVersion?: number): Promise<NoteDiff> {
+    const params = new URLSearchParams();
+    if (fromVersion !== undefined) params.append('fromVersion', fromVersion.toString());
+    if (toVersion !== undefined) params.append('toVersion', toVersion.toString());
+    return this.request(`/api/notes/${noteId}/diff?${params.toString()}`);
+  }
+
+  // Folders
+  async getFolders(workspaceId: string): Promise<any[]> {
+    return this.request(`/api/folders/workspace/${workspaceId}`);
+  }
+
+  async createFolder(data: { name: string; workspaceId: string; parentId?: string; createdBy: string }): Promise<any> {
+    return this.request('/api/folders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateFolder(id: string, data: { name?: string; parentId?: string }): Promise<any> {
+    return this.request(`/api/folders/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteFolder(id: string): Promise<void> {
+    return this.request(`/api/folders/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Tags
+  async getWorkspaceTags(workspaceId: string): Promise<string[]> {
+    return this.request(`/api/notes/workspace/${workspaceId}/tags`);
+  }
+
+  // Pin note
+  async toggleNotePin(noteId: string, isPinned: boolean): Promise<Note> {
+    return this.request(`/api/notes/${noteId}/pin`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isPinned }),
+    });
+  }
 }
 
+
+import { io } from "socket.io-client";
+
+export const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5002", {
+  autoConnect: false,
+  auth: (cb) => {
+    // We'll insert the token here when connecting
+    const token = localStorage.getItem('token');
+    cb({ token });
+  }
+});
+
 export const apiService = new ApiService();
+

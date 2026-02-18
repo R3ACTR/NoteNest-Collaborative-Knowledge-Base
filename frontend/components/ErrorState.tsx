@@ -39,20 +39,20 @@ export default function ErrorState({
       aria-live={getAriaLive()}
       aria-atomic="true"
     >
-      {onDismiss && (
-        <Button
-          variant="icon"
-          size="sm"
-          onClick={onDismiss}
-          className="error-state-dismiss absolute top-3 right-3"
-          aria-label="Dismiss this message"
-        >
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </Button>
-      )}
-      <div className="error-state-content">
+      <div className="error-state-content relative">
+        {onDismiss && (
+          <Button
+            variant="icon"
+            size="sm"
+            onClick={onDismiss}
+            className="error-state-dismiss absolute top-0 right-0 z-10"
+            aria-label="Dismiss this message"
+          >
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </Button>
+        )}
         <div className="error-state-icon" aria-hidden="true">
           {variant === "error" && (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

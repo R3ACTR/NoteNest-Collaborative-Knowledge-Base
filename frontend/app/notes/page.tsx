@@ -1,8 +1,11 @@
-export default function NotesPage() {
+import { Suspense } from "react";
+import NotesPage from "@/app/notes/notes";
+import Loading from "@/components/Loading";
+
+export default function WorkspaceNotesRoute() {
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>Notes</h1>
-      <p>Create your first note here.</p>
-    </div>
+    <Suspense fallback={<Loading />}>
+      <NotesPage />
+    </Suspense>
   );
 }

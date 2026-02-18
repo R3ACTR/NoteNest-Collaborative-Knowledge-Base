@@ -1,0 +1,29 @@
+{
+  "name": "notenest-socket-service",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.0.0",
+    "redis": "^4.6.10",
+    "socket.io": "^4.7.5",
+    "@socket.io/redis-adapter": "^8.2.1",
+    "yjs": "^13.6.18",
+    "y-protocols": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/node": "^20.8.7",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}

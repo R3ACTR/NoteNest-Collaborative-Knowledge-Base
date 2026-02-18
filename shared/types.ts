@@ -20,8 +20,22 @@ export interface Note {
   title: string;
   content: string;
   workspaceId: string;
+  folderId?: string;
   author: string;
   tags?: string[];
+  isPinned?: boolean;
+  isFavorite?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Folder {
+  _id: string;
+  name: string;
+  workspaceId: string;
+  parentId?: string;
+  path: string;
+  createdBy: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -36,7 +50,7 @@ export interface NoteVersion {
   };
   author: string;
   workspaceId: string;
-  createdAt: string;
+  timestamp: string;
   metadata?: {
     reason?: string;
     source?: string;
@@ -74,12 +88,17 @@ export interface CreateNoteRequest {
   title: string;
   content: string;
   workspaceId: string;
+  folderId?: string;
+  tags?: string[];
   authorId: string;
 }
 
 export interface UpdateNoteRequest {
   title: string;
   content: string;
+  folderId?: string;
+  tags?: string[];
+  isPinned?: boolean;
   authorId: string;
 }
 
@@ -90,6 +109,40 @@ export interface DeleteNoteRequest {
 export interface RestoreNoteRequest {
   versionNumber: number;
   authorId: string;
+}
+
+export interface ForkNoteRequest {
+  authorId: string;
+  branchName?: string;
+}
+
+export interface MergeNoteRequest {
+  forkedNoteId: string;
+  authorId: string;
+  mergeStrategy?: string;
+}
+
+export interface NoteDiff {
+  title: {
+    from: string;
+    to: string;
+    changed: boolean;
+    patches: any[];
+    diff: Array<{
+      operation: 'delete' | 'insert' | 'equal';
+      text: string;
+    }>;
+  };
+  content: {
+    from: string;
+    to: string;
+    changed: boolean;
+    patches: any[];
+    diff: Array<{
+      operation: 'delete' | 'insert' | 'equal';
+      text: string;
+    }>;
+  };
 }
 
 export interface CreateWorkspaceRequest {

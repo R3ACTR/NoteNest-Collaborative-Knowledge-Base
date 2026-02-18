@@ -14,13 +14,23 @@ const CREATE_RESTRICTED_TITLE = "You need Editor or Admin role to create notes."
 
 export default function DashboardPage() {
   const { canCreateNote } = usePermissions();
-  const [recentActivity, setRecentActivity] = useState<Array<{ id: number; action: string; timestamp: string }>>([]);
+
+  const [recentActivity, setRecentActivity] = useState<
+    Array<{ id: number; action: string; timestamp: string }>
+  >([]);
+
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
 
+  // ✅ NEW Recent Notes Mock Data
+  const [recentNotes] = useState([
+    { id: 1, title: "Project Plan", workspace: "Team", time: "2 hours ago" },
+    { id: 2, title: "Meeting Notes", workspace: "Personal", time: "Yesterday" },
+    { id: 3, title: "Design Ideas", workspace: "Product", time: "3 days ago" },
+  ]);
+
   useEffect(() => {
-    // Simulate loading dashboard data (no backend)
     const timer = setTimeout(() => {
       setRecentActivity([]);
       setLoadError(null);
@@ -41,7 +51,8 @@ export default function DashboardPage() {
   const cardStyle = {
     background: "var(--color-background)",
     borderColor: "var(--color-border-light)",
-    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)",
+    boxShadow:
+      "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)",
   };
 
   const sectionCardClass =
@@ -85,323 +96,99 @@ export default function DashboardPage() {
               )
             }
           />
-        <main
-          className="flex-1 overflow-auto flex gap-6 relative"
-          style={{
-            background: "var(--color-background)",
-            backgroundImage: "linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%)"
-          }}
-        >
-          {/* Background decorative elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div
-              className="absolute top-20 right-10 w-72 h-72 rounded-full blur-3xl opacity-20"
-              style={{ background: "radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%)" }}
-            ></div>
-            <div
-              className="absolute bottom-32 left-10 w-96 h-96 rounded-full blur-3xl opacity-15"
-              style={{ background: "radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)" }}
-            ></div>
-          </div>
 
-          <div className="flex-1 min-w-0 flex flex-col gap-8 max-w-4xl mx-auto p-4 sm:p-6 md:p-8 relative z-10">
-            {/* Welcome — enhanced hero */}
+          <main
+            className="flex-1 overflow-auto flex gap-6 relative"
+            style={{
+              background: "var(--color-background)",
+              backgroundImage:
+                "linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(139, 92, 246, 0.03) 100%)",
+            }}
+          >
+            <div className="flex-1 min-w-0 flex flex-col gap-8 max-w-4xl mx-auto p-4 sm:p-6 md:p-8 relative z-10">
+
+              {/* Quick Actions */}
               <section
-                className="rounded-2xl border p-6 sm:p-8 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] relative overflow-hidden group"
-                style={{
-                  background: "var(--color-background)",
-                  borderColor: "var(--color-border-light)",
-                  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
-                  borderLeftWidth: "4px",
-                  borderLeftColor: "var(--color-info)",
-                }}
+                className={sectionCardClass}
+                style={{ ...cardStyle, minHeight: "160px" }}
               >
-                {/* Subtle gradient overlay */}
                 <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  className="flex items-center gap-3 px-5 py-4"
                   style={{
-                    background: "linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.03) 100%)"
+                    borderBottom: "1px solid var(--color-border-light)",
                   }}
-                ></div>
-
-                <div className="relative z-10">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center"
-                      style={{
-                        background: "linear-gradient(135deg, var(--color-info) 0%, #8b5cf6 100%)",
-                        boxShadow: "0 4px 12px rgba(59, 130, 246, 0.3)"
-                      }}
-                    >
-                      <span className="text-2xl">👋</span>
-                    </div>
-                    <div>
-                      <h2
-                        className="text-xl sm:text-2xl font-bold mb-1"
-                        style={{
-                          color: "var(--color-text-primary)",
-                          letterSpacing: "-0.025em",
-                          lineHeight: "var(--line-height-tight)",
-                        }}
-                      >
-                        Welcome back!
-                      </h2>
-                      <p
-                        className="text-xs font-medium uppercase tracking-wide"
-                        style={{
-                          color: "var(--color-info)",
-                          letterSpacing: "0.05em"
-                        }}
-                      >
-                        Ready to collaborate?
-                      </p>
-                    </div>
-                  </div>
-
-                  <p
-                    className="text-sm sm:text-base max-w-2xl leading-relaxed"
-                    style={{
-                      color: "var(--color-text-secondary)",
-                      lineHeight: "var(--line-height-relaxed)",
-                    }}
+                >
+                  <h3
+                    className="text-base font-semibold"
+                    style={{ color: "var(--color-text-primary)" }}
                   >
-                    This is your NoteNest dashboard. Get started by creating your first note and organizing your team's knowledge in one beautiful, searchable space.
-                  </p>
+                    Quick Actions
+                  </h3>
+                </div>
 
-                  {/* Quick stats */}
-                  <div className="flex flex-wrap gap-4 mt-6 pt-6 border-t" style={{ borderColor: "var(--color-border-light)" }}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-success)" }}></div>
-                      <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                        Real-time collaboration
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-info)" }}></div>
-                      <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                        Enterprise security
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full" style={{ background: "var(--color-warning)" }}></div>
-                      <span className="text-sm font-medium" style={{ color: "var(--color-text-secondary)" }}>
-                        24/7 support
-                      </span>
-                    </div>
-                  </div>
+                <div className="flex-1 px-5 py-4 flex flex-wrap items-center gap-3">
+                  {canCreateNote && (
+                    <Link href="/notes?new=1" className="btn-primary">
+                      Create Note
+                    </Link>
+                  )}
+
+                  <Link href="/notes" className="btn-secondary">
+                    View All Notes
+                  </Link>
                 </div>
               </section>
 
-              {loadError && (
-                <ErrorState
-                  title="Couldn't load dashboard"
-                  message={loadError}
-                  variant="error"
-                  onDismiss={() => setLoadError(null)}
-                  action={
-                    <button
-                      type="button"
-                      onClick={retryLoad}
-                      className="btn-primary"
-                      style={{ fontSize: "var(--font-size-sm)", padding: "var(--space-sm) var(--space-md)" }}
-                    >
-                      Try again
-                    </button>
-                  }
-                  className="mb-0"
-                />
-              )}
-
-              {/* Quick Actions — card */}
-              <div>
-                <section
-                  className={sectionCardClass}
-                  style={{ ...cardStyle, minHeight: "160px" }}
-                >
-                  <div
-                    className="flex items-center gap-3 px-5 py-4"
-                    style={{ borderBottom: "1px solid var(--color-border-light)" }}
-                  >
-                    <span
-                      className="flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
-                      style={{
-                        background: "rgba(59, 130, 246, 0.12)",
-                        color: "var(--color-info)",
-                      }}
-                      aria-hidden
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </span>
-                    <h3 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                      Quick Actions
-                    </h3>
-                  </div>
-                  <div className="flex-1 px-5 py-4 flex flex-wrap items-center gap-3">
-                    {canCreateNote ? (
-                      <Link
-                        href="/notes?new=1"
-                        className="btn-primary inline-flex items-center gap-2 min-h-[40px]"
-                        style={{
-                          fontSize: "var(--font-size-sm)",
-                          padding: "var(--space-sm) var(--space-md)",
-                        }}
-                      >
-                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Create Note
-                      </Link>
-                    ) : (
-                      <span
-                        className="inline-flex items-center gap-2 min-h-[40px] rounded-lg border px-3 py-2 text-sm opacity-70 cursor-not-allowed"
-                        style={{
-                          borderColor: "var(--color-border-light)",
-                          color: "var(--color-text-muted)",
-                        }}
-                        title={CREATE_RESTRICTED_TITLE}
-                      >
-                        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                        </svg>
-                        Create Note
-                      </span>
-                    )}
-                    <Link
-                      href="/notes"
-                      className="btn-secondary inline-flex items-center gap-2 min-h-[40px]"
-                      style={{
-                        fontSize: "var(--font-size-sm)",
-                        padding: "var(--space-sm) var(--space-md)",
-                      }}
-                    >
-                      <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      View All Notes
-                    </Link>
-                  </div>
-                </section>
-              </div>
-            </div>
-
-            {/* Toggle: rightmost, vertical center — open/close Recent Activity panel */}
-            <button
-              type="button"
-              onClick={() => setActivityPanelOpen((open) => !open)}
-              className="fixed z-30 flex items-center justify-center rounded-full border transition-all duration-200 hover:scale-105 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)] focus-visible:ring-[var(--color-info)]"
-              style={{
-                top: "50%",
-                right: "1.5rem",
-                transform: "translateY(-50%)",
-                background: "var(--color-info)",
-                color: "white",
-                borderColor: "rgba(59, 130, 246, 0.4)",
-                width: "48px",
-                height: "48px",
-                boxShadow: "0 2px 8px rgba(59, 130, 246, 0.25)",
-              }}
-              aria-expanded={activityPanelOpen}
-              aria-label={activityPanelOpen ? "Close Recent Activity panel" : "Open Recent Activity panel"}
-            >
-              <svg
-                className="w-5 h-5 shrink-0 transition-transform duration-200"
-                style={{ transform: activityPanelOpen ? "rotate(180deg)" : "none" }}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-
-            {/* Recent Activity panel — inline right column */}
-            {activityPanelOpen && (
-              <aside
-                className="w-80 shrink-0 flex flex-col rounded-2xl border overflow-hidden transition-all duration-300 shadow-md"
-                style={{
-                  background: "var(--color-background)",
-                  borderColor: "var(--color-border-light)",
-                  maxHeight: "calc(100vh - 8rem)",
-                }}
-                role="complementary"
-                aria-label="Recent Activity"
-              >
+              {/* ✅ Recent Notes Section */}
+              <section className={sectionCardClass} style={cardStyle}>
                 <div
-                  className="flex items-center justify-between gap-3 px-5 py-4 shrink-0"
-                  style={{ borderBottom: "1px solid var(--color-border-light)" }}
+                  className="flex items-center gap-3 px-5 py-4"
+                  style={{
+                    borderBottom: "1px solid var(--color-border-light)",
+                  }}
                 >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className="flex items-center justify-center w-9 h-9 rounded-xl shrink-0"
-                      style={{
-                        background: "rgba(59, 130, 246, 0.12)",
-                        color: "var(--color-info)",
-                      }}
-                      aria-hidden
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </span>
-                    <h2 className="text-base font-semibold" style={{ color: "var(--color-text-primary)" }}>
-                      Recent Activity
-                    </h2>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setActivityPanelOpen(false)}
-                    className="btn-icon rounded-xl min-w-[36px] min-h-[36px] flex items-center justify-center"
-                    style={{ color: "var(--color-text-secondary)" }}
-                    aria-label="Close Recent Activity panel"
+                  <h3
+                    className="text-base font-semibold"
+                    style={{ color: "var(--color-text-primary)" }}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
+                    Recent Notes
+                  </h3>
                 </div>
-                <div className="flex-1 overflow-auto p-4 min-h-0">
-                  {isLoading ? (
-                    <div className="animate-fade-in rounded-xl border p-4" style={cardStyle}>
-                      <SkeletonList count={3} variant="list-item" />
-                    </div>
-                  ) : recentActivity.length === 0 ? (
+
+                <div className="p-5 space-y-3">
+                  {recentNotes.map((note) => (
                     <div
-                      className="state-content-enter rounded-xl border p-5 card-elevate"
+                      key={note.id}
+                      className="rounded-xl border p-4 flex justify-between items-center hover:shadow-sm transition"
                       style={cardStyle}
                     >
-                      <EmptyState
-                        size="compact"
-                        icon={
-                          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        }
-                        title="No recent activity"
-                        description="Your activity will be displayed here as you use NoteNest."
-                      />
+                      <div>
+                        <div
+                          className="font-medium"
+                          style={{ color: "var(--color-text-primary)" }}
+                        >
+                          {note.title}
+                        </div>
+                        <div
+                          className="text-sm"
+                          style={{ color: "var(--color-text-secondary)" }}
+                        >
+                          {note.workspace}
+                        </div>
+                      </div>
+
+                      <div
+                        className="text-xs"
+                        style={{ color: "var(--color-text-muted)" }}
+                      >
+                        {note.time}
+                      </div>
                     </div>
-                  ) : (
-                    <ul className="space-y-2">
-                      {recentActivity.map((activity) => (
-                        <li key={activity.id}>
-                          <div className="rounded-xl border p-3 transition-shadow duration-200 hover:shadow-sm" style={cardStyle}>
-                            <div className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-                              {activity.action}
-                            </div>
-                            <div className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
-                              {activity.timestamp}
-                            </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                  ))}
                 </div>
-              </aside>
-            )}
+              </section>
+
+            </div>
           </main>
         </div>
       </div>

@@ -18,9 +18,12 @@ export default function Sidebar() {
     background: "rgba(59, 130, 246, 0.1)",
     color: "var(--color-info)",
   };
-  const linkInactive = {
-    color: "var(--color-text-secondary)",
-  };
+ const linkInactive = {
+  color: "var(--color-text-primary)",
+  opacity: 0.85,
+};
+
+
 
   return (
     <aside

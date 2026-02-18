@@ -11,22 +11,26 @@ export default function WorkspaceSelector() {
         Select workspace
       </label>
       <select
-        id="workspace-select"
-        value={activeWorkspace.id}
-        onChange={(e) => setActiveWorkspace(e.target.value)}
-        className="rounded-lg border px-3 py-1 text-sm bg-white border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        style={{
-          borderColor: "var(--color-border-light)",
-          color: "var(--color-text-primary)",
-          background: "var(--color-background)",
-        }}
+  className="rounded-lg border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+  style={{
+    borderColor: "var(--color-border-light)",
+    color: "var(--color-text-primary)",
+    background: "var(--color-background)",
+  }}
+
+
         aria-label="Select active workspace"
         aria-describedby="workspace-description"
       >
         {workspaces.map((workspace) => (
-          <option key={workspace.id} value={workspace.id}>
-            {workspace.name}
-          </option>
+          <option
+  key={workspace.id}
+  value={workspace.id}
+  style={{ color: "var(--color-text-primary)" }}
+>
+  {workspace.name}
+</option>
+
         ))}
       </select>
       <div id="workspace-description" className="sr-only">

@@ -26,6 +26,6 @@ describe('Role-Based UI Rendering', () => {
     );
 
     // Basic navigation should be present
-    expect(screen.getByText(/features/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/features/i).length).toBeGreaterThan(0);
   });
 });

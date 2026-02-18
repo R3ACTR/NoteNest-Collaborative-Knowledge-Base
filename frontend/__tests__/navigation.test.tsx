@@ -17,14 +17,12 @@ describe('Navigation and Note Access', () => {
       </UserRoleProvider>
     );
 
-    expect(screen.getByText(/features/i)).toBeInTheDocument();
-    expect(screen.getByText(/sign in/i)).toBeInTheDocument();
-    expect(screen.getByText(/get started/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/features/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/login/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/get started/i).length).toBeGreaterThan(0);
   });
 
-  it('navigates to features section', async () => {
-    const user = userEvent.setup();
-
+  it('navigates to features section', () => {
     render(
       <UserRoleProvider>
         <WorkspaceProvider>
@@ -33,11 +31,9 @@ describe('Navigation and Note Access', () => {
       </UserRoleProvider>
     );
 
-    const featuresLink = screen.getByText(/features/i);
-    await user.click(featuresLink);
-
-    // Should scroll to features section
-    expect(document.getElementById('features')).toBeInTheDocument();
+    const featuresLinks = screen.getAllByRole('link', { name: 'Features' });
+    const navFeaturesLink = featuresLinks.find(link => link.getAttribute('href') === '#features');
+    expect(navFeaturesLink).toBeInTheDocument();
   });
 
   it('navigates to login page', async () => {
@@ -51,11 +47,11 @@ describe('Navigation and Note Access', () => {
       </UserRoleProvider>
     );
 
-    const signInLink = screen.getByText(/sign in/i);
-    await user.click(signInLink);
+    const loginLink = screen.getByText(/login/i);
+    await user.click(loginLink);
 
     // In a real app, this would navigate, but for testing we check the link
-    expect(signInLink.closest('a')).toHaveAttribute('href', '/login');
+    expect(loginLink.closest('a')).toHaveAttribute('href', '/login');
   });
 
   it('shows get started button', () => {
@@ -67,7 +63,7 @@ describe('Navigation and Note Access', () => {
       </UserRoleProvider>
     );
 
-    const getStartedButton = screen.getByText(/get started/i);
-    expect(getStartedButton).toBeInTheDocument();
+    const getStartedButtons = screen.getAllByText(/get started/i);
+    expect(getStartedButtons.length).toBeGreaterThan(0);
   });
 });
