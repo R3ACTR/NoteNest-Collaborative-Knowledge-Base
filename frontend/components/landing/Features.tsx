@@ -1,25 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  FileText, 
-  Users, 
-  Shield, 
-  Search, 
-  Layout, 
+import { Section } from "@/components/ui";
+import { cn } from "@/lib/utils";
+import {
+  FileText,
+  Users,
+  Shield,
+  Search,
+  Layout,
   Server,
   Smartphone,
   Sparkles,
   ChevronRight,
-  MoreHorizontal,
   Folder,
   File,
-  Hash
 } from "lucide-react";
 
 // Mock Components for Visuals
 const MockEditor = () => (
-  <div className="w-full h-full bg-[#FAFAFA] rounded-xl border border-black/5 p-4 flex gap-4 overflow-hidden relative">
+  <div className="w-full h-[500px] bg-[#FAFAFA] rounded-xl border border-black/5 p-4 flex gap-4 overflow-hidden relative">
     <div className="w-1/2 space-y-3">
       <div className="h-4 w-3/4 bg-black/10 rounded-full" />
       <div className="h-3 w-full bg-black/5 rounded-full" />
@@ -33,7 +33,7 @@ const MockEditor = () => (
       <div className="h-3 w-5/6 bg-black/5 rounded-full" />
     </div>
     {/* Floating Tag */}
-    <motion.div 
+    <motion.div
       initial={{ scale: 0 }}
       whileInView={{ scale: 1 }}
       transition={{ delay: 0.5, type: "spring" }}
@@ -48,15 +48,15 @@ const AvatarStack = () => (
   <div className="flex items-center justify-center h-full">
     <div className="flex -space-x-4">
       {[1, 2, 3, 4].map((i) => (
-        <motion.div 
+        <motion.div
           key={i}
           initial={{ x: -20, opacity: 0 }}
           whileInView={{ x: 0, opacity: 1 }}
           transition={{ delay: i * 0.1 }}
           className="w-12 h-12 rounded-full border-4 border-white bg-gray-200 shadow-md flex items-center justify-center text-xs font-bold text-[#1A1A1A]"
-          style={{ backgroundColor: ['#FFD93D', '#FF6B6B', '#EAE8DD', '#B2EBF2'][i-1] }}
+          style={{ backgroundColor: ['#FFD93D', '#FF6B6B', '#EAE8DD', '#B2EBF2'][i - 1] }}
         >
-          {['JD', 'AS', 'MK', '+'][i-1]}
+          {['JD', 'AS', 'MK', '+'][i - 1]}
         </motion.div>
       ))}
     </div>
@@ -66,7 +66,7 @@ const AvatarStack = () => (
 const BadgeUI = () => (
   <div className="flex flex-col gap-2 justify-center h-full px-4">
     {['Admin', 'Editor', 'Viewer'].map((role, i) => (
-      <motion.div 
+      <motion.div
         key={role}
         initial={{ x: -20, opacity: 0 }}
         whileInView={{ x: 0, opacity: 1 }}
@@ -119,7 +119,7 @@ const FolderTree = () => (
 const ServerGraph = () => (
   <div className="flex items-end justify-center gap-1 h-3/4 px-6 pb-4">
     {[40, 70, 50, 90, 60, 80].map((h, i) => (
-      <motion.div 
+      <motion.div
         key={i}
         initial={{ height: 0 }}
         whileInView={{ height: `${h}%` }}
@@ -134,42 +134,42 @@ const features = [
   {
     title: "Rich Note Editor",
     description: "Structured documentation with Markdown support.",
-    className: "md:col-span-2 md:row-span-2",
+    className: "md:col-span-2 md:row-span-2 lg:translate-x-[65px] lg:translate-y-[55px] lg:scale-[1.12] origin-center",
     visual: <MockEditor />,
     icon: FileText
   },
   {
     title: "Team Workspaces",
     description: "Collaborative spaces for your team.",
-    className: "md:col-span-1 md:row-span-1",
+    className: "md:col-span-1 md:row-span-1 lg:translate-x-[120px] lg:translate-y-[40px] lg:scale-[1.12] origin-center",
     visual: <AvatarStack />,
     icon: Users
   },
   {
     title: "Role-Based Access",
     description: "Fine-grained permissions.",
-    className: "md:col-span-1 md:row-span-1",
+    className: "md:col-span-1 md:row-span-1 lg:translate-x-[120px] lg:translate-y-[0px] lg:scale-[1.12] origin-center",
     visual: <BadgeUI />,
     icon: Shield
   },
   {
     title: "Fast Search",
     description: "Find notes quickly with powerful navigation.",
-    className: "md:col-span-1 md:row-span-1",
+    className: "md:col-span-1 md:row-span-1 lg:translate-x-[40px] lg:-translate-y-[-110px] lg:scale-[1.12] origin-center",
     visual: <SearchBarAnim />,
     icon: Search
   },
   {
     title: "Organization",
     description: "Folders and tags to keep notes organized.",
-    className: "md:col-span-1 md:row-span-2",
+    className: "md:col-span-1 md:row-span-2 lg:translate-x-[115px] lg:-translate-y-[-110px] lg:scale-[1.12] origin-center",
     visual: <FolderTree />,
     icon: Layout
   },
   {
     title: "Scalable Backend",
     description: "Built for performance and growth.",
-    className: "md:col-span-1 md:row-span-1",
+    className: "md:col-span-1 md:row-span-1 lg:translate-x-[120px] lg:-translate-y-[55px] lg:scale-[1.12] origin-center",
     visual: <ServerGraph />,
     icon: Server
   },
@@ -194,13 +194,18 @@ const FeatureCard = ({ feature, index }: { feature: any, index: number }) => (
           <ArrowUpRightIcon className="w-5 h-5 text-[#1A1A1A]" />
         </div>
       </div>
-      
-      <h3 className="text-xl font-serif font-bold text-[#1A1A1A] mb-2">
-        {feature.title}
-      </h3>
-      <p className="text-sm text-[#1A1A1A]/60 font-medium mb-6">
-        {feature.description}
-      </p>
+
+      <div className="mb-2">
+        <h3 className="text-xl font-serif font-bold text-[#1A1A1A]">
+          {feature.title}
+        </h3>
+      </div>
+
+      <div className="mb-6">
+        <p className="text-sm text-[#1A1A1A]/60 font-medium">
+          {feature.description}
+        </p>
+      </div>
 
       {/* Visual Container */}
       <div className="flex-1 w-full relative min-h-[120px] rounded-xl bg-[#F9F9F9] border border-black/5 overflow-hidden group-hover:border-black/10 transition-colors">
@@ -211,14 +216,14 @@ const FeatureCard = ({ feature, index }: { feature: any, index: number }) => (
 );
 
 const ArrowUpRightIcon = ({ className }: { className?: string }) => (
-  <svg 
-    xmlns="http://www.w3.org/2000/svg" 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    stroke="currentColor" 
-    strokeWidth="2" 
-    strokeLinecap="round" 
-    strokeLinejoin="round" 
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className={className}
   >
     <path d="M7 7h10v10" />
@@ -228,11 +233,13 @@ const ArrowUpRightIcon = ({ className }: { className?: string }) => (
 
 const Features = () => {
   return (
-    <section id="features" className="py-32 bg-[#F3F0E6] relative overflow-hidden">
+    <section id="features" className="py-20 bg-[#F3F0E6] relative overflow-hidden lg:-translate-y-[66px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
+
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-20">
+        <div
+          className="max-w-3xl mb-16 lg:translate-x-[34px] lg:translate-y-[20px] lg:scale-[1.06] origin-top-left text-left"
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -241,8 +248,8 @@ const Features = () => {
           >
             Capabilities
           </motion.div>
-          
-          <motion.h2 
+
+          <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -258,30 +265,33 @@ const Features = () => {
           </motion.h2>
         </div>
 
-        {/* Bento Grid layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 auto-rows-[minmax(280px,auto)] gap-6">
-          {features.map((feature, index) => (
-            <FeatureCard key={index} feature={feature} index={index} />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 auto-rows-[minmax(200px,auto)] gap-[20px] lg:gap-[80px]">
+          {features.map((feature, index) => {
+            return (
+              <div key={feature.title} className={cn("md:transform-gpu", feature.className)}>
+                <FeatureCard feature={feature} index={index} />
+              </div>
+            );
+          })}
         </div>
 
         {/* Roadmap / Coming Soon */}
         <div className="mt-20 border-t border-black/5 pt-10">
-           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <p className="font-serif font-bold text-lg text-[#1A1A1A]">Coming Soon on Roadmap</p>
-              <div className="flex flex-wrap justify-center gap-3">
-                 {[
-                   { icon: Search, text: "Full-text Search" },
-                   { icon: Sparkles, text: "AI Summaries" },
-                   { icon: Smartphone, text: "Mobile App" }
-                 ].map((item, i) => (
-                   <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/5 shadow-sm text-sm font-medium text-[#1A1A1A]/70">
-                      <item.icon className="w-4 h-4" />
-                      {item.text}
-                   </div>
-                 ))}
-              </div>
-           </div>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 w-full">
+            <p className="font-serif font-bold text-lg text-[#1A1A1A] shrink-0">Coming Soon on Roadmap</p>
+            <div className="flex flex-wrap justify-center md:justify-end gap-3 flex-1">
+              {[
+                { icon: Search, text: "Full-text Search" },
+                { icon: Sparkles, text: "AI Summaries" },
+                { icon: Smartphone, text: "Mobile App" }
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/5 shadow-sm text-sm font-medium text-[#1A1A1A]/70">
+                  <item.icon className="w-4 h-4" />
+                  {item.text}
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>

@@ -29,6 +29,37 @@ import {
   AuditLogsResponse,
   ErrorResponse,
 } from '../../shared/types';
+
+export type {
+  AuditLog,
+  Workspace,
+  Note,
+  NoteVersion,
+  User,
+  CreateWorkspaceRequest,
+  AddMemberRequest,
+  UpdateMemberRoleRequest,
+  CreateNoteRequest,
+  UpdateNoteRequest,
+  DeleteNoteRequest,
+  RestoreNoteRequest,
+  ForkNoteRequest,
+  MergeNoteRequest,
+  NoteDiff,
+  RegisterRequest,
+  LoginRequest,
+  RegisterResponse,
+  LoginResponse,
+  UserProfileResponse,
+  NotesResponse,
+  NoteResponse,
+  NoteVersionsResponse,
+  RestoreNoteResponse,
+  WorkspacesResponse,
+  WorkspaceResponse,
+  AuditLogsResponse,
+  ErrorResponse,
+};
 // import { io } from "socket.io-client"; // Added at bottom
 
 // Re-export types for convenience

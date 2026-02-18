@@ -21,7 +21,7 @@ const FolderSchema: Schema = new Schema({
 });
 
 // Index for efficient path queries
-FolderSchema.index({ path: 1 });
+// FolderSchema.index({ path: 1 }); // Removed duplicate index
 FolderSchema.index({ workspaceId: 1 });
 
 export default mongoose.model<IFolder>('Folder', FolderSchema);

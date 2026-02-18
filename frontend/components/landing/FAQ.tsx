@@ -1,98 +1,107 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Section } from "@/components/ui";
 
 const faqs = [
   {
-    question: "Is NoteNest free to use?",
-    answer: "Yes! NoteNest is open-source software. You can self-host it for free forever. We also offer a managed cloud version for teams who don't want to manage infrastructure."
+    question: "Is NoteNest completely free?",
+    answer: "Yes! NoteNest is open-source and free to self-host. We also offer a managed cloud version for teams who don't want to manage their own infrastructure."
   },
   {
-    question: "How can I contribute?",
-    answer: "We love contributors! Head over to our GitHub repository. You can pick up 'good first issues', improve documentation, or suggest new features in the discussions tab."
-  },
-  {
-    question: "Is there a self-hosting guide?",
-    answer: "Absolutely. Our documentation includes a comprehensive Docker Compose setup guide that gets you up and running in minutes on any VPS or local machine."
+    question: "Can I import from Notion/Obsidian?",
+    answer: "Currently we support Markdown import. Direct Notion and Obsidian importers are on our roadmap for Q3 2024."
   },
   {
     question: "How does the real-time collaboration work?",
-    answer: "We use WebSockets (via Socket.io) and Y.js CRDTs to ensure conflict-free, real-time editing, even with multiple users typing in the same block."
+    answer: "We use a CRDT (Conflict-free Replicated Data Type) based engine (Yjs) to ensure that all changes are merged instantly without conflicts, even if you go offline."
+  },
+  {
+    question: "Is my data encrypted?",
+    answer: "Yes. All data is encrypted at rest and in transit. For the self-hosted version, you have full control over your encryption keys."
+  },
+  {
+    question: "Do you offer an API?",
+    answer: "Absolutely. NoteNest is API-first. Anything you can do in the UI, you can do via our REST API."
   }
 ];
 
-const FAQItem = ({ item, isOpen, onClick }: { item: any, isOpen: boolean, onClick: () => void }) => {
-  return (
-    <div className="border-b border-black/5 last:border-none">
-      <button 
-        onClick={onClick}
-        className="w-full flex items-center justify-between py-6 text-left group hover:opacity-70 transition-opacity"
-      >
-        <span className="text-xl font-serif font-bold text-[#1A1A1A]">{item.question}</span>
-        <div className={`w-8 h-8 rounded-full border border-black/10 flex items-center justify-center transition-colors duration-300 ${isOpen ? 'bg-[#1A1A1A] text-white' : 'bg-white text-[#1A1A1A]'}`}>
-          {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-        </div>
-      </button>
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="overflow-hidden"
-          >
-            <p className="pb-6 text-[#1A1A1A]/70 leading-relaxed font-medium max-w-2xl">
-              {item.answer}
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-};
-
 const FAQ = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-
   return (
-    <section className="py-24 bg-[#F3F0E6]">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-block px-4 py-1.5 rounded-full border border-black/10 bg-white/50 backdrop-blur-sm text-sm font-bold uppercase tracking-wider mb-6"
-          >
-            Support
-          </motion.div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-serif font-black text-[#1A1A1A]"
-          >
-            Frequently Asked Questions
-          </motion.h2>
+    <Section
+      spacing="large"
+      background="bg-white"
+      className="mt-[5vh]"
+    >
+      {/* Grid: gap 100px */}
+      <div
+        className="grid lg:grid-cols-12 items-start gap-16 lg:gap-[100px]"
+      >
+        {/* Header — leftX: 20, leftY: 20, leftScale: 1.12 */}
+        <div className="lg:col-span-4 md:transform-gpu lg:translate-x-[20px] lg:translate-y-[20px] lg:scale-[1.12] origin-center">
+          <div>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="sticky top-32"
+            >
+              {/* Badge — badgeX: 20, badgeY: 0 */}
+              <div
+                className="inline-block px-4 py-1.5 rounded-full border border-black/10 bg-brand-beige/50 text-sm font-bold uppercase tracking-wider mb-6 lg:translate-x-[20px]"
+              >
+                Support
+              </div>
+              {/* Heading — headingX: 20, headingY: 0 */}
+              <h2
+                className="text-4xl md:text-5xl font-serif font-black text-brand-dark mb-6 lg:translate-x-[20px]"
+              >
+                Frequently Asked Questions
+              </h2>
+              {/* Subtitle — subtitleX: 20, subtitleY: 0 */}
+              <p
+                className="text-brand-dark/60 text-lg font-medium mb-8 lg:translate-x-[20px]"
+              >
+                Can't find the answer you're looking for? Join our <a href="#" className="text-brand-dark underline decoration-2 underline-offset-4 hover:opacity-70 transition-opacity">Discord community</a>.
+              </p>
+            </motion.div>
+          </div>
         </div>
 
-        <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-black/5">
-          {faqs.map((faq, index) => (
-            <FAQItem 
-              key={index} 
-              item={faq} 
-              isOpen={openIndex === index} 
-              onClick={() => setOpenIndex(openIndex === index ? null : index)} 
-            />
-          ))}
+        {/* List — rightX: 17 */}
+        <div className="lg:col-span-8 md:transform-gpu lg:translate-x-[17px]">
+          <div>
+            {/* FAQ Card — faqCardPadding: 48 */}
+            <div
+              className="bg-[#F9F9F9] rounded-3xl border border-black/5 p-8 lg:p-[48px]"
+            >
+              <Accordion type="single" collapsible className="w-full space-y-4">
+                {faqs.map((faq, i) => (
+                  <AccordionItem
+                    key={i}
+                    value={`item-${i}`}
+                    className="border border-black/5 bg-white rounded-2xl px-6 data-[state=open]:pb-4 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+                  >
+                    <AccordionTrigger className="text-lg font-bold text-brand-dark hover:no-underline hover:text-brand-accent py-6 text-left">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-base text-brand-dark/70 leading-relaxed pb-4">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </div>
         </div>
-
       </div>
-    </section>
+    </Section>
   );
 };
 

@@ -23,7 +23,7 @@ const AccessLinkSchema: Schema = new Schema({
 });
 
 // Indexes
-AccessLinkSchema.index({ token: 1 });
+// AccessLinkSchema.index({ token: 1 }); // Removed duplicate index
 AccessLinkSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 }); // TTL index
 
 export default mongoose.model<IAccessLink>('AccessLink', AccessLinkSchema);

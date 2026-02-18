@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@radix-ui/react-accordion": "^1.2.12",
     "@tiptap/extension-collaboration": "^3.19.0",
     "@tiptap/extension-collaboration-cursor": "^3.0.0",
     "@tiptap/react": "^3.19.0",

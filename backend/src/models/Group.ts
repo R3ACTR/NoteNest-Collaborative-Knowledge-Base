@@ -25,7 +25,7 @@ const GroupSchema: Schema = new Schema({
 });
 
 // Index for efficient path queries
-GroupSchema.index({ path: 1 });
+// GroupSchema.index({ path: 1 }); // Removed duplicate index
 GroupSchema.index({ workspaceId: 1 });
 GroupSchema.index({ members: 1 });
 

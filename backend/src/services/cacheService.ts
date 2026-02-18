@@ -36,6 +36,15 @@ export class CacheService {
         enableReadyCheck: false,
       });
 
+      // Handle Redis errors to prevent unhandled error events crashing the app
+      this.client.on('error', (error) => {
+        // Only log if we haven't already logged a connection failure to avoid spamming
+        // checking isEnabled to see if it was ever successfully connected
+        if (this.isEnabled) {
+          console.warn('⚠️  Redis cache error:', error instanceof Error ? error.message : String(error));
+        }
+      });
+
       // Test connection with timeout
       await Promise.race([
         this.client.ping(),

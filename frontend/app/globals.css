@@ -9,6 +9,13 @@
   --color-brand-primary: #0ea5e9;
   --color-brand-accent: #7c3aed;
 
+  /* Semantic Colors */
+  --color-bg-primary: var(--color-brand-beige);
+  --color-bg-card: #FFFFFF;
+  --color-text-primary: var(--color-brand-dark);
+  --color-text-secondary: #4A4A4A;
+  --color-text-muted: #6B6B6B;
+
   --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
@@ -17,7 +24,44 @@
   --color-foreground: var(--color-brand-dark);
 }
 
+/* ============================================================================
+ * Custom Utilities
+ * ============================================================================ */
+
+/**
+ * Linear fade mask for logo ticker and horizontal scrollers
+ * Creates smooth fade-out effect on edges
+ */
+.mask-linear-fade {
+  mask-image: linear-gradient(to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%);
+  -webkit-mask-image: linear-gradient(to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%);
+}
+
 :root {
+  /* Brand colors - matched to design-tokens.ts */
+  --color-brand-beige: #F3F0E6;
+  --color-brand-dark: #1A1A1A;
+  --color-brand-accent: #FF6B6B;
+
+  /* Semantic colors */
+  --color-bg-primary: var(--color-brand-beige);
+  --color-bg-card: #FFFFFF;
+  --color-text-primary: var(--color-brand-dark);
+  --color-text-secondary: #4A4A4A;
+  --color-text-muted: #6B6B6B;
+  /* ========== Color Palette (Legacy Variables for components) ========== */
+
+  /* ========== Color Palette ========== */
+
+  /* Neutral Grays */
   /* Neutral */
   --color-gray-50: #fafafa;
   --color-gray-100: #f5f5f5;
@@ -65,6 +109,225 @@
   --space-sm: 0.5rem;
   --space-md: 1rem;
   --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+}
+
+/* ========== Dark Mode Tokens ========== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background: #0a0a0a;
+    --color-foreground: #ededed;
+
+    --color-text-primary: var(--color-gray-50);
+    --color-text-secondary: var(--color-gray-400);
+    --color-text-muted: var(--color-gray-600);
+
+    --color-border-light: var(--color-gray-800);
+    --color-border-medium: var(--color-gray-700);
+    --color-border-dark: var(--color-gray-600);
+  }
+}
+
+/* Legacy theme bridge removed */
+
+
+:root {
+  /* Override default background to be beige */
+  --color-background: #F3F0E6;
+  --color-foreground: #1A1A1A;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-gradient-text {
+  background-size: 200% auto;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.delay-1000 {
+  animation-delay: 1s;
+}
+
+/* Logo ticker infinite scroll animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 40s linear infinite;
+}
+
+.animate-scroll:hover {
+  animation-play-state: paused;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ========== Responsive Enhancements ========== */
+
+/* Mobile-first responsive improvements */
+@media (max-width: 640px) {
+
+  /* Ensure touch targets are at least 44px */
+  button,
+  a[role="button"],
+  [role="link"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Section padding handled by Container (px-6 sm:px-8 lg:px-12) */
+  /* Removed !important section padding override that was stacking */
+}
+
+/* Tablet: Container handles padding — no extra overrides needed */
+
+/* Large screen optimizations */
+@media (min-width: 1280px) {
+
+  /* Ensure content doesn't stretch too wide */
+  .max-w-7xl {
+    max-width: 1280px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #0ea5e9, #8b5cf6);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #0284c7, #7c3aed);
+}
+
+/* ========== Enhanced Animations ========== */
+
+@keyframes slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.5s ease-out forwards;
 }
 
 /* =====================================================
@@ -110,6 +373,28 @@ nav input::placeholder {
 .btn-primary,
 .btn-secondary {
   min-height: 40px;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-nav:hover:not(:disabled):not(.loading) {
+  color: var(--color-info);
+  background: rgba(59, 130, 246, 0.05);
+  transform: translateY(-2px);
+}
+
+.btn-nav:focus-visible {
+  color: var(--color-info);
+  background: rgba(59, 130, 246, 0.05);
+  outline: none;
+}
+
+.btn-nav:active:not(:disabled):not(.loading) {
+  background: rgba(59, 130, 246, 0.1);
+  transform: translateY(0) scale(0.97);
   padding: 0.5rem 1rem;
   font-size: var(--font-size-sm);
   border-radius: 0.5rem;
@@ -135,6 +420,60 @@ nav input::placeholder {
   width: 40px;
   height: 40px;
   border-radius: 0.5rem;
+  color: var(--color-text-primary);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-icon:hover:not(:disabled):not(.loading) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-icon:focus-visible {
+  background: rgba(0, 0, 0, 0.05);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4), 0 0 0 1px rgba(59, 130, 246, 0.8);
+}
+
+.btn-icon:active:not(:disabled):not(.loading) {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(0.95);
+}
+
+/* Link interactive states with smooth transitions */
+a {
+  cursor: pointer;
+  text-decoration: none;
+  position: relative;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.2s ease,
+    background-color 0.2s ease;
+  will-change: transform, opacity;
+}
+
+a:hover:not([aria-disabled="true"]):not(.loading) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+a:active:not([aria-disabled="true"]):not(.loading) {
+  opacity: 0.8;
+  transform: translateY(0) scale(0.98);
+  transition:
+    opacity 0.1s ease,
+    transform 0.08s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== Reusable Link Patterns ========== */
+
+/* Navigation text link pattern */
+.link-nav {
+  position: relative;
+  font-weight: var(--font-weight-medium);
+  padding: clamp(0.5rem, 2vw, 0.625rem) clamp(0.875rem, 3vw, 1rem);
+  min-height: 40px;
+  color: var(--color-text-primary);
   background: transparent;
   display: inline-flex;
   align-items: center;
@@ -166,6 +505,48 @@ nav input::placeholder {
   }
 }
 
+.text-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+
+.text-underline:hover::after {
+  width: 100%;
+}
+
+/* =====================================================
+   FIX: Workspace top navigation contrast (light theme)
+   ===================================================== */
+
+/* Top workspace navigation links */
+nav a,
+nav button {
+  color: var(--color-text-primary);
+  opacity: 1;
+}
+
+/* Workspace dropdown / title text */
+nav [role="button"],
+nav select {
+  color: var(--color-text-primary);
+}
+
+/* Search input in top navigation */
+nav input {
+  color: var(--color-text-primary);
+  background: var(--color-background);
+}
+
+nav input::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 1;
+}
 .animate-fade-in-up {
   animation: fade-in-up 0.4s ease-out forwards;
 }
