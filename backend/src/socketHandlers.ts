@@ -27,12 +27,23 @@ export default function setupSocketHandlers(io: SocketIOServer) { // Setup socke
     }
 
     try {
-      // TODO: Verify JWT token and extract userId
-      // For now assuming token is userId or handled elsewhere, preserving original logic
-      socket.userId = token;
+      if (!process.env.JWT_SECRET) {
+        console.error("JWT_SECRET is not defined");
+        return next(new Error("Server configuration error"));
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET) as { userId: string };
+      const user = await User.findById(decoded.userId);
+
+      if (!user) {
+        return next(new Error("Authentication error"));
+      }
+
+      socket.userId = decoded.userId;
       next();
     } catch (error) {
-      next(new Error("Authentication error"));
+      console.error("Socket authentication failed:", error);
+      return next(new Error("Authentication error"));
     }
   });
 
