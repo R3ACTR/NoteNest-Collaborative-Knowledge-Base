@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NoteNest",
-  description: "Collaborative Knowledge Base",
+  title: "NoteNest - Collaborative Knowledge Base for Teams",
+  description: "NoteNest is an open-source, team-based knowledge base that allows users to create, organize, and collaborate on notes and documentation in real time.",
 };
 
 export default function RootLayout({

@@ -146,11 +146,12 @@ export default function NotesPage() {
         <main className="flex-1 overflow-auto" aria-busy={isLoading}>
           <div className="max-w-3xl mx-auto p-6">
             {createSuccessMessage && (
-              <div
-                role="status"
-                aria-live="polite"
-                className="mb-4 text-green-600 font-medium"
-              >
+             <div
+  role="status"
+  aria-live="polite"
+  className="mb-4 text-green-600 font-medium"
+>
+
                 {createSuccessMessage}
               </div>
             )}
@@ -238,12 +239,13 @@ export default function NotesPage() {
               <div className="flex justify-end gap-3">
                 {/* ✅ REQUIRED FIX */}
                 <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="btn-secondary"
-                >
-                  Cancel
-                </button>
+  type="button"
+  onClick={() => setShowCreateModal(false)}
+  className="btn-secondary"
+>
+  Cancel
+</button>
+
 
                 <button type="submit" className="btn-primary">
                   Create note
