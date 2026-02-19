@@ -50,21 +50,24 @@ export default function NotesPage() {
   const [createSuccessMessage, setCreateSuccessMessage] =
     useState<string | null>(null);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+
   const createButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-  if (!showCreateModal) return;
+    if (!showCreateModal) return;
 
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
-      setShowCreateModal(false);
-      createButtonRef.current?.focus();
-    }
-  };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setShowCreateModal(false);
+        createButtonRef.current?.focus();
+      }
+    };
 
-  document.addEventListener("keydown", handleKeyDown);
-  return () => document.removeEventListener("keydown", handleKeyDown);
-}, [showCreateModal]);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showCreateModal]);
 
 
   /* ---------- Initial Load ---------- */
@@ -75,17 +78,17 @@ export default function NotesPage() {
         stored.length > 0
           ? stored
           : [
-              {
-                id: 1,
-                title: "Project Overview",
-                content: "A high-level overview of the project.",
-              },
-              {
-                id: 2,
-                title: "Meeting Notes",
-                content: "Key points from the last team sync.",
-              },
-            ]
+            {
+              id: 1,
+              title: "Project Overview",
+              content: "A high-level overview of the project.",
+            },
+            {
+              id: 2,
+              title: "Meeting Notes",
+              content: "Key points from the last team sync.",
+            },
+          ]
       );
       setIsLoading(false);
     }, 600);
@@ -98,13 +101,13 @@ export default function NotesPage() {
   }, [notes, isLoading]);
 
   /* ---------- Create Note ---------- */
-  const handleCreateNote = useCallback(() => {
-    if (!canCreateNote) return;
-    setCreateTitle("");
-    setCreateContent("");
-    setCreateTitleError("");
-    setShowCreateModal(true);
-  }, [canCreateNote]);
+ const handleCreateNote = useCallback(() => {
+  if (!canCreateNote) return;
+  
+  setCreateTitleError("");
+  setShowCreateModal(true);
+}, [canCreateNote]);
+
 
   const handleSubmitCreate = useCallback(
     (e: React.FormEvent) => {
@@ -129,10 +132,22 @@ export default function NotesPage() {
         content: createContent.trim() || undefined,
       };
 
-      setNotes((prev) => [...prev, newNote]);
-      setCreateSuccessMessage("Note created successfully.");
-      setShowCreateModal(false);
-      setTimeout(() => setCreateSuccessMessage(null), 2000);
+     setIsSubmitting(true);
+
+setNotes((prev) => [...prev, newNote]);
+setCreateSuccessMessage("Note created successfully.");
+setShowCreateModal(false);
+
+// Clear draft after successful creation
+setCreateTitle("");
+setCreateContent("");
+
+setTimeout(() => {
+  setCreateSuccessMessage(null);
+  setIsSubmitting(false);
+}, 2000);
+
+
     },
     [createTitle, createContent]
   );
@@ -222,35 +237,40 @@ export default function NotesPage() {
 
       {/* Create Note Modal */}
       {showCreateModal && canCreateNote && (
-<div
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="new-note-title"
-  className="fixed inset-0 bg-black/50 flex items-center justify-center"
->
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="new-note-title"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center"
+        >
 
           <div className="bg-white p-6 rounded w-full max-w-md">
-<h2
-  id="new-note-title"
-  className="text-xl font-semibold mb-4"
->
-  New note
-</h2>
+            <h2
+              id="new-note-title"
+              className="text-xl font-semibold mb-4"
+            >
+              New note
+            </h2>
 
             <form onSubmit={handleSubmitCreate} noValidate>
               <input
-  type="text"
-  autoFocus
-  value={createTitle}
-  onChange={(e) => {
-    setCreateTitle(e.target.value);
-    setCreateTitleError("");
-  }}
-  className="w-full border p-2 mb-2"
-  placeholder="Title"
-/>
+                type="text"
+                autoFocus
+                value={createTitle}
+                onChange={(e) => {
+                  setCreateTitle(e.target.value);
+                  setCreateTitleError("");
+                }}
+                className="w-full border p-2 mb-2"
+                placeholder="Title"
+              />
+             <p className="text-xs text-gray-500 mb-2">
+  Max {TITLE_MAX_LENGTH} characters
+</p>
 
-              
+
+
+
 
 
               {createTitleError && (
@@ -269,18 +289,24 @@ export default function NotesPage() {
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
-onClick={() => {
-  setShowCreateModal(false);
-  createButtonRef.current?.focus();
-}}
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    createButtonRef.current?.focus();
+                  }}
                   className="btn-secondary"
                 >
                   Cancel
                 </button>
 
-                <button type="submit" className="btn-primary">
-                  Create note
-                </button>
+               <button
+  type="submit"
+  className="btn-primary"
+  disabled={isSubmitting}
+>
+  {isSubmitting ? "Creating..." : "Create note"}
+</button>
+
+
               </div>
             </form>
           </div>
