@@ -134,52 +134,74 @@ export default function DashboardPage() {
                 }}
               >
                 <div style={{ padding: 20, borderBottom: "1px solid #222" }}>
-                  <h3 style={{ color: "#fff" }}>Recent Notes</h3>
+                  <h3 style={{ color: "#fff" }}>
+                    Recent Notes ({recentNotes.length})
+                  </h3>
                 </div>
 
                 <div style={{ padding: 20 }}>
-                  {recentNotes.map((note) => (
-                    <div
-                      key={note.id}
-                      className="
-                        transition-all duration-200 ease-in-out
-                        hover:scale-[1.02]
-                        hover:shadow-lg
-                        hover:border-gray-500/40
-                        cursor-pointer
-                      "
-                      style={{
-                        padding: 16,
-                        border: "1px solid #222",
-                        borderRadius: 12,
-                        marginBottom: 12,
-                        background: "#0f0f0f",
-                      }}
-                    >
-                      <div style={{ color: "#fff", fontWeight: 600 }}>
-                        {note.title}
+                  {recentNotes.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                      <div className="text-2xl mb-3">📝</div>
+                      <div className="text-lg font-medium mb-1">
+                        No recent notes
+                      </div>
+                      <div className="text-sm">
+                        Start by creating your first note.
                       </div>
 
-                      {/* Colored Workspace Text */}
-                      <div
-                        className={`text-sm font-medium ${
-                          note.workspace === "Team"
-                            ? "text-purple-400"
-                            : note.workspace === "Personal"
-                            ? "text-blue-400"
-                            : note.workspace === "Product"
-                            ? "text-green-400"
-                            : "text-gray-400"
-                        }`}
-                      >
-                        {note.workspace}
-                      </div>
-
-                      <div style={{ color: "#666", fontSize: 12 }}>
-                        {getTimeAgo(note.createdAt)}
-                      </div>
+                      {canCreateNote && (
+                        <Link
+                          href="/notes?new=1"
+                          className="mt-4 px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-sm transition"
+                        >
+                          Create Note
+                        </Link>
+                      )}
                     </div>
-                  ))}
+                  ) : (
+                    recentNotes.map((note) => (
+                      <div
+                        key={note.id}
+                        className="
+                          transition-all duration-200 ease-in-out
+                          hover:scale-[1.02]
+                          hover:shadow-lg
+                          hover:border-gray-500/40
+                          cursor-pointer
+                        "
+                        style={{
+                          padding: 16,
+                          border: "1px solid #222",
+                          borderRadius: 12,
+                          marginBottom: 12,
+                          background: "#0f0f0f",
+                        }}
+                      >
+                        <div style={{ color: "#fff", fontWeight: 600 }}>
+                          {note.title}
+                        </div>
+
+                        <div
+                          className={`text-sm font-medium ${
+                            note.workspace === "Team"
+                              ? "text-purple-400"
+                              : note.workspace === "Personal"
+                              ? "text-blue-400"
+                              : note.workspace === "Product"
+                              ? "text-green-400"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {note.workspace}
+                        </div>
+
+                        <div style={{ color: "#666", fontSize: 12 }}>
+                          {getTimeAgo(note.createdAt)}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </section>
 
