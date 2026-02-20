@@ -28,13 +28,13 @@ export default function Home() {
 <span className="font-display text-2xl font-bold tracking-tight">NoteNest</span>
 </div>
 <div className="hidden md:flex items-center gap-8 text-sm font-medium text-stone-600">
-<a className="hover:text-black :text-white transition-colors" href="#">Features</a>
-<a className="hover:text-black :text-white transition-colors" href="#">Community</a>
-<a className="hover:text-black :text-white transition-colors" href="#">Docs</a>
+<a className="hover:text-black :text-white transition-colors" href="#features">Features</a>
+<a className="hover:text-black :text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Community</a>
+<a className="hover:text-black :text-white transition-colors" href="#docs">Docs</a>
 </div>
 <div className="flex items-center gap-4">
-<a className="hidden md:block text-sm font-medium hover:text-black :text-white transition-colors" href="#">Log in</a>
-<a className="bg-[#18181b] hover:bg-[#27272a] text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 group" href="#">
+<a className="hidden md:block text-sm font-medium hover:text-black :text-white transition-colors" href="/login">Log in</a>
+<a className="bg-[#18181b] hover:bg-[#27272a] text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2 group" href="/dashboard">
                     Get Started <span className="material-icons-outlined text-sm group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
 </a>
 </div>
@@ -55,7 +55,7 @@ export default function Home() {
                         NoteNest is an open-source, team-based knowledge base that allows users to create, organize, and collaborate on notes and documentation in real time.
                     </p>
 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-<a className="bg-[#18181b] hover:bg-[#27272a] text-white px-8 py-4 rounded-full text-lg font-medium transition-all flex items-center gap-2 group" href="#">
+<a className="bg-[#18181b] hover:bg-[#27272a] text-white px-8 py-4 rounded-full text-lg font-medium transition-all flex items-center gap-2 group" href="/dashboard">
                             Start Writing
                             <span className="bg-white text-black rounded-full w-6 h-6 flex items-center justify-center group-hover:bg-stone-200 transition-colors">
 <span className="material-icons-outlined text-sm">arrow_forward</span>
@@ -121,7 +121,7 @@ export default function Home() {
 </div>
 </div>
 </div>
-<div className="max-w-7xl mx-auto mt-40">
+<div id="features" className="max-w-7xl mx-auto mt-40">
 <div className="mb-12 max-w-xl">
 <h2 className="text-xs font-bold tracking-widest uppercase text-stone-500 mb-2">Capabilities</h2>
 <h3 className="font-display text-4xl md:text-5xl text-stone-900 leading-tight">
@@ -223,7 +223,7 @@ export default function Home() {
 </div>
 </div>
 </div>
-<div className="max-w-7xl mx-auto mt-40 grid lg:grid-cols-2 gap-20 items-center">
+<div id="docs" className="max-w-7xl mx-auto mt-40 grid lg:grid-cols-2 gap-20 items-center">
 <div>
 <h2 className="text-xs font-bold tracking-widest uppercase text-stone-500 mb-2">NoteNest Methodology</h2>
 <h3 className="font-display text-4xl md:text-5xl text-stone-900 leading-tight mb-4">
@@ -345,11 +345,11 @@ export default function Home() {
                         Open-source knowledge base for high-performance teams. Built with love and caffeine.
                     </p>
 <div className="flex gap-4">
-<a className="w-10 h-10 rounded-full bg-stone-900 flex items-center justify-center hover:bg-stone-800 transition-colors" href="#">
+<a className="w-10 h-10 rounded-full bg-stone-900 flex items-center justify-center hover:bg-stone-800 transition-colors" href="https://twitter.com">
 <span className="sr-only">Twitter</span>
 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"></path></svg>
 </a>
-<a className="w-10 h-10 rounded-full bg-stone-900 flex items-center justify-center hover:bg-stone-800 transition-colors" href="#">
+<a className="w-10 h-10 rounded-full bg-stone-900 flex items-center justify-center hover:bg-stone-800 transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">
 <span className="sr-only">GitHub</span>
 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fillRule="evenodd"></path></svg>
 </a>
@@ -358,35 +358,35 @@ export default function Home() {
 <div>
 <h4 className="font-bold text-white mb-6 uppercase text-xs tracking-wider">Product</h4>
 <ul className="space-y-4 text-sm">
-<li><a className="hover:text-white transition-colors" href="#">Features</a></li>
-<li><a className="hover:text-white transition-colors" href="#">Roadmap</a></li>
-<li><a className="hover:text-white transition-colors" href="#">Changelog</a></li>
-<li><a className="hover:text-white transition-colors" href="#">Pricing</a></li>
+<li><a className="hover:text-white transition-colors" href="#features">Features</a></li>
+<li><a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Roadmap</a></li>
+<li><a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Changelog</a></li>
+<li><a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Pricing</a></li>
 </ul>
 </div>
 <div>
 <h4 className="font-bold text-white mb-6 uppercase text-xs tracking-wider">Resources</h4>
 <ul className="space-y-4 text-sm">
-<li><a className="hover:text-white transition-colors" href="#">Documentation</a></li>
-<li><a className="hover:text-white transition-colors" href="#">API Reference</a></li>
-<li><a className="hover:text-white transition-colors" href="#">Guide</a></li>
+<li><a className="hover:text-white transition-colors" href="#docs">Documentation</a></li>
+<li><a className="hover:text-white transition-colors" href="#docs">API Reference</a></li>
+<li><a className="hover:text-white transition-colors" href="#docs">Guide</a></li>
 </ul>
 </div>
 <div>
 <h4 className="font-bold text-white mb-6 uppercase text-xs tracking-wider">Community</h4>
 <ul className="space-y-4 text-sm">
-<li><a className="hover:text-white transition-colors" href="#">GitHub</a></li>
-<li><a className="hover:text-white transition-colors" href="#">Discord</a></li>
-<li><a className="hover:text-white transition-colors" href="#">Blog</a></li>
+<li><a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">GitHub</a></li>
+<li><a className="hover:text-white transition-colors" href="https://discord.com">Discord</a></li>
+<li><a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Blog</a></li>
 </ul>
 </div>
 </div>
 <div className="pt-8 border-t border-stone-800 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
 <p>© 2024 NoteNest Inc. All rights reserved.</p>
 <div className="flex gap-6">
-<a className="hover:text-white transition-colors" href="#">Privacy</a>
-<a className="hover:text-white transition-colors" href="#">Terms</a>
-<a className="hover:text-white transition-colors" href="#">Cookies</a>
+<a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Privacy</a>
+<a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Terms</a>
+<a className="hover:text-white transition-colors" href="https://github.com/R3ACTR/NoteNest-Collaborative-Knowledge-Base">Cookies</a>
 </div>
 </div>
 </div>
