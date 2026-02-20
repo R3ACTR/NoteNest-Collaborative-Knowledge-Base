@@ -1,0 +1,233 @@
+SyntaxError: Expected ',' or '}' after property value in JSON at position 96923 (line 2653 column 5)
+    at JSON.parse (<anonymous>)
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\anant\pnpm-lock.yaml as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\anant\OneDrive\Desktop\prms\open\NoteNest-Collaborative-Knowledge-Base\frontend\pnpm-lock.yaml
+   * C:\Users\anant\OneDrive\Desktop\prms\open\NoteNest-Collaborative-Knowledge-Base\pnpm-lock.yaml
+
+▲ Next.js 16.1.6 (Turbopack)
+
+  Creating an optimized production build ...
+SyntaxError: Expected ',' or '}' after property value in JSON at position 96923 (line 2653 column 5)
+    at JSON.parse (<anonymous>)
+
+> Build error occurred
+Error: Turbopack build failed with 8 errors:
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:15
+Ecmascript file had an error
+[0m [90m 64 |[39m
+ [90m 65 |[39m [90m// Re-export types for convenience[39m
+[31m[1m>[22m[39m[90m 66 |[39m [36mexport[39m type { [33mAuditLog[39m[33m,[39m [33mWorkspace[39m[33m,[39m [33mNote[39m[33m,[39m [33mNoteVersion[39m[33m,[39m [33mUser[39m[33m,[39m [33mFolder[39m }[33m;[39m
+ [90m    |[39m               [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 67 |[39m
+ [90m 68 |[39m
+ [90m 69 |[39m [36mconst[39m [33mAPI_BASE_URL[39m [33m=[39m process[33m.[39menv[33m.[39m[33mNEXT_PUBLIC_API_URL[39m[33m;[39m[0m
+
+the name `AuditLog` is exported multiple times
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:42
+Ecmascript file had an error
+[0m [90m 64 |[39m
+ [90m 65 |[39m [90m// Re-export types for convenience[39m
+[31m[1m>[22m[39m[90m 66 |[39m [36mexport[39m type { [33mAuditLog[39m[33m,[39m [33mWorkspace[39m[33m,[39m [33mNote[39m[33m,[39m [33mNoteVersion[39m[33m,[39m [33mUser[39m[33m,[39m [33mFolder[39m }[33m;[39m
+ [90m    |[39m                                          [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 67 |[39m
+ [90m 68 |[39m
+ [90m 69 |[39m [36mconst[39m [33mAPI_BASE_URL[39m [33m=[39m process[33m.[39menv[33m.[39m[33mNEXT_PUBLIC_API_URL[39m[33m;[39m[0m
+
+the name `NoteVersion` is exported multiple times
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:36
+Ecmascript file had an error
+[0m [90m 64 |[39m
+ [90m 65 |[39m [90m// Re-export types for convenience[39m
+[31m[1m>[22m[39m[90m 66 |[39m [36mexport[39m type { [33mAuditLog[39m[33m,[39m [33mWorkspace[39m[33m,[39m [33mNote[39m[33m,[39m [33mNoteVersion[39m[33m,[39m [33mUser[39m[33m,[39m [33mFolder[39m }[33m;[39m
+ [90m    |[39m                                    [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 67 |[39m
+ [90m 68 |[39m
+ [90m 69 |[39m [36mconst[39m [33mAPI_BASE_URL[39m [33m=[39m process[33m.[39menv[33m.[39m[33mNEXT_PUBLIC_API_URL[39m[33m;[39m[0m
+
+the name `Note` is exported multiple times
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:55
+Ecmascript file had an error
+[0m [90m 64 |[39m
+ [90m 65 |[39m [90m// Re-export types for convenience[39m
+[31m[1m>[22m[39m[90m 66 |[39m [36mexport[39m type { [33mAuditLog[39m[33m,[39m [33mWorkspace[39m[33m,[39m [33mNote[39m[33m,[39m [33mNoteVersion[39m[33m,[39m [33mUser[39m[33m,[39m [33mFolder[39m }[33m;[39m
+ [90m    |[39m                                                       [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 67 |[39m
+ [90m 68 |[39m
+ [90m 69 |[39m [36mconst[39m [33mAPI_BASE_URL[39m [33m=[39m process[33m.[39menv[33m.[39m[33mNEXT_PUBLIC_API_URL[39m[33m;[39m[0m
+
+the name `User` is exported multiple times
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:25
+Ecmascript file had an error
+[0m [90m 64 |[39m
+ [90m 65 |[39m [90m// Re-export types for convenience[39m
+[31m[1m>[22m[39m[90m 66 |[39m [36mexport[39m type { [33mAuditLog[39m[33m,[39m [33mWorkspace[39m[33m,[39m [33mNote[39m[33m,[39m [33mNoteVersion[39m[33m,[39m [33mUser[39m[33m,[39m [33mFolder[39m }[33m;[39m
+ [90m    |[39m                         [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 67 |[39m
+ [90m 68 |[39m
+ [90m 69 |[39m [36mconst[39m [33mAPI_BASE_URL[39m [33m=[39m process[33m.[39menv[33m.[39m[33mNEXT_PUBLIC_API_URL[39m[33m;[39m[0m
+
+the name `Workspace` is exported multiple times
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts:5:1
+Module not found: Can't resolve 'lib0/decoding'
+[0m [90m 3 |[39m [36mimport[39m [33m*[39m [36mas[39m syncProtocol [36mfrom[39m [32m'y-protocols/sync'[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m [33m*[39m [36mas[39m encoding [36mfrom[39m [32m'lib0/encoding'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 5 |[39m [36mimport[39m [33m*[39m [36mas[39m decoding [36mfrom[39m [32m'lib0/decoding'[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 6 |[39m [90m// import { Observable } from 'lib0/observable'; // Y.js providers usually extend Observable, but we can be simpler[39m
+ [90m 7 |[39m
+ [90m 8 |[39m [36mexport[39m [36mclass[39m [33mYSocketIOProvider[39m {[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/components/CollaborativeEditor.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/components/CollaborativeEditor.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts:4:1
+Module not found: Can't resolve 'lib0/encoding'
+[0m [90m 2 |[39m [36mimport[39m { [33mSocket[39m } [36mfrom[39m [32m'socket.io-client'[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m [33m*[39m [36mas[39m syncProtocol [36mfrom[39m [32m'y-protocols/sync'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m [33m*[39m [36mas[39m encoding [36mfrom[39m [32m'lib0/encoding'[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 5 |[39m [36mimport[39m [33m*[39m [36mas[39m decoding [36mfrom[39m [32m'lib0/decoding'[39m[33m;[39m
+ [90m 6 |[39m [90m// import { Observable } from 'lib0/observable'; // Y.js providers usually extend Observable, but we can be simpler[39m
+ [90m 7 |[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/components/CollaborativeEditor.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/components/CollaborativeEditor.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts:3:1
+Module not found: Can't resolve 'y-protocols/sync'
+[0m [90m 1 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mY[39m [36mfrom[39m [32m'yjs'[39m[33m;[39m
+ [90m 2 |[39m [36mimport[39m { [33mSocket[39m } [36mfrom[39m [32m'socket.io-client'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m [33m*[39m [36mas[39m syncProtocol [36mfrom[39m [32m'y-protocols/sync'[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 4 |[39m [36mimport[39m [33m*[39m [36mas[39m encoding [36mfrom[39m [32m'lib0/encoding'[39m[33m;[39m
+ [90m 5 |[39m [36mimport[39m [33m*[39m [36mas[39m decoding [36mfrom[39m [32m'lib0/decoding'[39m[33m;[39m
+ [90m 6 |[39m [90m// import { Observable } from 'lib0/observable'; // Y.js providers usually extend Observable, but we can be simpler[39m[0m
+
+
+
+Import traces:
+  Client Component Browser:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/components/CollaborativeEditor.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component Browser]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/components/CollaborativeEditor.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Client Component SSR]
+    ./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/app/notes/[id]/page.tsx [Server Component]
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:15)
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:42)
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:36)
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:55)
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/api.ts:66:25)
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts:5:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts:4:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./OneDrive/Desktop/prms/open/NoteNest-Collaborative-Knowledge-Base/frontend/lib/yjs-provider.ts:3:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

@@ -22,7 +22,7 @@ export default function WorkspaceSelector() {
           const selected = workspaces.find(
             (w) => w.id === e.target.value
           );
-          if (selected) setActiveWorkspace(selected);
+          if (selected) setActiveWorkspace(selected.id);
         }}
         className="rounded-lg border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         style={{

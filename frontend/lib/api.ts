@@ -36,6 +36,7 @@ export type {
   Note,
   NoteVersion,
   User,
+  Folder,
   CreateWorkspaceRequest,
   AddMemberRequest,
   UpdateMemberRoleRequest,
@@ -63,8 +64,6 @@ export type {
 // import { io } from "socket.io-client"; // Added at bottom
 
 // Re-export types for convenience
-export type { AuditLog, Workspace, Note, NoteVersion, User, Folder };
-
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5002';

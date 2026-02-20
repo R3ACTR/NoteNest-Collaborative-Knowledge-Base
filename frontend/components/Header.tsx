@@ -37,19 +37,19 @@ export default function Header({
 
       <header
         className="flex items-center gap-4 border-b px-6 py-4"
+        role="banner"
         style={{
           background: "#000000",
           borderColor: "rgba(255,255,255,0.08)",
           color: "#FFFFFF",
         }}
-        role="banner"
       >
         <WorkspaceSelector />
 
         <h1
+          id="page-title"
           className="text-xl font-semibold shrink-0"
           style={{ color: "#FFFFFF" }}
-          id="page-title"
         >
           {title}
         </h1>

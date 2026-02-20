@@ -96,13 +96,13 @@ export default function NotesPage() {
                 id: 1,
                 title: "Project Overview",
                 content: "A high-level overview of the project.",
-                createdAt: Date.now() - 1000 * 60 * 60,
+                createdAt: Date.now() - 1000 * 60 * 60, // 1 hour ago
               },
               {
                 id: 2,
                 title: "Meeting Notes",
                 content: "Key points from the last team sync.",
-                createdAt: Date.now() - 1000 * 60 * 5,
+                createdAt: Date.now() - 1000 * 60 * 5, // 5 minutes ago
               },
             ]
       );
@@ -125,7 +125,6 @@ export default function NotesPage() {
   /* ---------- Filtered notes ---------- */
   const filteredNotes = notes.filter((note) => {
     if (!searchQuery.trim()) return true;
-
     const query = searchQuery.toLowerCase();
     return (
       note.title.toLowerCase().includes(query) ||
@@ -181,15 +180,13 @@ export default function NotesPage() {
           )
         );
       } else {
-        setNotes((prev) => [
-          ...prev,
-          {
-            id: Date.now(),
-            title,
-            content: createContent.trim() || undefined,
-            createdAt: Date.now(),
-          },
-        ]);
+        const newNote: Note = {
+          id: Date.now(),
+          title,
+          content: createContent.trim() || undefined,
+          createdAt: Date.now(),
+        };
+        setNotes((prev) => [...prev, newNote]);
       }
 
       setCreateSuccessMessage(
@@ -325,6 +322,138 @@ export default function NotesPage() {
           </div>
         </main>
       </div>
+
+      {/* Create / Edit Modal */}
+      {showCreateModal && canCreateNote && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="new-note-title"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center"
+        >
+          <div className="relative bg-white p-6 rounded w-full max-w-md">
+            <button
+              type="button"
+              onClick={() => {
+                setShowCreateModal(false);
+                createButtonRef.current?.focus();
+              }}
+              aria-label="Close dialog"
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
+
+            <h2 id="new-note-title" className="text-xl font-semibold mb-4">
+              {editingNoteId !== null ? "Edit note" : "New note"}
+            </h2>
+
+            <form onSubmit={handleSubmitCreate} noValidate>
+              <input
+                type="text"
+                autoFocus
+                value={createTitle}
+                onChange={(e) => {
+                  setCreateTitle(e.target.value);
+                  setCreateTitleError("");
+                }}
+                className="w-full border p-2 mb-2"
+                placeholder="Title"
+              />
+
+              <p className="text-xs text-gray-500 mb-2">
+                {createTitle.length} / {TITLE_MAX_LENGTH} characters
+              </p>
+
+              {createTitleError && (
+                <p className="text-sm text-red-600 mb-2">
+                  {createTitleError}
+                </p>
+              )}
+
+              <textarea
+                value={createContent}
+                onChange={(e) => setCreateContent(e.target.value)}
+                className="w-full border p-2 mb-4"
+                placeholder="Content (optional)"
+              />
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    createButtonRef.current?.focus();
+                  }}
+                  className="btn-secondary"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || createTitle.trim().length === 0}
+                >
+                  {isSubmitting
+                    ? "Saving..."
+                    : editingNoteId !== null
+                    ? "Update note"
+                    : "Create note"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {noteToDelete && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-note-title"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center"
+        >
+          <div className="bg-white p-6 rounded w-full max-w-sm">
+            <h2
+              id="delete-note-title"
+              className="text-lg font-semibold mb-3"
+            >
+              Delete note
+            </h2>
+
+            <p className="text-sm text-gray-700 mb-6">
+              Are you sure you want to delete this note?
+              <br />
+              <strong>This action cannot be undone.</strong>
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setNoteToDelete(null)}
+                className="btn-secondary"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setNotes((prev) =>
+                    prev.filter((n) => n.id !== noteToDelete.id)
+                  );
+                  setNoteToDelete(null);
+                }}
+                className="btn-danger"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

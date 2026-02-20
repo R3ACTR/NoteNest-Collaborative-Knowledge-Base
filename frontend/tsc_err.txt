@@ -1,0 +1,14 @@
+components/WorkspaceSelector.tsx(25,44): error TS2345: Argument of type 'Workspace' is not assignable to parameter of type 'string'.
+lib/api.ts(34,3): error TS2300: Duplicate identifier 'AuditLog'.
+lib/api.ts(35,3): error TS2300: Duplicate identifier 'Workspace'.
+lib/api.ts(36,3): error TS2300: Duplicate identifier 'Note'.
+lib/api.ts(37,3): error TS2300: Duplicate identifier 'NoteVersion'.
+lib/api.ts(38,3): error TS2300: Duplicate identifier 'User'.
+lib/api.ts(66,15): error TS2300: Duplicate identifier 'AuditLog'.
+lib/api.ts(66,25): error TS2300: Duplicate identifier 'Workspace'.
+lib/api.ts(66,36): error TS2300: Duplicate identifier 'Note'.
+lib/api.ts(66,42): error TS2300: Duplicate identifier 'NoteVersion'.
+lib/api.ts(66,55): error TS2300: Duplicate identifier 'User'.
+lib/yjs-provider.ts(3,31): error TS2307: Cannot find module 'y-protocols/sync' or its corresponding type declarations.
+lib/yjs-provider.ts(4,27): error TS2307: Cannot find module 'lib0/encoding' or its corresponding type declarations.
+lib/yjs-provider.ts(5,27): error TS2307: Cannot find module 'lib0/decoding' or its corresponding type declarations.
