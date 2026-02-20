@@ -1,0 +1,6 @@
+
+C:\Users\anant\OneDrive\Desktop\prms\open\NoteNest-Collaborative-Knowledge-Base\frontend\app\page.tsx
+  239:0  error  Parsing error: Identifier expected
+
+✖ 1 problem (1 error, 0 warnings)
+

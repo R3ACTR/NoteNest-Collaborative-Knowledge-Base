@@ -1,4 +1,6 @@
-@import "tailwindcss";
+const fs = require('fs');
+
+const css = `@import "tailwindcss";
 
 @theme {
   --color-primary: #18181b;
@@ -29,3 +31,7 @@
     -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
   }
 }
+`;
+
+fs.writeFileSync('app/globals.css', css, 'utf8');
+console.log('Successfully wiped globals.css to raw Tailwind default');
