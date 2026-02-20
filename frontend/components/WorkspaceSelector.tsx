@@ -24,12 +24,7 @@ export default function WorkspaceSelector() {
           );
           if (selected) setActiveWorkspace(selected);
         }}
-        className="rounded-lg border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        style={{
-          borderColor: "rgba(255,255,255,0.12)", // ✅ Dark border
-          color: "#FFFFFF", // ✅ White text
-          background: "#0B0B0B", // ✅ Dark background
-        }}
+        className="rounded-lg border border-blue-500 bg-black px-3 py-1 text-sm text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none"
         aria-label="Select active workspace"
         aria-describedby="workspace-description"
       >
@@ -37,10 +32,7 @@ export default function WorkspaceSelector() {
           <option
             key={workspace.id}
             value={workspace.id}
-            style={{
-              background: "#0B0B0B", // ✅ Dark dropdown items
-              color: "#FFFFFF",
-            }}
+            className="bg-black text-blue-400"
           >
             {workspace.name}
           </option>
