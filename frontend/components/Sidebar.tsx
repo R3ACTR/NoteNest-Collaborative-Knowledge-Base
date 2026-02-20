@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePermissions } from "@/hooks/usePermissions";
@@ -12,123 +13,154 @@ export default function Sidebar() {
   const { canAccessManagement } = usePermissions();
   const { role, setRole } = useUserRole();
   const { activeWorkspace } = useWorkspace();
+
+  // ✅ NEW STATE (for collapse)
+  const [collapsed, setCollapsed] = useState(false);
+
   const linkBase =
-    "block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2";
-  const linkActive = {
-    background: "rgba(59, 130, 246, 0.1)",
-    color: "var(--color-info)",
-  };
- const linkInactive = {
-  color: "var(--color-text-primary)",
-  opacity: 0.85,
-};
+    "block rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200 text-white hover:bg-gray-700 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500";
 
-
+  const activeClass =
+    "bg-blue-600 text-white border-r-2 border-white";
 
   return (
     <aside
-      className="w-60 min-h-screen flex flex-col border-r shrink-0"
-      style={{
-        background: "var(--color-background)",
-        borderColor: "var(--color-border-light)",
-      }}
+      className={`${collapsed ? "w-20" : "w-60"} min-h-screen flex flex-col shrink-0 bg-gray-900 border-r border-gray-800 text-white transition-all duration-300`}
       aria-label="Main navigation"
     >
-      <header className="p-5 border-b" style={{ borderColor: "var(--color-border-light)" }}>
-        <Link
-          href="/"
-          className="font-bold text-xl tracking-tight hover:opacity-90 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-md px-2 py-1"
-          style={{ color: "var(--color-text-primary)" }}
-          aria-label="NoteNest home page"
+      {/* HEADER */}
+      <header className="flex items-center justify-between p-5 border-b border-gray-800">
+        {!collapsed && (
+          <Link
+            href="/"
+            className="font-bold text-xl tracking-tight text-white hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md px-2 py-1"
+          >
+            NoteNest
+          </Link>
+        )}
+
+        {/* TOGGLE BUTTON */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="p-2 rounded-md hover:bg-gray-700 transition-colors"
         >
-          NoteNest
-        </Link>
+          {collapsed ? "▶" : "◀"}
+        </button>
       </header>
 
-      <nav className="flex-1 p-3 space-y-1" role="navigation" aria-label="Workspace navigation">
+      {/* NAV */}
+      <nav
+        className="flex-1 p-3 space-y-1"
+        role="navigation"
+        aria-label="Workspace navigation"
+      >
         <Link
           href={`/workspace/${activeWorkspace.id}`}
-          className={`${linkBase} flex items-center gap-2`}
-          style={pathname === `/workspace/${activeWorkspace.id}` ? linkActive : linkInactive}
-          aria-current={pathname === `/workspace/${activeWorkspace.id}` ? "page" : undefined}
+          className={`${linkBase} flex items-center ${
+            collapsed ? "justify-center" : "gap-2"
+          } ${
+            pathname === `/workspace/${activeWorkspace.id}`
+              ? activeClass
+              : ""
+          }`}
         >
-          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          <svg
+            className="w-4 h-4 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+            />
           </svg>
-          Home
+          {!collapsed && "Home"}
         </Link>
+
         <Link
           href={`/workspace/${activeWorkspace.id}/dashboard`}
-          className={linkBase}
-          style={pathname === `/workspace/${activeWorkspace.id}/dashboard` ? linkActive : linkInactive}
-          aria-current={pathname === `/workspace/${activeWorkspace.id}/dashboard` ? "page" : undefined}
+          className={`${linkBase} ${
+            collapsed ? "text-center" : ""
+          } ${
+            pathname === `/workspace/${activeWorkspace.id}/dashboard`
+              ? activeClass
+              : ""
+          }`}
         >
-          Dashboard
+          {!collapsed && "Dashboard"}
+          {collapsed && <span className="text-sm">D</span>}
         </Link>
+
         <Link
           href={`/workspace/${activeWorkspace.id}/notes`}
-          className={linkBase}
-          style={pathname === `/workspace/${activeWorkspace.id}/notes` ? linkActive : linkInactive}
-          aria-current={pathname === `/workspace/${activeWorkspace.id}/notes` ? "page" : undefined}
+          className={`${linkBase} ${
+            collapsed ? "text-center" : ""
+          } ${
+            pathname === `/workspace/${activeWorkspace.id}/notes`
+              ? activeClass
+              : ""
+          }`}
         >
-          Notes
+          {!collapsed && "Notes"}
+          {collapsed && <span className="text-sm">N</span>}
         </Link>
+
         {canAccessManagement && (
           <Link
             href="/management"
-            className={`${linkBase} flex items-center gap-2`}
-            style={pathname === "/management" ? linkActive : linkInactive}
-            aria-current={pathname === "/management" ? "page" : undefined}
+            className={`${linkBase} flex items-center ${
+              collapsed ? "justify-center" : "gap-2"
+            } ${pathname === "/management" ? activeClass : ""}`}
           >
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg
+              className="w-4 h-4 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0..."
+              />
             </svg>
-            Management
+            {!collapsed && "Management"}
           </Link>
         )}
       </nav>
 
-      <footer
-        className="p-4 border-t flex flex-col items-center gap-3"
-        style={{ borderColor: "var(--color-border-light)" }}
-      >
-        <div className="w-full">
-          <label htmlFor="role-select" className="block text-sm font-medium text-gray-700 mb-1">
-            Role (for testing)
-          </label>
-          <select
-            id="role-select"
-            value={role}
-            onChange={(e) => setRole(e.target.value as UserRole)}
-            className="w-full rounded-lg border px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            style={{
-              borderColor: "var(--color-border-light)",
-              color: "var(--color-text-primary)",
-              background: "var(--color-background)",
-            }}
-            aria-describedby="role-description"
-          >
-            <option value="viewer">Viewer</option>
-            <option value="editor">Editor</option>
-            <option value="admin">Admin</option>
-          </select>
-          <div id="role-description" className="sr-only">
-            Switch user role for testing purposes. Changes are saved in localStorage.
+      {/* FOOTER */}
+      {!collapsed && (
+        <footer className="p-4 border-t border-gray-800 flex flex-col items-center gap-3">
+          <div className="w-full">
+            <label
+              htmlFor="role-select"
+              className="block text-sm mb-1 text-gray-300"
+            >
+              Role (for testing)
+            </label>
+
+            <select
+              id="role-select"
+              value={role}
+              onChange={(e) => setRole(e.target.value as UserRole)}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="viewer">Viewer</option>
+              <option value="editor">Editor</option>
+              <option value="admin">Admin</option>
+            </select>
           </div>
-        </div>
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0"
-          style={{
-            background: "var(--color-info)",
-            color: "white",
-          }}
-          aria-label="User avatar"
-          role="img"
-        >
-          N
-        </div>
-      </footer>
+
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 bg-blue-600 text-white">
+            N
+          </div>
+        </footer>
+      )}
     </aside>
   );
 }
