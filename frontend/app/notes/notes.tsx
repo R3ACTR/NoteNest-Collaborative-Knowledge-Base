@@ -112,11 +112,25 @@ export default function NotesPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  
+  /* ---------- Sync URL search ---------- */
+  useEffect(() => {
+    setSearchQuery(search);
+  }, [search]);
 
+  /* ---------- Persist notes ---------- */
   useEffect(() => {
     if (!isLoading) saveNotesToStorage(notes);
   }, [notes, isLoading]);
+
+  /* ---------- Filtered notes ---------- */
+  const filteredNotes = notes.filter((note) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(query) ||
+      note.content?.toLowerCase().includes(query)
+    );
+  });
 
   /* ---------- Create Note ---------- */
   const handleCreateNote = useCallback(() => {
@@ -137,7 +151,7 @@ export default function NotesPage() {
     setShowCreateModal(true);
   }, []);
 
-  /* ---------- Submit (Create / Edit) ---------- */
+  /* ---------- Submit ---------- */
   const handleSubmitCreate = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -172,7 +186,6 @@ export default function NotesPage() {
           content: createContent.trim() || undefined,
           createdAt: Date.now(),
         };
-
         setNotes((prev) => [...prev, newNote]);
       }
 
@@ -259,20 +272,23 @@ export default function NotesPage() {
                   )
                 }
               />
+            ) : filteredNotes.length === 0 ? (
+              <EmptyState
+                title="No results found"
+                description="Try adjusting your search keywords."
+              />
             ) : (
               <ul className="space-y-3">
-                {notes.map((note) => (
+                {filteredNotes.map((note) => (
                   <li
                     key={note.id}
                     className="rounded-xl border p-4 bg-white shadow-sm flex justify-between gap-4"
                   >
                     <div>
                       <h4 className="font-semibold">{note.title}</h4>
-
                       <p className="text-xs text-gray-500 mt-1">
                         {formatRelativeTime(note.createdAt)}
                       </p>
-
                       <p className="text-sm text-gray-600 mt-1">
                         {note.content || "No content"}
                       </p>
@@ -333,21 +349,21 @@ export default function NotesPage() {
             </h2>
 
             <form onSubmit={handleSubmitCreate} noValidate>
-             <input
-  type="text"
-  autoFocus
-  value={createTitle}
-  onChange={(e) => {
-    setCreateTitle(e.target.value);
-    setCreateTitleError("");
-  }}
-  className="w-full border p-2 mb-2"
-  placeholder="Title"
-/>
+              <input
+                type="text"
+                autoFocus
+                value={createTitle}
+                onChange={(e) => {
+                  setCreateTitle(e.target.value);
+                  setCreateTitleError("");
+                }}
+                className="w-full border p-2 mb-2"
+                placeholder="Title"
+              />
 
-             <p className="text-xs text-gray-500 mb-2">
-  {createTitle.length} / {TITLE_MAX_LENGTH} characters
-</p>
+              <p className="text-xs text-gray-500 mb-2">
+                {createTitle.length} / {TITLE_MAX_LENGTH} characters
+              </p>
 
               {createTitleError && (
                 <p className="text-sm text-red-600 mb-2">
@@ -376,7 +392,9 @@ export default function NotesPage() {
 
                 <button
                   type="submit"
-className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"disabled={isSubmitting || createTitle.trim().length === 0}                >
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isSubmitting || createTitle.trim().length === 0}
+                >
                   {isSubmitting
                     ? "Saving..."
                     : editingNoteId !== null
