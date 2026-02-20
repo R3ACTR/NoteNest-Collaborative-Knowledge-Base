@@ -33,6 +33,21 @@ function getTimeAgo(dateString: string) {
 export default function DashboardPage() {
   const { canCreateNote } = usePermissions();
 
+  /* ✅ Badge Color Logic (NEW) */
+  const getWorkspaceBadgeClass = (workspace: string) => {
+    switch (workspace) {
+      case "Team":
+        return "bg-purple-500/10 text-purple-400";
+      case "Personal":
+        return "bg-blue-500/10 text-blue-400";
+      case "Product":
+        return "bg-green-500/10 text-green-400";
+      default:
+        return "bg-gray-500/10 text-gray-400";
+    }
+  };
+
+  /* ✅ UPDATED — Use timestamps instead of text */
   const [recentNotes] = useState([
     {
       id: 1,
@@ -97,9 +112,7 @@ export default function DashboardPage() {
               </section>
 
               {/* Quick Actions */}
-              <section
-                style={{ ...cardStyle, borderRadius: 16, marginTop: 24 }}
-              >
+              <section style={{ ...cardStyle, borderRadius: 16, marginTop: 24 }}>
                 <div style={{ padding: 20, borderBottom: "1px solid #222" }}>
                   <h3 style={{ color: "#fff" }}>Quick Actions</h3>
                 </div>
