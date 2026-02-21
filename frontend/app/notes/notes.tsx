@@ -5,11 +5,11 @@ import { useSearchParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import EmptyState from "@/components/EmptyState";
-import ErrorState from "@/components/ErrorState";
 import { SkeletonList } from "@/components/Skeleton";
 import { usePermissions } from "@/hooks/usePermissions";
 
 const STORAGE_KEY = "notenest-notes";
+const DRAFT_KEY = "notenest-note-draft";
 const TITLE_MAX_LENGTH = 200;
 
 interface Note {
@@ -19,6 +19,7 @@ interface Note {
   createdAt: number;
 }
 
+/* ---------- Helpers ---------- */
 function loadNotesFromStorage(): Note[] {
   if (typeof window === "undefined") return [];
   try {
@@ -30,9 +31,7 @@ function loadNotesFromStorage(): Note[] {
 }
 
 function saveNotesToStorage(notes: Note[]) {
-  if (typeof window !== "undefined") {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
-  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
 }
 
 function formatRelativeTime(timestamp?: number) {
@@ -47,6 +46,8 @@ function formatRelativeTime(timestamp?: number) {
   return `Created ${hours} hours ago`;
 }
 
+/* ============================= */
+
 export default function NotesPage() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
@@ -54,27 +55,30 @@ export default function NotesPage() {
 
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "az">("newest");
+  const [sortBy, setSortBy] =
+    useState<"newest" | "oldest" | "az">("newest");
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [createTitle, setCreateTitle] = useState("");
   const [createContent, setCreateContent] = useState("");
   const [createTitleError, setCreateTitleError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
-  const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  /* ---------- Undo delete ---------- */
+  const [recentlyDeleted, setRecentlyDeleted] = useState<Note | null>(null);
+  const [showUndoToast, setShowUndoToast] = useState(false);
+  const deleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const createButtonRef = useRef<HTMLButtonElement>(null);
 
   /* ---------- Initial load ---------- */
   useEffect(() => {
     const stored = loadNotesFromStorage();
-    setTimeout(() => {
-      setNotes(stored);
-      setIsLoading(false);
-    }, 500);
+    setNotes(stored);
+    setIsLoading(false);
   }, []);
 
   /* ---------- Sync search ---------- */
@@ -82,12 +86,36 @@ export default function NotesPage() {
     setSearchQuery(search);
   }, [search]);
 
-  /* ---------- Persist ---------- */
+  /* ---------- Persist notes ---------- */
   useEffect(() => {
     if (!isLoading) saveNotesToStorage(notes);
   }, [notes, isLoading]);
 
-  /* ---------- Filter ---------- */
+  /* ---------- Restore draft ---------- */
+  useEffect(() => {
+    if (!showCreateModal) return;
+
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+
+    try {
+      const draft = JSON.parse(raw);
+      setCreateTitle(draft.title || "");
+      setCreateContent(draft.content || "");
+    } catch {}
+  }, [showCreateModal]);
+
+  /* ---------- Autosave draft ---------- */
+  useEffect(() => {
+    if (!showCreateModal) return;
+
+    localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({ title: createTitle, content: createContent })
+    );
+  }, [createTitle, createContent, showCreateModal]);
+
+  /* ---------- Filter & sort ---------- */
   const filteredNotes = notes.filter((note) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
@@ -97,21 +125,9 @@ export default function NotesPage() {
     );
   });
 
-  /* ---------- Sort (FIXED) ---------- */
   const sortedNotes = [...filteredNotes].sort((a, b) => {
-    const aTime = a.createdAt ?? a.id;
-    const bTime = b.createdAt ?? b.id;
-
-    if (sortBy === "newest") {
-      if (bTime !== aTime) return bTime - aTime;
-      return b.id - a.id;
-    }
-
-    if (sortBy === "oldest") {
-      if (aTime !== bTime) return aTime - bTime;
-      return a.id - b.id;
-    }
-
+    if (sortBy === "newest") return b.createdAt - a.createdAt;
+    if (sortBy === "oldest") return a.createdAt - b.createdAt;
     return a.title.localeCompare(b.title);
   });
 
@@ -143,13 +159,20 @@ export default function NotesPage() {
       return;
     }
 
+    if (title.length > TITLE_MAX_LENGTH) {
+      setCreateTitleError(
+        `Title must be ${TITLE_MAX_LENGTH} characters or less`
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     setNotes((prev) =>
       editingNoteId
         ? prev.map((n) =>
             n.id === editingNoteId
-              ? { ...n, title, content: createContent }
+              ? { ...n, title, content: createContent || undefined }
               : n
           )
         : [
@@ -165,90 +188,124 @@ export default function NotesPage() {
 
     setShowCreateModal(false);
     setEditingNoteId(null);
+    setCreateTitle("");
+    setCreateContent("");
+    localStorage.removeItem(DRAFT_KEY);
     setIsSubmitting(false);
   };
 
+  /* ---------- Delete with undo ---------- */
+  const handleDeleteNote = (note: Note) => {
+    setNotes((prev) => prev.filter((n) => n.id !== note.id));
+    setRecentlyDeleted(note);
+    setShowUndoToast(true);
+
+    if (deleteTimeoutRef.current) {
+      clearTimeout(deleteTimeoutRef.current);
+    }
+
+    deleteTimeoutRef.current = setTimeout(() => {
+      setRecentlyDeleted(null);
+      setShowUndoToast(false);
+    }, 5000);
+  };
+
+  /* ============================= */
+
   return (
-    <div className="flex min-h-screen bg-[#0b0b0b]">
-      <Sidebar />
+    <>
+      <div className="flex">
+        <Sidebar />
 
-      <div className="flex-1 flex flex-col">
-        <Header
-          title="Notes"
-          showSearch
-          action={
-            canCreateNote && (
-              <button
-                ref={createButtonRef}
-                onClick={handleCreateNote}
-                className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-semibold shadow hover:bg-blue-700 transition"
-              >
-                + Create Note
-              </button>
-            )
-          }
-        />
+        <div className="flex-1 flex flex-col">
+          <Header
+            title="Notes"
+            showSearch
+            action={
+              canCreateNote && (
+                <button
+                  ref={createButtonRef}
+                  onClick={handleCreateNote}
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
+                >
+                  + Create Note
+                </button>
+              )
+            }
+          />
 
-        <main className="flex-1 overflow-y-auto">
-          <div className="max-w-3xl mx-auto p-6">
-            {/* Sort */}
-            <div className="mb-4 flex justify-end items-center gap-2">
-              <span className="text-sm text-gray-400">Sort by</span>
-              <select
-                value={sortBy}
-                onChange={(e) =>
-                  setSortBy(e.target.value as "newest" | "oldest" | "az")
-                }
-                className="bg-white text-black border rounded-lg px-3 py-2 text-sm shadow"
-              >
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
-                <option value="az">A–Z</option>
-              </select>
-            </div>
+          <main className="flex-1 overflow-y-auto">
+            <div className="max-w-3xl mx-auto p-6">
+              <div className="mb-4 flex justify-end gap-2">
+                <span className="text-sm text-gray-500">Sort by</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) =>
+                    setSortBy(e.target.value as any)
+                  }
+                  className="border rounded px-3 py-2"
+                >
+                  <option value="newest">Newest first</option>
+                  <option value="oldest">Oldest first</option>
+                  <option value="az">A–Z</option>
+                </select>
+              </div>
 
-            {isLoading ? (
-              <SkeletonList count={4} />
-            ) : sortedNotes.length === 0 ? (
-              <EmptyState
-                title="No results found"
-                description="Try adjusting your search."
-              />
-            ) : (
-              <ul className="space-y-4">
-                {sortedNotes.map((note) => (
-                  <li
-                    key={note.id}
-                    className="bg-white rounded-xl p-5 shadow flex justify-between gap-4"
-                  >
-                    <div>
-                      <h4 className="font-semibold text-lg">{note.title}</h4>
-                      <p className="text-sm text-gray-500">
-                        {formatRelativeTime(note.createdAt)}
-                      </p>
-                      <p className="text-gray-700 mt-2">
-                        {note.content || "No content"}
-                      </p>
-                    </div>
-
-                    {!isViewer && (
-                      <div className="flex gap-2">
-                        <button onClick={() => handleEditNote(note)}>✏️</button>
-                        <button onClick={() => setNoteToDelete(note)}>🗑️</button>
+              {isLoading ? (
+                <SkeletonList count={4} />
+              ) : sortedNotes.length === 0 ? (
+                <EmptyState
+                  title="No results found"
+                  description="Try adjusting your search keywords."
+                />
+              ) : (
+                <ul className="space-y-3">
+                  {sortedNotes.map((note) => (
+                    <li
+                      key={note.id}
+                      className="border rounded-xl p-4 bg-white flex justify-between"
+                    >
+                      <div>
+                        <h4 className="font-semibold">{note.title}</h4>
+                        <p className="text-xs text-gray-500">
+                          {formatRelativeTime(note.createdAt)}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {note.content || "No content"}
+                        </p>
                       </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </main>
+
+                      {!isViewer && (
+                        <div className="flex gap-2">
+                          <button
+                            title="Edit note"
+                            onClick={() => handleEditNote(note)}
+                            className="text-blue-600"
+                          >
+                            ✏️
+                          </button>
+                          <button
+                            title="Delete note"
+                            onClick={() => handleDeleteNote(note)}
+                            className="text-red-600"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </main>
+        </div>
       </div>
 
-      {/* Modal */}
+      {/* ---------- Modal ---------- */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white p-6 rounded w-full max-w-md">
             <h2 className="text-xl font-semibold mb-4">
               {editingNoteId ? "Edit note" : "New note"}
             </h2>
@@ -257,12 +314,15 @@ export default function NotesPage() {
               <input
                 value={createTitle}
                 onChange={(e) => setCreateTitle(e.target.value)}
-                className="w-full border p-2 mb-2"
+                className="w-full border p-2 mb-1"
                 placeholder="Title"
               />
+              <p className="text-xs text-gray-500 mb-2">
+                {createTitle.length} / {TITLE_MAX_LENGTH}
+              </p>
 
               {createTitleError && (
-                <p className="text-red-600 text-sm mb-2">
+                <p className="text-sm text-red-600 mb-2">
                   {createTitleError}
                 </p>
               )}
@@ -278,21 +338,42 @@ export default function NotesPage() {
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 border rounded"
+                  className="border px-4 py-2 rounded"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded"
+                  disabled={isSubmitting}
+                  className="bg-blue-600 text-white px-4 py-2 rounded"
                 >
-                  Save
+                  {editingNoteId ? "Update" : "Create"}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
-    </div>
+
+      {/* ---------- Undo Toast ---------- */}
+      {showUndoToast && recentlyDeleted && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-4 py-3 rounded flex gap-4">
+          <span>Note deleted</span>
+          <button
+            onClick={() => {
+              setNotes((prev) => [...prev, recentlyDeleted]);
+              if (deleteTimeoutRef.current) {
+                clearTimeout(deleteTimeoutRef.current);
+              }
+              setShowUndoToast(false);
+              setRecentlyDeleted(null);
+            }}
+            className="underline font-semibold"
+          >
+            Undo
+          </button>
+        </div>
+      )}
+    </>
   );
 }
