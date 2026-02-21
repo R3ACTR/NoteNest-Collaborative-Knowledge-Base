@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import WorkspaceSelector from "@/components/WorkspaceSelector";
 import { useUserRole } from "@/contexts/UserRoleContext";
@@ -14,7 +14,7 @@ interface HeaderProps {
   action?: React.ReactNode;
 }
 
-export default function Header({
+function HeaderInner({
   title = "Dashboard",
   showSearch = false,
   action,
@@ -36,21 +36,14 @@ export default function Header({
       </a>
 
 <header
-  className="sticky top-0 z-40 flex items-center gap-4 border-b px-6 py-4"
+  className="sticky top-0 z-40 flex items-center gap-4 border-b px-6 py-4 bg-[#F3F0E6]/90 backdrop-blur-sm border-stone-200/50"
   role="banner"
-  style={{
-    background: "#000000",
-    borderColor: "rgba(255,255,255,0.08)",
-  
-          color: "#FFFFFF",
-        }}
-      >
+>
         <WorkspaceSelector />
 
         <h1
           id="page-title"
-          className="text-xl font-semibold shrink-0"
-          style={{ color: "#FFFFFF" }}
+          className="font-display text-3xl font-bold shrink-0 text-stone-900"
         >
           {title}
         </h1>
@@ -80,13 +73,7 @@ export default function Header({
 
                 router.replace(`?${params.toString()}`);
               }}
-              className="w-full rounded-lg border px-3 py-2 text-sm transition-colors placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              style={{
-                borderColor: "rgba(255,255,255,0.12)",
-                color: "#FFFFFF",
-                background: "#0B0B0B",
-                fontSize: "var(--font-size-sm)",
-              }}
+              className="w-full rounded-full border border-stone-200 bg-white px-4 py-2 text-sm transition-colors placeholder:text-stone-400 text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 shadow-sm"
             />
           </div>
         )}
@@ -110,5 +97,20 @@ export default function Header({
         </nav>
       </header>
     </>
+  );
+}
+
+export default function Header(props: HeaderProps) {
+  return (
+    <Suspense
+      fallback={
+        <header
+          className="sticky top-0 z-40 flex items-center gap-4 border-b px-6 py-4 bg-[#F3F0E6]/90 backdrop-blur-sm border-stone-200/50"
+          role="banner"
+        />
+      }
+    >
+      <HeaderInner {...props} />
+    </Suspense>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import Sidebar from "@/components/Sidebar";
@@ -14,12 +15,25 @@ import ActivityTimeline from "@/components/ActivityTimeline";
 const CREATE_RESTRICTED_TITLE = "You need Editor or Admin role to create notes.";
 
 export default function WorkspaceDashboardPage({ workspaceId }: { workspaceId: string }) {
-  const { activeWorkspace } = useWorkspace();
+  const router = useRouter();
+  const { workspaces, activeWorkspace, setActiveWorkspace } = useWorkspace();
   const { canCreateNote } = usePermissions();
   const [recentActivity, setRecentActivity] = useState<Array<{ id: number; action: string; timestamp: string }>>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
+
+  const workspace = workspaces.find((w) => w.id === workspaceId);
+
+  useEffect(() => {
+    if (!workspace) {
+      router.push(`/workspace/${activeWorkspace.id}/dashboard`);
+    } else if (workspaceId !== activeWorkspace.id) {
+      setActiveWorkspace(workspaceId);
+    }
+  }, [workspace, workspaceId, activeWorkspace.id, router, setActiveWorkspace]);
+
+  if (!workspace) return null;
 
   useEffect(() => {
     // Simulate loading dashboard data (no backend)
@@ -55,7 +69,7 @@ export default function WorkspaceDashboardPage({ workspaceId }: { workspaceId: s
 
       <div className="flex-1 flex flex-col min-w-0">
         <Header
-          title={`Dashboard - ${activeWorkspace.name}`}
+          title={`Dashboard - ${workspace.name}`}
           showSearch
           action={
             canCreateNote ? (
@@ -106,36 +120,16 @@ export default function WorkspaceDashboardPage({ workspaceId }: { workspaceId: s
           </div>
 
           <div className="flex-1 min-w-0 flex flex-col gap-8 max-w-4xl mx-auto p-4 sm:p-6 md:p-8 relative z-10">
-            {/* Welcome — compact hero */}
-            <section
-              className="rounded-2xl border p-6 sm:p-7 transition-shadow duration-200 hover:shadow-md"
-              style={{
-                background: "var(--color-background)",
-                borderColor: "var(--color-border-light)",
-                boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.06)",
-                borderLeftWidth: "4px",
-                borderLeftColor: "var(--color-info)",
-              }}
-            >
-              <h2
-                className="text-xl sm:text-2xl font-bold mb-2"
-                style={{
-                  color: "var(--color-text-primary)",
-                  letterSpacing: "-0.025em",
-                  lineHeight: "var(--line-height-tight)",
-                }}
-              >
-                Welcome to {activeWorkspace.name} 👋
-              </h2>
-              <p
-                className="text-sm sm:text-base max-w-xl"
-                style={{
-                  color: "var(--color-text-secondary)",
-                  lineHeight: "var(--line-height-relaxed)",
-                }}
-              >
-                {activeWorkspace.description || "This is your workspace dashboard. Get started by creating your first note."}
-              </p>
+            {/* Welcome Section */}
+            <section className="bg-white rounded-3xl p-8 border border-stone-200 shadow-sm relative overflow-hidden">
+              <div className="relative z-10">
+                <h2 className="font-display text-4xl font-bold mb-3 text-stone-900">
+                  Welcome to {workspace.name} 👋
+                </h2>
+                <p className="text-lg text-stone-600 max-w-2xl">
+                  {workspace.description || "This is your workspace dashboard. Get started by creating your first note."}
+                </p>
+              </div>
             </section>
 
             {loadError && (

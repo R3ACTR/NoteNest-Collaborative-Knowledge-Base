@@ -69,78 +69,62 @@ export default function DashboardPage() {
     },
   ]);
 
-  useEffect(() => {
-    document.body.style.background = "#000";
-    document.documentElement.style.background = "#000";
-  }, []);
-
-  const cardStyle = {
-    background: "#0b0b0b",
-    border: "1px solid #1f1f1f",
-    boxShadow: "0 10px 40px rgba(0, 0, 0, 0.9)",
-  };
-
   return (
     <RouteGuard requireAuth>
-      <div style={{ background: "#000", minHeight: "100vh", display: "flex" }}>
+      <div className="flex min-h-screen bg-[#F3F0E6]">
         <Sidebar />
 
-        <div style={{ flex: 1, background: "#000" }}>
+        <div className="flex-1 flex flex-col min-w-0">
           <Header title="Dashboard" showSearch />
 
-          <main style={{ background: "#000", minHeight: "100vh", padding: 32 }}>
-            <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <main className="flex-1 overflow-auto p-4 sm:p-8">
+            <div className="max-w-4xl mx-auto space-y-8">
 
               {/* Welcome Section */}
-              <section className="p-6 rounded-2xl" style={{ ...cardStyle }}>
-                <h2 className="text-xl font-semibold mb-2 text-white">
+              <section className="bg-white rounded-3xl p-8 border border-stone-200 shadow-sm">
+                <h2 className="font-display text-4xl font-bold mb-3 text-stone-900">
                   Welcome back!
                 </h2>
 
-                <p className="text-sm mb-3 text-gray-400">
+                <p className="text-lg text-stone-600">
                   This is your NoteNest dashboard. Get started by creating your
                   first note and organizing your team's knowledge.
                 </p>
               </section>
 
               {/* Quick Actions */}
-              <section className="rounded-2xl mt-6 overflow-hidden" style={{ ...cardStyle }}>
-                <div className="px-5 py-4 border-b border-[#222]">
-                  <h3 className="text-white font-semibold">Quick Actions</h3>
-                </div>
+              <section className="bg-white rounded-3xl p-8 border border-stone-200 shadow-sm">
+                <h3 className="font-display text-2xl font-bold mb-6 text-stone-900">Quick Actions</h3>
 
-                <div className="p-5 flex gap-3">
+                <div className="flex flex-wrap gap-4 items-center">
                   {canCreateNote && (
-                    <Link href="/notes?new=1" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium transition">
-                      Create Note
+                    <Link href="/notes?new=1" className="bg-[#18181b] hover:bg-[#27272a] text-white px-6 py-3 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
+                       <span className="material-icons-outlined text-sm">add</span> Create Note
                     </Link>
                   )}
 
-                  <Link
-                    href="/notes"
-                    className="border border-[#333] hover:bg-[#1a1a1a] text-white px-4 py-2 rounded-lg font-medium transition"
-                  >
-                    View All Notes
+                  <Link href="/notes" className="bg-white hover:bg-stone-50 text-stone-900 border border-stone-200 px-6 py-3 rounded-full text-sm font-medium transition-colors flex items-center gap-2">
+                    <span className="material-icons-outlined text-sm">article</span> View All Notes
                   </Link>
                 </div>
               </section>
 
               {/* Recent Notes */}
-              <section className="rounded-2xl mt-8 overflow-hidden" style={{ ...cardStyle }}>
-                <div className="px-5 py-4 border-b border-[#222]">
-                  <h3 className="text-gray-200 font-semibold flex items-center gap-2">
+              <section className="bg-white rounded-3xl p-8 border border-stone-200 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <h3 className="font-display text-2xl font-bold text-stone-900">
                     Recent Notes
-                    <span className="bg-purple-500/15 text-purple-400 px-2.5 py-0.5 rounded-full text-xs font-medium">
-                      {recentNotes.length}
-                    </span>
                   </h3>
+                  <span className="bg-stone-100 text-stone-600 px-3 py-1 rounded-full text-xs font-bold border border-stone-200">
+                    {recentNotes.length}
+                  </span>
                 </div>
 
-                <div className="p-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {recentNotes.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                      <div className="text-2xl mb-3">📝</div>
-                      <div className="text-lg font-medium mb-1">
+                    <div className="col-span-full flex flex-col items-center justify-center py-12 text-stone-400 bg-stone-50 rounded-2xl border border-stone-200 border-dashed">
+                      <span className="material-icons-outlined text-4xl mb-3">description</span>
+                      <div className="text-lg font-medium text-stone-900 mb-1">
                         No recent notes
                       </div>
                       <div className="text-sm">
@@ -150,9 +134,9 @@ export default function DashboardPage() {
                       {canCreateNote && (
                         <Link
                           href="/notes?new=1"
-                          className="mt-4 px-4 py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white text-sm transition"
+                          className="mt-4 px-6 py-2 rounded-full bg-[#18181b] hover:bg-[#27272a] text-white text-sm font-medium transition flex items-center gap-2"
                         >
-                          Create Note
+                          <span className="material-icons-outlined text-sm">add</span> Create Note
                         </Link>
                       )}
                     </div>
@@ -160,18 +144,36 @@ export default function DashboardPage() {
                     recentNotes.map((note) => (
                       <div
                         key={note.id}
-                        className="transition-all duration-200 ease-in-out hover:scale-[1.01] hover:shadow-lg cursor-pointer p-4 border border-[#222] hover:border-gray-500/40 rounded-xl mb-3 bg-[#0f0f0f]"
+                        className="p-6 bg-white border border-stone-200 rounded-2xl cursor-pointer hover:border-stone-400 hover:shadow-md transition-all group"
                       >
-                        <div className="text-white font-semibold mb-1">
-                          {note.title}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="font-semibold text-lg text-stone-900 group-hover:text-blue-600 transition-colors">
+                            {note.title}
+                          </div>
+                          <button className="text-stone-400 hover:text-stone-900 transition-colors">
+                            <span className="material-icons-outlined text-sm">more_horiz</span>
+                          </button>
                         </div>
 
-                        <div className={`text-sm font-medium ${getWorkspaceBadgeClass(note.workspace)} inline-block px-2 rounded mb-2`}>
-                          {note.workspace}
-                        </div>
+                        <div className="flex items-center justify-between mt-8">
+                          <div
+                            className={`text-xs font-bold px-2.5 py-1 rounded-md ${
+                              note.workspace === "Team"
+                                ? "bg-purple-100 text-purple-700"
+                                : note.workspace === "Personal"
+                                ? "bg-blue-100 text-blue-700"
+                                : note.workspace === "Product"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-stone-100 text-stone-700"
+                            }`}
+                          >
+                            {note.workspace}
+                          </div>
 
-                        <div className="text-gray-500 text-xs">
-                          {getTimeAgo(note.createdAt)}
+                          <div className="text-stone-500 text-xs font-medium flex items-center gap-1">
+                            <span className="material-icons-outlined text-[14px]">schedule</span>
+                            {getTimeAgo(note.createdAt)}
+                          </div>
                         </div>
                       </div>
                     ))

@@ -34,21 +34,24 @@ export default function ManagementPage() {
 
   if (!canAccessManagement) {
     return (
-      <div className="flex">
+      <div className="flex min-h-screen bg-[#F3F0E6]">
         <Sidebar />
         <div className="flex-1 flex flex-col min-w-0">
           <Header title="Management" />
-          <main className="flex-1 p-6 overflow-auto flex items-center justify-center bg-black">
-            <div className="max-w-md rounded-xl p-6 text-center" style={{ background: "#0b0b0b", border: "1px solid #1f1f1f", boxShadow: "0 10px 40px rgba(0,0,0,0.9)" }}>
-              <p className="text-sm font-medium mb-2 text-white">
+          <main className="flex-1 p-4 sm:p-8 overflow-auto flex items-center justify-center">
+            <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-stone-200 shadow-sm text-center">
+              <div className="w-16 h-16 rounded-full bg-stone-100 text-stone-600 flex items-center justify-center mx-auto mb-6">
+                <span className="material-icons-outlined text-2xl">admin_panel_settings</span>
+              </div>
+              <h2 className="font-display text-2xl font-bold mb-2 text-stone-900">
                 Admin only
-              </p>
-              <p className="text-sm mb-6 text-gray-400">
+              </h2>
+              <p className="text-stone-600 leading-relaxed mb-8">
                 You need the Admin role to access Management. This area is for workspace settings, members, and roles.
               </p>
               <Link
                 href="/dashboard"
-                className="inline-block bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-5 py-2 transition-colors text-sm font-medium"
+                className="inline-flex px-6 py-3 rounded-full border border-stone-200 text-stone-900 hover:bg-stone-50 font-medium transition-colors whitespace-nowrap w-full justify-center"
               >
                 Back to Dashboard
               </Link>
@@ -60,22 +63,21 @@ export default function ManagementPage() {
   }
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-[#F3F0E6]">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0">
         <Header title="Management" />
-        <main className="flex-1 p-6 overflow-auto bg-black text-white">
-          <div className="max-w-4xl mx-auto">
-            <section
-              className="rounded-2xl p-6 mb-8"
-              style={{ background: "#0b0b0b", border: "1px solid #1f1f1f", boxShadow: "0 10px 40px rgba(0,0,0,0.9)" }}
-            >
-              <h2 className="text-xl font-semibold mb-2 text-white">
-                Hierarchical RBAC Management
-              </h2>
-              <p className="text-sm mb-6 text-gray-400">
-                Manage groups, permissions, and access links for granular control over workspace resources.
-              </p>
+        <main className="flex-1 p-4 sm:p-8 overflow-auto">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <section className="bg-white rounded-3xl p-8 border border-stone-200 shadow-sm">
+              <div className="border-b border-stone-100 pb-6 mb-6">
+                <h2 className="font-display text-2xl font-bold text-stone-900">
+                  Hierarchical RBAC Management
+                </h2>
+                <p className="text-stone-500 text-sm mt-2">
+                  Manage groups, permissions, and access links for granular control over workspace resources.
+                </p>
+              </div>
 
               {/* Tabs */}
               <div className="flex space-x-1 mb-6 border-b border-[#222] pb-1">
@@ -87,10 +89,10 @@ export default function ManagementPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                    className={`px-5 py-2.5 text-sm font-medium rounded-full transition-colors ${
                       activeTab === tab.id
-                        ? 'bg-[#1f1f1f] text-white border-t border-x border-[#333]'
-                        : 'text-gray-400 hover:text-gray-200 hover:bg-[#1a1a1a]'
+                        ? 'bg-[#18181b] text-white shadow-sm'
+                        : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
                     }`}
                   >
                     {tab.label}
@@ -101,27 +103,36 @@ export default function ManagementPage() {
               {/* Tab Content */}
               {activeTab === 'groups' && (
                 <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-md font-semibold text-white">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                    <h3 className="font-display text-xl font-bold text-stone-900">
                       User Groups
                     </h3>
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-sm transition font-medium">Create Group</button>
+                    <button className="bg-white border border-stone-200 text-stone-900 hover:bg-stone-50 px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
+                      <span className="material-icons-outlined text-[16px]">add</span> Create Group
+                    </button>
                   </div>
                   <div className="space-y-3">
                     {groups.length === 0 ? (
-                      <div className="text-center py-8 text-gray-400 border border-[#222] rounded-xl bg-[#0f0f0f]">
-                        <p className="text-sm">No groups created yet.</p>
+                      <div className="flex flex-col items-center justify-center py-12 text-stone-400 bg-stone-50/50 rounded-2xl border border-stone-200 border-dashed">
+                        <span className="material-icons-outlined text-4xl mb-3">group</span>
+                        <p className="text-sm font-medium text-stone-600">No groups created yet.</p>
                       </div>
                     ) : (
                       groups.map((group) => (
-                        <div key={group._id} className="flex items-center justify-between p-4 border border-[#222] bg-[#0f0f0f] rounded-xl hover:border-gray-500/40 transition">
+                        <div key={group._id} className="flex items-center justify-between p-4 border border-stone-200 rounded-2xl bg-white hover:border-stone-300 transition-colors group/card">
                           <div>
-                            <p className="font-medium text-white">{group.name}</p>
-                            <p className="text-sm text-gray-400">{group.members.length} members</p>
+                            <p className="font-bold text-stone-900">{group.name}</p>
+                            <p className="text-sm text-stone-500 mt-1 flex items-center gap-1">
+                              <span className="material-icons-outlined text-[14px]">person</span> {group.members.length} members
+                            </p>
                           </div>
-                          <div className="flex space-x-3">
-                            <button className="text-sm text-blue-400 hover:text-blue-300 transition">Edit</button>
-                            <button className="text-sm text-red-500 hover:text-red-400 transition">Delete</button>
+                          <div className="flex gap-2">
+                            <button className="w-8 h-8 rounded-full flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-stone-900 transition-colors" title="Edit">
+                               <span className="material-icons-outlined text-[16px]">edit</span>
+                            </button>
+                            <button className="w-8 h-8 rounded-full flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Delete">
+                               <span className="material-icons-outlined text-[16px]">delete</span>
+                            </button>
                           </div>
                         </div>
                       ))
@@ -132,27 +143,35 @@ export default function ManagementPage() {
 
               {activeTab === 'permissions' && (
                 <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-md font-semibold text-white">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                    <h3 className="font-display text-xl font-bold text-stone-900">
                       Resource Permissions
                     </h3>
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-sm transition font-medium">Grant Permission</button>
+                    <button className="bg-white border border-stone-200 text-stone-900 hover:bg-stone-50 px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
+                      <span className="material-icons-outlined text-[16px]">vpn_key</span> Grant Permission
+                    </button>
                   </div>
                   <div className="space-y-3">
                     {permissions.length === 0 ? (
-                      <div className="text-center py-8 text-gray-400 border border-[#222] rounded-xl bg-[#0f0f0f]">
-                        <p className="text-sm">No permissions granted yet.</p>
+                      <div className="flex flex-col items-center justify-center py-12 text-stone-400 bg-stone-50/50 rounded-2xl border border-stone-200 border-dashed">
+                        <span className="material-icons-outlined text-4xl mb-3">gavel</span>
+                        <p className="text-sm font-medium text-stone-600">No permissions granted yet.</p>
                       </div>
                     ) : (
                       permissions.map((perm) => (
-                        <div key={perm._id} className="flex items-center justify-between p-4 border border-[#222] bg-[#0f0f0f] rounded-xl hover:border-gray-500/40 transition">
+                        <div key={perm._id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border border-stone-200 rounded-2xl bg-white hover:border-stone-300 transition-colors">
                           <div>
-                            <p className="font-medium text-white">{perm.resourcePath}</p>
-                            <p className="text-sm text-gray-400">
-                              {perm.subjectType}: {perm.subjectId} - {perm.permissions.join(', ')}
+                            <p className="font-bold text-stone-900">{perm.resourcePath}</p>
+                            <p className="text-sm text-stone-500 mt-1 flex items-center gap-1">
+                              <span className="material-icons-outlined text-[14px]">
+                                {perm.subjectType === 'user' ? 'person' : 'group'}
+                              </span>
+                              {perm.subjectType}: {perm.subjectId} • {perm.permissions.join(', ')}
                             </p>
                           </div>
-                          <button className="text-sm text-red-500 hover:text-red-400 transition">Revoke</button>
+                          <button className="bg-white border border-stone-200 text-red-600 hover:bg-red-50 hover:border-red-200 px-4 py-2 rounded-full text-xs font-medium transition-colors whitespace-nowrap shadow-sm">
+                            Revoke
+                          </button>
                         </div>
                       ))
                     )}
@@ -162,29 +181,31 @@ export default function ManagementPage() {
 
               {activeTab === 'access-links' && (
                 <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-md font-semibold text-white">
+                  <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
+                    <h3 className="font-display text-xl font-bold text-stone-900">
                       Temporary Access Links
                     </h3>
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-sm transition font-medium">Create Access Link</button>
+                    <button className="bg-white border border-stone-200 text-stone-900 hover:bg-stone-50 px-4 py-2 rounded-full text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
+                       <span className="material-icons-outlined text-[16px]">link</span> Create Access Link
+                    </button>
                   </div>
-                  <div className="text-center py-8 text-gray-400 border border-[#222] rounded-xl bg-[#0f0f0f]">
-                    <p className="text-sm">Access links functionality coming soon.</p>
+                  <div className="flex flex-col items-center justify-center py-12 text-stone-400 bg-stone-50/50 rounded-2xl border border-stone-200 border-dashed">
+                     <span className="material-icons-outlined text-4xl mb-3">construction</span>
+                    <p className="text-sm font-medium text-stone-600">Access links functionality coming soon.</p>
                   </div>
                 </div>
               )}
             </section>
 
-            <section
-              className="rounded-2xl p-6"
-              style={{ background: "#0b0b0b", border: "1px solid #1f1f1f", boxShadow: "0 10px 40px rgba(0,0,0,0.9)" }}
-            >
-              <h2 className="text-xl font-semibold mb-2 text-white">
-                Feature Flags
-              </h2>
-              <p className="text-sm mb-6 text-gray-400">
-                Control experimental and optional features. Changes are saved automatically.
-              </p>
+            <section className="bg-white rounded-3xl p-8 border border-stone-200 shadow-sm">
+              <div className="border-b border-stone-100 pb-6 mb-6">
+                <h2 className="font-display text-2xl font-bold text-stone-900">
+                  Feature Flags
+                </h2>
+                <p className="text-stone-500 text-sm mt-2">
+                  Control experimental and optional features. Changes are saved automatically.
+                </p>
+              </div>
               <FeatureFlagExample />
             </section>
           </div>

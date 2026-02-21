@@ -34,7 +34,7 @@ const MOCK_NOTES: StaticNote[] = [
 
 export default function StaticNotesPage() {
   return (
-    <div className="flex">
+    <div className="flex min-h-screen bg-[#F3F0E6]">
       {/* Sidebar */}
       <Sidebar />
 
@@ -42,37 +42,24 @@ export default function StaticNotesPage() {
       <div className="flex-1 flex flex-col min-w-0">
         <Header title="Static Notes List" />
 
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-4 sm:p-8">
           <div className="max-w-3xl mx-auto">
             <ul className="space-y-4">
               {MOCK_NOTES.map((note) => (
                 <li
                   key={note.id}
-                  className="rounded-xl border p-4 transition hover:shadow-md"
-                  style={{
-                    background: "var(--color-background)",
-                    borderColor: "var(--color-border-light)",
-                  }}
+                  className="rounded-3xl border border-stone-200 p-6 bg-white transition hover:shadow-md group"
                 >
-                  <h3
-                    className="text-base font-semibold mb-1"
-                    style={{ color: "var(--color-text-primary)" }}
-                  >
+                  <h3 className="font-display text-2xl font-bold mb-2 text-stone-900 group-hover:text-blue-600 transition-colors">
                     {note.title}
                   </h3>
 
-                  <p
-                    className="text-sm mb-2"
-                    style={{ color: "var(--color-text-secondary)" }}
-                  >
+                  <p className="text-base text-stone-600 mb-4 line-clamp-2">
                     {note.preview}
                   </p>
 
-                  <span
-                    className="text-xs"
-                    style={{ color: "var(--color-text-muted)" }}
-                  >
-                    Updated {note.updatedAt}
+                  <span className="text-sm text-stone-500 font-medium flex items-center gap-1">
+                    <span className="material-icons-outlined text-[14px]">schedule</span> Updated {note.updatedAt}
                   </span>
                 </li>
               ))}

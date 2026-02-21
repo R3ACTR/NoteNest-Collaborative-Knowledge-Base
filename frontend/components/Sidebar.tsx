@@ -18,23 +18,24 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const linkBase =
-    "block rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200 text-white hover:bg-gray-700 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500";
+    "block rounded-md px-3 py-2.5 text-sm font-medium transition-all duration-200 text-stone-600 hover:bg-stone-200 hover:text-stone-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400";
 
   const activeClass =
-    "bg-blue-600 text-white border-r-2 border-white";
+    "bg-stone-200 text-stone-900 font-semibold border-r-2 border-black";
 
   return (
     <aside
-      className={`${collapsed ? "w-20" : "w-60"} min-h-screen flex flex-col shrink-0 bg-gray-900 border-r border-gray-800 text-white transition-all duration-300`}
+      className={`${collapsed ? "w-20" : "w-60"} min-h-screen flex flex-col shrink-0 bg-[#F3F0E6] border-r border-stone-200 text-stone-900 transition-all duration-300`}
       aria-label="Main navigation"
     >
       {/* HEADER */}
-      <header className="flex items-center justify-between p-5 border-b border-gray-800">
+      <header className="flex items-center justify-between p-5 border-b border-stone-200/50">
         {!collapsed && (
           <Link
             href="/"
-            className="font-bold text-xl tracking-tight text-white hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-md px-2 py-1"
+            className="flex items-center gap-2 font-display text-2xl font-bold tracking-tight text-stone-900 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded-md px-2 py-1"
           >
+            <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-display text-xl pt-1">N</div>
             NoteNest
           </Link>
         )}
@@ -42,7 +43,7 @@ export default function Sidebar() {
         {/* TOGGLE BUTTON */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-2 rounded-md hover:bg-gray-700 transition-colors"
+          className="p-2 rounded-md hover:bg-stone-200 transition-colors"
         >
           {collapsed ? "▶" : "◀"}
         </button>
@@ -135,11 +136,11 @@ export default function Sidebar() {
 
       {/* FOOTER */}
       {!collapsed && (
-        <footer className="p-4 border-t border-gray-800 flex flex-col items-center gap-3">
+        <footer className="p-4 border-t border-stone-200/50 flex flex-col items-center gap-3">
           <div className="w-full">
             <label
               htmlFor="role-select"
-              className="block text-sm mb-1 text-gray-300"
+              className="block text-sm mb-1 text-stone-500"
             >
               Role (for testing)
             </label>
@@ -148,7 +149,7 @@ export default function Sidebar() {
               id="role-select"
               value={role}
               onChange={(e) => setRole(e.target.value as UserRole)}
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 text-white px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-stone-200 bg-white text-stone-900 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-stone-400"
             >
               <option value="viewer">Viewer</option>
               <option value="editor">Editor</option>
@@ -156,7 +157,7 @@ export default function Sidebar() {
             </select>
           </div>
 
-          <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 bg-blue-600 text-white">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-display shrink-0 bg-black text-white pt-1">
             N
           </div>
         </footer>
