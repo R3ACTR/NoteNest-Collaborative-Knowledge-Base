@@ -525,4 +525,179 @@ router.patch('/:id/pin', authenticateToken, requirePermission('write'), async (r
   }
 });
 
+// ========== BULK OPERATIONS ==========
+
+// Bulk pin/unpin notes
+router.post('/bulk/pin', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { noteIds, isPinned } = req.body;
+    const { authorId } = req.body;
+
+    if (!Array.isArray(noteIds) || noteIds.length === 0) {
+      return res.status(400).json({ error: 'noteIds must be a non-empty array' });
+    }
+
+    const updatedNotes = await Note.updateMany(
+      { _id: { $in: noteIds } },
+      { isPinned, updatedAt: new Date() }
+    );
+
+    // Invalidate cache
+    const cacheService = getCacheService();
+    if (cacheService) {
+      // Get affected workspaces
+      const notes = await Note.find({ _id: { $in: noteIds } });
+      const workspaceIds = [...new Set(notes.map(n => n.workspaceId.toString()))];
+      
+      for (const workspaceId of workspaceIds) {
+        await cacheService.delete(CacheKeys.workspaceNotes(workspaceId));
+      }
+
+      for (const noteId of noteIds) {
+        await cacheService.delete(CacheKeys.note(noteId));
+      }
+    }
+
+    res.json({ message: 'Notes updated successfully', modifiedCount: updatedNotes.modifiedCount });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to bulk pin notes' });
+  }
+});
+
+// Bulk delete notes
+router.delete('/bulk', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { noteIds, authorId } = req.body;
+
+    if (!Array.isArray(noteIds) || noteIds.length === 0) {
+      return res.status(400).json({ error: 'noteIds must be a non-empty array' });
+    }
+
+    // Get notes before deletion for audit
+    const notesToDelete = await Note.find({ _id: { $in: noteIds } });
+
+    // Delete notes
+    const result = await Note.deleteMany({ _id: { $in: noteIds } });
+
+    // Emit events and audit logs
+    const eventBus = getEventBus();
+    for (const note of notesToDelete) {
+      const event: NoteDeletedEvent = {
+        type: EVENT_NAMES.NOTE_DELETED,
+        timestamp: new Date(),
+        actorId: authorId,
+        workspaceId: note.workspaceId.toString(),
+        noteId: note._id.toString(),
+        title: note.title,
+      };
+      await eventBus.emit(EVENT_NAMES.NOTE_DELETED, event);
+
+      await AuditService.logEvent(
+        'note_deleted',
+        authorId,
+        note.workspaceId.toString(),
+        note._id.toString(),
+        'note',
+        { title: note.title }
+      );
+    }
+
+    // Invalidate cache
+    const cacheService = getCacheService();
+    if (cacheService) {
+      const workspaceIds = [...new Set(notesToDelete.map(n => n.workspaceId.toString()))];
+      
+      for (const workspaceId of workspaceIds) {
+        await cacheService.delete(CacheKeys.workspaceNotes(workspaceId));
+      }
+
+      for (const noteId of noteIds) {
+        await cacheService.delete(CacheKeys.note(noteId));
+      }
+    }
+
+    res.json({ message: 'Notes deleted successfully', deletedCount: result.deletedCount });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to bulk delete notes' });
+  }
+});
+
+// Bulk move notes to folder
+router.patch('/bulk/move-to-folder', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { noteIds, folderId, authorId } = req.body;
+
+    if (!Array.isArray(noteIds) || noteIds.length === 0) {
+      return res.status(400).json({ error: 'noteIds must be a non-empty array' });
+    }
+
+    const updatedNotes = await Note.updateMany(
+      { _id: { $in: noteIds } },
+      { folderId: folderId || null, updatedAt: new Date() }
+    );
+
+    // Invalidate cache
+    const cacheService = getCacheService();
+    if (cacheService) {
+      const notes = await Note.find({ _id: { $in: noteIds } });
+      const workspaceIds = [...new Set(notes.map(n => n.workspaceId.toString()))];
+      
+      for (const workspaceId of workspaceIds) {
+        await cacheService.delete(CacheKeys.workspaceNotes(workspaceId));
+      }
+
+      for (const noteId of noteIds) {
+        await cacheService.delete(CacheKeys.note(noteId));
+      }
+    }
+
+    res.json({ message: 'Notes moved successfully', modifiedCount: updatedNotes.modifiedCount });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to bulk move notes' });
+  }
+});
+
+// Bulk add tags to notes
+router.patch('/bulk/add-tags', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
+  try {
+    const { noteIds, tags, authorId } = req.body;
+
+    if (!Array.isArray(noteIds) || noteIds.length === 0) {
+      return res.status(400).json({ error: 'noteIds must be a non-empty array' });
+    }
+
+    if (!Array.isArray(tags) || tags.length === 0) {
+      return res.status(400).json({ error: 'tags must be a non-empty array' });
+    }
+
+    // Use aggregation to add tags efficiently
+    const result = await Note.updateMany(
+      { _id: { $in: noteIds } },
+      { 
+        $addToSet: { tags: { $each: tags } },
+        updatedAt: new Date()
+      }
+    );
+
+    // Invalidate cache
+    const cacheService = getCacheService();
+    if (cacheService) {
+      const notes = await Note.find({ _id: { $in: noteIds } });
+      const workspaceIds = [...new Set(notes.map(n => n.workspaceId.toString()))];
+      
+      for (const workspaceId of workspaceIds) {
+        await cacheService.delete(CacheKeys.workspaceNotes(workspaceId));
+      }
+
+      for (const noteId of noteIds) {
+        await cacheService.delete(CacheKeys.note(noteId));
+      }
+    }
+
+    res.json({ message: 'Tags added successfully', modifiedCount: result.modifiedCount });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to bulk add tags' });
+  }
+});
+
 export default router;

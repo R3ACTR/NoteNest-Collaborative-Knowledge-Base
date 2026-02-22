@@ -84,10 +84,10 @@ class ApiService {
     this.token = token;
   }
 
-  private async request(
+  private async request<T = unknown>(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<any> {
+  ): Promise<T> {
     const baseUrl = getApiBaseUrl();
     if (!baseUrl) {
       throw new Error("API base URL is not configured");
@@ -211,6 +211,50 @@ class ApiService {
     return this.request(`/api/notes/${id}`, {
       method: "DELETE",
       body: JSON.stringify(data),
+    });
+  }
+
+  async pinNote(id: string, isPinned: boolean): Promise<Note> {
+    return this.request(`/api/notes/${id}/pin`, {
+      method: "PATCH",
+      body: JSON.stringify({ isPinned }),
+    });
+  }
+
+  /* ---------- Bulk Operations ---------- */
+  async bulkPinNotes(noteIds: string[], isPinned: boolean, authorId: string): Promise<{ modifiedCount: number }> {
+    return this.request("/api/notes/bulk/pin", {
+      method: "POST",
+      body: JSON.stringify({ noteIds, isPinned, authorId }),
+    });
+  }
+
+  async bulkDeleteNotes(noteIds: string[], authorId: string): Promise<{ deletedCount: number }> {
+    return this.request("/api/notes/bulk", {
+      method: "DELETE",
+      body: JSON.stringify({ noteIds, authorId }),
+    });
+  }
+
+  async bulkMoveNotesToFolder(
+    noteIds: string[],
+    folderId: string | null,
+    authorId: string
+  ): Promise<{ modifiedCount: number }> {
+    return this.request("/api/notes/bulk/move-to-folder", {
+      method: "PATCH",
+      body: JSON.stringify({ noteIds, folderId, authorId }),
+    });
+  }
+
+  async bulkAddTagsToNotes(
+    noteIds: string[],
+    tags: string[],
+    authorId: string
+  ): Promise<{ modifiedCount: number }> {
+    return this.request("/api/notes/bulk/add-tags", {
+      method: "PATCH",
+      body: JSON.stringify({ noteIds, tags, authorId }),
     });
   }
 
