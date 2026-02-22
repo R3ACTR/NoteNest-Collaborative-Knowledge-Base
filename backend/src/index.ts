@@ -10,6 +10,8 @@ import folderRoutes from './routes/folders';
 import userRoutes from './routes/users';
 import groupRoutes from './routes/groups';
 import permissionRoutes from './routes/permissions';
+import notificationRoutes from './routes/notifications';
+import activityRoutes from './routes/activity';
 import { requestLoggingMiddleware } from './middleware/logging';
 import { authenticateToken } from './middleware/auth';
 import { initializeCache, getCacheService, CacheKeys } from './services/cacheService';
@@ -61,6 +63,8 @@ app.use('/api/notes', authenticateToken, noteRoutes);
 app.use('/api/folders', authenticateToken, folderRoutes);
 app.use('/api/groups', authenticateToken, groupRoutes);
 app.use('/api/permissions', authenticateToken, permissionRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/activities', activityRoutes);
 
 // Endpoint to issue socket tokens
 app.post('/api/socket/token', authenticateToken, (req: Request, res: Response) => {

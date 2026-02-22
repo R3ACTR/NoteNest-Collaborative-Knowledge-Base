@@ -32,7 +32,7 @@ export default function FolderTree({ workspaceId, selectedFolderId, onSelectFold
     try {
       setIsLoading(true);
       const data = await apiService.getFolders(workspaceId);
-      setFolders(data);
+      setFolders(data as FolderData[]);
     } catch (error) {
       console.error("Failed to load folders:", error);
     } finally {
