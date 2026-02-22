@@ -84,10 +84,10 @@ class ApiService {
     this.token = token;
   }
 
-  private async request<T = unknown>(
+  private async request(
     endpoint: string,
     options: RequestInit = {}
-  ): Promise<T> {
+  ): Promise<any> {
     const baseUrl = getApiBaseUrl();
     if (!baseUrl) {
       throw new Error("API base URL is not configured");
@@ -214,6 +214,7 @@ class ApiService {
     });
   }
 
+<<<<<<< HEAD
   async pinNote(id: string, isPinned: boolean): Promise<Note> {
     return this.request(`/api/notes/${id}/pin`, {
       method: "PATCH",
@@ -245,79 +246,7 @@ class ApiService {
       body: JSON.stringify(data),
     });
   }
-
-  /* ---------- Bulk Operations ---------- */
-  async bulkPinNotes(noteIds: string[], isPinned: boolean, authorId: string): Promise<{ modifiedCount: number }> {
-    return this.request("/api/notes/bulk/pin", {
-      method: "POST",
-      body: JSON.stringify({ noteIds, isPinned, authorId }),
-    });
-  }
-
-  async bulkDeleteNotes(noteIds: string[], authorId: string): Promise<{ deletedCount: number }> {
-    return this.request("/api/notes/bulk", {
-      method: "DELETE",
-      body: JSON.stringify({ noteIds, authorId }),
-    });
-  }
-
-  async bulkMoveNotesToFolder(
-    noteIds: string[],
-    folderId: string | null,
-    authorId: string
-  ): Promise<{ modifiedCount: number }> {
-    return this.request("/api/notes/bulk/move-to-folder", {
-      method: "PATCH",
-      body: JSON.stringify({ noteIds, folderId, authorId }),
-    });
-  }
-
-  async bulkAddTagsToNotes(
-    noteIds: string[],
-    tags: string[],
-    authorId: string
-  ): Promise<{ modifiedCount: number }> {
-    return this.request("/api/notes/bulk/add-tags", {
-      method: "PATCH",
-      body: JSON.stringify({ noteIds, tags, authorId }),
-    });
-  }
-
   /* ---------- Users ---------- */
-  async register(
-    email: string,
-    password: string,
-    name: string
-  ): Promise<{ userId: string; message: string }> {
-    return this.request("/api/users/register", {
-      method: "POST",
-      body: JSON.stringify({ email, password, name }),
-    });
-  }
-
-  async login(
-    email: string,
-    password: string
-  ): Promise<{ token: string; user: User }> {
-    return this.request("/api/users/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
-  }
-
-  async getUser(id: string): Promise<User> {
-    return this.request(`/api/users/${id}`);
-  }
-
-  /* ---------- Folders ---------- */
-  async getFolders(workspaceId: string): Promise<Folder[]> {
-    return this.request(`/api/folders/workspace/${workspaceId}`);
-  }
-
-  /* ---------- Note Versions & Diffs ---------- */
-  async getNoteVersions(noteId: string): Promise<NoteVersion[]> {
-    return this.request(`/api/notes/${noteId}/versions`);
-  }
 
   async getNoteDiff(
     noteId: string,
