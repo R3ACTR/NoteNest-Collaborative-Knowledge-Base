@@ -3,12 +3,23 @@
 import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import { useEffect, useState } from "react";
 
 export default function WorkspaceHome({
   params,
 }: {
   params: { id: string };
 }) {
+  const [noteCount, setNoteCount] = useState(0);
+  useEffect(() => {
+  try {
+    const raw = localStorage.getItem("notenest-notes");
+    const notes = raw ? JSON.parse(raw) : [];
+    setNoteCount(Array.isArray(notes) ? notes.length : 0);
+  } catch {
+    setNoteCount(0);
+  }
+}, []);
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -24,6 +35,9 @@ export default function WorkspaceHome({
           <p className="text-gray-500 mb-6">
             This is your personal workspace. Use quick actions to get started.
           </p>
+          <p className="text-sm text-gray-600 mb-6">
+  You have <span className="font-semibold">{noteCount}</span> notes
+</p>
 
           <div className="flex gap-4">
             <Link
