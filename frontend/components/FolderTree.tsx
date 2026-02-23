@@ -8,7 +8,7 @@ interface FolderData {
   _id: string;
   name: string;
   workspaceId: string;
-  parentId: string | null;
+  parentId?: string | null;
   path: string;
   createdBy: string;
 }

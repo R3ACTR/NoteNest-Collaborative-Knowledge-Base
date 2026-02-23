@@ -184,6 +184,33 @@ class ApiService {
     );
   }
 
+  async getInviteDetails(token: string): Promise<any> {
+    return this.request(`/api/workspaces/invite/${token}`);
+  }
+
+  async acceptInvite(token: string): Promise<any> {
+    return this.request(`/api/workspaces/invite/${token}/accept`, {
+      method: "POST",
+    });
+  }
+
+  async getInvites(workspaceId: string): Promise<any[]> {
+    return this.request(`/api/workspaces/${workspaceId}/invites`);
+  }
+
+  async createInvite(workspaceId: string, email: string, role: string): Promise<any> {
+    return this.request(`/api/workspaces/${workspaceId}/invites`, {
+      method: "POST",
+      body: JSON.stringify({ email, role }),
+    });
+  }
+
+  async revokeInvite(workspaceId: string, inviteId: string): Promise<any> {
+    return this.request(`/api/workspaces/${workspaceId}/invites/${inviteId}`, {
+      method: "DELETE",
+    });
+  }
+
   /* ---------- Notes ---------- */
   async getNotesForWorkspace(workspaceId: string): Promise<Note[]> {
     return this.request(`/api/notes/workspace/${workspaceId}`);
@@ -212,6 +239,43 @@ class ApiService {
       method: "DELETE",
       body: JSON.stringify(data),
     });
+  }
+
+  async getNoteVersions(noteId: string): Promise<NoteVersion[]> {
+    return this.request(`/api/notes/${noteId}/versions`);
+  }
+
+  async getNoteDiff(noteId: string, version1Id: string | number, version2Id: string | number): Promise<NoteDiff> {
+    return this.request(`/api/notes/${noteId}/diff?v1=${version1Id}&v2=${version2Id}`);
+  }
+
+  async restoreNoteVersion(noteId: string, versionNumber: number | string, authorId: string): Promise<RestoreNoteResponse> {
+    return this.request(`/api/notes/${noteId}/restore`, {
+      method: "POST",
+      body: JSON.stringify({ versionNumber, authorId }),
+    });
+  }
+
+  async forkNote(noteId: string, data: ForkNoteRequest): Promise<Note> {
+    return this.request(`/api/notes/${noteId}/fork`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async mergeNote(noteId: string, data: MergeNoteRequest): Promise<Note> {
+    return this.request(`/api/notes/${noteId}/merge`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getWorkspaceTags(workspaceId: string): Promise<string[]> {
+    return this.request(`/api/workspaces/${workspaceId}/tags`);
+  }
+
+  async getFolders(workspaceId: string): Promise<Folder[]> {
+    return this.request(`/api/workspaces/${workspaceId}/folders`);
   }
 
   /* ---------- Users ---------- */
