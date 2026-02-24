@@ -260,16 +260,19 @@ if (rawPinned) {
 
   /* ---------- Delete with undo ---------- */
   const handleDeleteNote = (note: Note) => {
-    setNotes((prev) => prev.filter((n) => n.id !== note.id));
+  const confirmed = window.confirm("Are you sure you want to delete this note?");
+  if (!confirmed) return;
 
-    // ✅ ADD THIS (keeps pinned storage in sync)
-    setPinnedNoteIds((prev) =>
-      prev.filter((id) => id !== note.id)
-    );
+  setNotes((prev) => prev.filter((n) => n.id !== note.id));
 
-    setRecentlyDeleted(note);
-    setShowUndoToast(true);
-  };
+  // keep pinned storage in sync
+  setPinnedNoteIds((prev) =>
+    prev.filter((id) => id !== note.id)
+  );
+
+  setRecentlyDeleted(note);
+  setShowUndoToast(true);
+};
   /* ---------- Bulk select ---------- */
   const toggleSelectNote = (id: number) => {
     setSelectedNoteIds((prev) =>
