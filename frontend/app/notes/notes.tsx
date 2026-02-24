@@ -58,6 +58,7 @@ export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [pinnedNoteIds, setPinnedNoteIds] = useState<number[]>([]);
+  const [lastSaved, setLastSaved] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] =
     useState<"newest" | "oldest" | "az">("newest");
@@ -131,6 +132,22 @@ if (rawPinned) {
   // Mark loading complete
   setIsLoading(false);
 }, []);
+
+  /* ---------- Global Shortcut (Ctrl+K) ---------- */
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        const searchInput = document.getElementById("search-input");
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
   
   /* ---------- Sync search ---------- */
   useEffect(() => {
@@ -139,7 +156,10 @@ if (rawPinned) {
 
   /* ---------- Persist notes ---------- */
   useEffect(() => {
-    if (!isLoading) saveNotesToStorage(notes);
+    if (!isLoading) {
+      saveNotesToStorage(notes);
+      setLastSaved(Date.now());
+    }
   }, [notes, isLoading])
 
   useEffect(() => {
@@ -313,6 +333,21 @@ if (rawPinned) {
         ? prev.filter((id) => id !== noteId)
         : [...prev, noteId]
     );
+  /* ---------- Export ---------- */
+  const handleExportNote = (note: Note) => {
+    const title = note.title || "untitled";
+    const content = note.content || "";
+    const markdown = `# ${title}\n\n${content}`;
+    
+    const blob = new Blob([markdown], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${title.toLowerCase().replace(/\s+/g, "-")}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   /* ============================= */
@@ -327,15 +362,22 @@ if (rawPinned) {
             title="Notes"
             showSearch
             action={
-              canCreateNote && (
-                <button
-                  ref={createButtonRef}
-                  onClick={handleCreateNote}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
-                >
-                  + Create Note
-                </button>
-              )
+              <div className="flex items-center gap-4">
+                {lastSaved && (
+                  <span className="text-xs text-stone-500 italic">
+                    Last saved: {new Date(lastSaved).toLocaleTimeString()}
+                  </span>
+                )}
+                {canCreateNote && (
+                  <button
+                    ref={createButtonRef}
+                    onClick={handleCreateNote}
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
+                  >
+                    + Create Note
+                  </button>
+                )}
+              </div>
             }
           />
 
@@ -468,6 +510,13 @@ if (rawPinned) {
                         >
                           {copiedNoteId === note.id ? <Check size={18} /> : <Copy size={18} />}
                         </button>
+                        <button
+                          title="Export as Markdown"
+                          onClick={() => handleExportNote(note)}
+                          className="text-gray-600 hover:text-gray-900"
+                        >
+                          📥
+                        </button>
                         {!isViewer && (
                           <>
                             <button
@@ -580,4 +629,5 @@ if (rawPinned) {
       )}
     </>
   );
+}
 }
