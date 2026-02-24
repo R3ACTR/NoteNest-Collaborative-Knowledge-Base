@@ -5,6 +5,10 @@ import {
   NoteVersion,
   User,
   Folder,
+  Template,
+  TemplateCategory,
+  TemplateVisibility,
+  TemplatePlaceholder,
   CreateWorkspaceRequest,
   AddMemberRequest,
   UpdateMemberRoleRequest,
@@ -37,6 +41,10 @@ export type {
   NoteVersion,
   User,
   Folder,
+  Template,
+  TemplateCategory,
+  TemplateVisibility,
+  TemplatePlaceholder,
   CreateWorkspaceRequest,
   AddMemberRequest,
   UpdateMemberRoleRequest,
@@ -124,6 +132,21 @@ class ApiService {
     }
 
     return response.json();
+  }
+
+  /* ---------- Auth ---------- */
+  async login(email: string, password: string): Promise<LoginResponse> {
+    return this.request('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  }
+
+  async register(email: string, password: string, name: string): Promise<RegisterResponse> {
+    return this.request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, name }),
+    });
   }
 
   /* ---------- Workspaces ---------- */
@@ -220,6 +243,10 @@ class ApiService {
     return this.request(`/api/notes/${id}`);
   }
 
+  async getNoteVersions(noteId: string): Promise<NoteVersion[]> {
+    return this.request(`/api/notes/${noteId}/versions`);
+  }
+
   async createNote(data: CreateNoteRequest): Promise<Note> {
     return this.request("/api/notes", {
       method: "POST",
@@ -240,6 +267,7 @@ class ApiService {
       body: JSON.stringify(data),
     });
   }
+
 
   async pinNote(id: string, isPinned: boolean): Promise<Note> {
     return this.request(`/api/notes/${id}/pin`, {
@@ -292,8 +320,25 @@ class ApiService {
     return this.request(`/api/notes/workspace/${workspaceId}/tags`);
   }
 
+  /* ---------- Folders ---------- */
   async getFolders(workspaceId: string): Promise<Folder[]> {
-    return this.request(`/api/workspaces/${workspaceId}/folders`);
+    return this.request(`/api/folders/workspace/${workspaceId}`);
+  }
+
+  async createFolder(data: { name: string; workspaceId: string; parentId?: string }): Promise<Folder> {
+    return this.request('/api/folders', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteFolder(folderId: string): Promise<void> {
+    return this.request(`/api/folders/${folderId}`, { method: 'DELETE' });
+  }
+
+  /* ---------- Invites ---------- */
+  async getInvites(workspaceId: string): Promise<unknown[]> {
+    return this.request(`/api/workspaces/${workspaceId}/invites`);
   }
 
   /* ---------- Authentication ---------- */
@@ -374,6 +419,71 @@ class ApiService {
     return this.request(
       `/api/activities/note/${noteId}?limit=${limit}&skip=${skip}`
     );
+  }
+  /* ---------- Templates ---------- */
+  async getBuiltInTemplates(): Promise<{ templates: Template[] }> {
+    return this.request('/api/templates/builtin');
+  }
+
+  async getWorkspaceTemplates(
+    workspaceId: string,
+    params?: { category?: string; tags?: string; search?: string; visibility?: string }
+  ): Promise<{ templates: Template[] }> {
+    const q = new URLSearchParams(params as Record<string, string> || {}).toString();
+    return this.request(`/api/templates/workspace/${workspaceId}${q ? `?${q}` : ''}`);
+  }
+
+  async getTemplate(id: string): Promise<{ template: Template }> {
+    return this.request(`/api/templates/${id}`);
+  }
+
+  async createTemplate(
+    workspaceId: string,
+    data: Omit<Partial<Template>, '_id' | 'usageCount' | 'isBuiltIn' | 'version'>
+  ): Promise<{ template: Template }> {
+    return this.request(`/api/templates/workspace/${workspaceId}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateTemplate(
+    id: string,
+    data: Partial<Template>
+  ): Promise<{ template: Template }> {
+    return this.request(`/api/templates/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteTemplate(id: string): Promise<{ deleted: boolean; id: string }> {
+    return this.request(`/api/templates/${id}`, { method: 'DELETE' });
+  }
+
+  async copyTemplate(
+    id: string,
+    targetWorkspaceId?: string,
+    visibility?: string
+  ): Promise<{ template: Template }> {
+    return this.request(`/api/templates/${id}/copy`, {
+      method: 'POST',
+      body: JSON.stringify({ targetWorkspaceId, visibility }),
+    });
+  }
+
+  async useTemplate(
+    id: string,
+    values: Record<string, string>
+  ): Promise<{ title: string; body: string }> {
+    return this.request(`/api/templates/${id}/use`, {
+      method: 'POST',
+      body: JSON.stringify({ values }),
+    });
+  }
+
+  async seedBuiltInTemplates(workspaceId: string): Promise<{ seeded: number; total: number }> {
+    return this.request(`/api/templates/seed/${workspaceId}`, { method: 'POST' });
   }
 }
 
