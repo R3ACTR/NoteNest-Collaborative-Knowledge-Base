@@ -4,12 +4,14 @@ import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function WorkspaceHome({
   params,
 }: {
   params: { id: string };
 }) {
+  const router = useRouter();
   const [noteCount, setNoteCount] = useState(0);
   useEffect(() => {
   try {
@@ -35,10 +37,16 @@ export default function WorkspaceHome({
           <p className="text-gray-500 mb-6">
             This is your personal workspace. Use quick actions to get started.
           </p>
-          <p className="text-sm text-gray-600 mb-6">
-  You have <span className="font-semibold">{noteCount}</span> notes
+        <p className="text-sm text-gray-600 mb-6">
+  You have{" "}
+  <span
+    className="font-semibold cursor-pointer hover:underline"
+    onClick={() => router.push(`/workspace/${params.id}/notes`)}
+  >
+    {noteCount}
+  </span>{" "}
+  notes
 </p>
-
           <div className="flex gap-4">
             <Link
               href={`/workspace/${params.id}/notes?new=1`}

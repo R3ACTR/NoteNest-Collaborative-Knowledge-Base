@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import ActivityFeed from "@/components/ActivityFeed";
@@ -47,6 +48,7 @@ function loadNotesSafely() {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { canCreateNote } = usePermissions();
   const [notes, setNotes] = useState<any[]>([]);
   const [workspaceId, setWorkspaceId] = useState<string>("");
@@ -93,7 +95,26 @@ export default function DashboardPage() {
                   Manage and organize your notes from one place.
                 </p>
               </section>
+              {/* Stats */}
+              <section className="bg-[#0b0b0b] border border-[#1f1f1f] rounded-2xl p-6">
+                <div className="flex gap-6 text-sm text-gray-400">
 
+                <span
+  className="cursor-pointer hover:underline"
+  onClick={() => router.push("/notes")}
+>
+  {notes.length} total notes
+</span>
+
+<span
+  className="cursor-pointer hover:underline"
+  onClick={() => router.push("/notes")}
+>
+  {notes.filter((n) => n.isPinned).length} pinned notes
+</span>
+
+                </div>
+              </section>
               {/* Quick Actions */}
               <section className="bg-[#0b0b0b] border border-[#1f1f1f] rounded-2xl p-6">
                 <h3 className="text-lg font-semibold text-white mb-4">
