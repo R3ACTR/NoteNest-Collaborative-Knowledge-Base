@@ -136,14 +136,14 @@ class ApiService {
 
   /* ---------- Auth ---------- */
   async login(email: string, password: string): Promise<LoginResponse> {
-    return this.request('/api/auth/login', {
+    return this.request('/api/users/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
   }
 
   async register(email: string, password: string, name: string): Promise<RegisterResponse> {
-    return this.request('/api/auth/register', {
+    return this.request('/api/users/register', {
       method: 'POST',
       body: JSON.stringify({ email, password, name }),
     });
