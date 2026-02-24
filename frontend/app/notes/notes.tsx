@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import EmptyState from "@/components/EmptyState";
 import { SkeletonList } from "@/components/Skeleton";
 import { usePermissions } from "@/hooks/usePermissions";
-import { FileX, Search as SearchIcon } from "lucide-react";
+import { FileX, Search as SearchIcon, Copy, Check } from "lucide-react";
 
 const STORAGE_KEY = "notenest-notes";
 const DRAFT_KEY = "notenest-note-draft";
@@ -71,6 +71,7 @@ export default function NotesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedNoteIds, setSelectedNoteIds] = useState<number[]>([]);
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [copiedNoteId, setCopiedNoteId] = useState<number | null>(null);
 
   /* ---------- Undo delete ---------- */
   const [recentlyDeleted, setRecentlyDeleted] = useState<Note | null>(null);
@@ -389,16 +390,16 @@ export default function NotesPage() {
 
                       <div className="flex gap-2">
                         <button
-                          title="Copy note"
+                          title={copiedNoteId === note.id ? "Copied!" : "Copy note"}
                           onClick={() => {
-                            const text = note.content || note.title;
+                            const text = `${note.title}\n\n${note.content || ""}`.trim();
                             navigator.clipboard.writeText(text);
-                            // Visual feedback could be added here if needed, but for now simple copy
-                            alert("Copied to clipboard!"); 
+                            setCopiedNoteId(note.id);
+                            setTimeout(() => setCopiedNoteId(null), 2000);
                           }}
-                          className="text-gray-600 hover:text-gray-900"
+                          className={`flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition-colors ${copiedNoteId === note.id ? 'text-green-600' : 'text-gray-600'}`}
                         >
-                          📋
+                          {copiedNoteId === note.id ? <Check size={18} /> : <Copy size={18} />}
                         </button>
                         {!isViewer && (
                           <>
