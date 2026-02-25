@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
@@ -10,8 +10,6 @@ import { usePermissions } from "@/hooks/usePermissions";
 import { FileX, Search as SearchIcon } from "lucide-react";
 
 const STORAGE_KEY = "notenest-notes";
-const DRAFT_KEY = "notenest-note-draft";
-const TITLE_MAX_LENGTH = 200;
 const PINNED_KEY = "notenest-pinned-notes";
 
 interface Note {
@@ -53,6 +51,7 @@ function formatRelativeTime(timestamp?: number) {
 export default function NotesPage() {
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
+  const pinnedOnly = searchParams.get("pinned") === "1";
   const { canCreateNote, isViewer } = usePermissions();
 
   const [notes, setNotes] = useState<Note[]>([]);
@@ -63,17 +62,9 @@ export default function NotesPage() {
     useState<"newest" | "oldest" | "az">("newest");
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
   const [createTitle, setCreateTitle] = useState("");
   const [createContent, setCreateContent] = useState("");
-  const [createTitleError, setCreateTitleError] = useState("");
-  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [selectedNoteIds, setSelectedNoteIds] = useState<number[]>([]);
-  const [isSelectionMode, setIsSelectionMode] = useState(false);
-
-  const pinnedOnly = searchParams.get("pinned") === "1";
-  const deleteTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   /* ---------- Initial load ---------- */
   useEffect(() => {
@@ -89,7 +80,7 @@ export default function NotesPage() {
     setIsLoading(false);
   }, []);
 
-  /* ---------- Sync search ---------- */
+  /* ---------- Sync search from URL ---------- */
   useEffect(() => {
     setSearchQuery(search);
   }, [search]);
@@ -118,6 +109,7 @@ export default function NotesPage() {
   const sortedNotes = [...filteredNotes].sort((a, b) => {
     const aPinned = pinnedNoteIds.includes(a.id);
     const bPinned = pinnedNoteIds.includes(b.id);
+
     if (aPinned && !bPinned) return -1;
     if (!aPinned && bPinned) return 1;
 
@@ -146,103 +138,134 @@ export default function NotesPage() {
     setPinnedNoteIds((prev) => prev.filter((id) => id !== note.id));
   };
 
+  const handleCreateNote = () => {
+    if (!canCreateNote) return;
+    setEditingNoteId(null);
+    setCreateTitle("");
+    setCreateContent("");
+    setShowCreateModal(true);
+  };
+
   /* ============================= */
 
   return (
-    <>
-      <div className="flex">
-        <Sidebar />
+    <div className="flex">
+      <Sidebar />
 
-        <div className="flex-1 flex flex-col">
-          <Header title="Notes" showSearch />
+      <div className="flex-1 flex flex-col">
+        <Header
+          title="Notes"
+          showSearch
+          action={
+            canCreateNote && (
+              <button
+                onClick={handleCreateNote}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold"
+              >
+                + Create Note
+              </button>
+            )
+          }
+        />
 
-          <main className="flex-1 overflow-y-auto">
-            <div className="max-w-3xl mx-auto p-6">
-              {isLoading ? (
-                <SkeletonList count={4} />
-              ) : sortedNotes.length === 0 ? (
-                <EmptyState
-                  icon={searchQuery ? SearchIcon : FileX}
-                  title="No notes found"
-                  description="Try adjusting your search or create a new note."
-                />
-              ) : (
-                <ul className="space-y-3">
-                  {sortedNotes.map((note) => (
-                    <li
-                      key={note.id}
-                      className="border rounded-xl p-4 bg-white flex justify-between"
-                    >
-                      <div>
-                        <h4 className="font-semibold">{note.title}</h4>
-                        <p className="text-xs text-gray-500">
-                          {formatRelativeTime(note.createdAt)}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {note.content || "No content"}
-                        </p>
-                      </div>
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-3xl mx-auto p-6">
+            {isLoading ? (
+              <SkeletonList count={4} />
+            ) : sortedNotes.length === 0 ? (
+              <EmptyState
+                icon={searchQuery ? SearchIcon : FileX}
+                title={
+                  pinnedOnly
+                    ? "No pinned notes"
+                    : searchQuery
+                    ? "No matching notes"
+                    : "No notes yet"
+                }
+                description={
+                  pinnedOnly
+                    ? "You haven’t pinned any notes yet."
+                    : searchQuery
+                    ? `We couldn't find any notes matching "${searchQuery}".`
+                    : "Start by creating your first note."
+                }
+              />
+            ) : (
+              <ul className="space-y-3">
+                {sortedNotes.map((note) => (
+                  <li
+                    key={note.id}
+                    className="border rounded-xl p-4 bg-white flex justify-between"
+                  >
+                    <div>
+                      <h4 className="font-semibold">{note.title}</h4>
+                      <p className="text-xs text-gray-500">
+                        {formatRelativeTime(note.createdAt)}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {note.content || "No content"}
+                      </p>
+                    </div>
 
-                      {!isViewer && (
-                        <div className="flex gap-2">
-                          {/* PIN */}
-                          <button
-                            aria-label={
-                              pinnedNoteIds.includes(note.id)
-                                ? "Unpin note"
-                                : "Pin note"
+                    {!isViewer && (
+                      <div className="flex gap-2">
+                        {/* Pin */}
+                        <button
+                          aria-label={
+                            pinnedNoteIds.includes(note.id)
+                              ? "Unpin note"
+                              : "Pin note"
+                          }
+                          onClick={() => togglePin(note.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              togglePin(note.id);
                             }
-                            onClick={() => togglePin(note.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                togglePin(note.id);
-                              }
-                            }}
-                            className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                          >
-                            {pinnedNoteIds.includes(note.id) ? "📌" : "📍"}
-                          </button>
+                          }}
+                          className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        >
+                          {pinnedNoteIds.includes(note.id) ? "📌" : "📍"}
+                        </button>
 
-                          {/* EDIT */}
-                          <button
-                            aria-label="Edit note"
-                            onClick={() => handleEditNote(note)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                handleEditNote(note);
-                              }
-                            }}
-                            className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                          >
-                            ✏️
-                          </button>
+                        {/* Edit */}
+                        <button
+                          aria-label="Edit note"
+                          onClick={() => handleEditNote(note)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleEditNote(note);
+                            }
+                          }}
+                          className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        >
+                          ✏️
+                        </button>
 
-                          {/* DELETE */}
-                          <button
-                            aria-label="Delete note"
-                            onClick={() => handleDeleteNote(note)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") {
-                                e.preventDefault();
-                                handleDeleteNote(note);
-                              }
-                            }}
-                            className="focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </main>
-        </div>
+                        {/* Delete */}
+                        <button
+                          aria-label="Delete note"
+                          onClick={() => handleDeleteNote(note)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleDeleteNote(note);
+                            }
+                          }}
+                          className="focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </main>
       </div>
-    </>
+    </div>
   );
 }
