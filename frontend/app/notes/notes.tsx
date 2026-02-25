@@ -419,57 +419,56 @@ export default function NotesPage() {
                       {!isViewer && (
                         <div className="flex gap-2">
                           <div className="relative group">
-  <button
-    aria-label={pinnedNoteIds.includes(note.id) ? "Unpin note" : "Pin note"}
-    onClick={() => togglePin(note.id)}
-    onKeyDown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        togglePin(note.id);
-      }
-    }}
-    className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-  >
-    {pinnedNoteIds.includes(note.id) ? "📌" : "📍"}
-  </button>
+ <button
+  aria-label={pinnedNoteIds.includes(note.id) ? "Unpin note" : "Pin note"}
+  onClick={() => togglePin(note.id)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      togglePin(note.id);
+    }
+  }}
+  className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+>
+  {pinnedNoteIds.includes(note.id) ? "📌" : "📍"}
+</button>
 
   <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
     {pinnedNoteIds.includes(note.id) ? "Unpin note" : "Pin note"}
   </span>
 </div>
                           <div className="relative group">
-  <button
-    aria-label="Edit note"
-    onClick={() => handleEditNote(note)}
-    onKeyDown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleEditNote(note);
-      }
-    }}
-    className="text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-  >
-    ✏️
-  </button>
-
+ <button
+  aria-label="Edit note"
+  onClick={() => handleEditNote(note)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleEditNote(note);
+    }
+  }}
+  className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+>
+  ✏️
+</button>
   <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
     Edit note
   </span>
 </div>
                         <div className="relative group">
-  <button
-    aria-label="Delete note"
-    onClick={() => handleDeleteNote(note)}
-    onKeyDown={(e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        handleDeleteNote(note);
-      }
-    }}
-    className="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
-  >
-    🗑️
-  </button>
+ <button
+  aria-label="Delete note"
+  onClick={() => handleDeleteNote(note)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleDeleteNote(note);
+    }
+  }}
+  className="focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+>
+  🗑️
+</button>
 
   <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
     Delete note
