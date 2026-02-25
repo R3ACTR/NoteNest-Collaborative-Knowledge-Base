@@ -209,3 +209,47 @@ export interface AuditLogsResponse {
 export interface ErrorResponse {
   error: string;
 }
+
+/* ─── Templates ─────────────────────────────────────────────────── */
+export type TemplateCategory =
+  | 'meeting'
+  | 'rfc'
+  | 'design'
+  | 'project'
+  | 'bug_report'
+  | 'retrospective'
+  | 'onboarding'
+  | 'research'
+  | 'sprint'
+  | 'general';
+
+export type TemplateVisibility = 'private' | 'workspace' | 'public';
+
+export interface TemplatePlaceholder {
+  name: string;
+  label: string;
+  type: 'text' | 'date' | 'list' | 'number';
+  defaultValue?: string;
+  description?: string;
+  required: boolean;
+}
+
+export interface Template {
+  _id: string;
+  workspaceId: string | null;
+  ownerId: string;
+  title: string;
+  description: string;
+  category: TemplateCategory;
+  tags: string[];
+  body: string;
+  placeholders: TemplatePlaceholder[];
+  visibility: TemplateVisibility;
+  version: number;
+  usageCount: number;
+  previewContent: string;
+  isBuiltIn: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+

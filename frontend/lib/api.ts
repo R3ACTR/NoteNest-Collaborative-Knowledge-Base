@@ -5,6 +5,10 @@ import {
   NoteVersion,
   User,
   Folder,
+  Template,
+  TemplateCategory,
+  TemplateVisibility,
+  TemplatePlaceholder,
   CreateWorkspaceRequest,
   AddMemberRequest,
   UpdateMemberRoleRequest,
@@ -37,6 +41,10 @@ export type {
   NoteVersion,
   User,
   Folder,
+  Template,
+  TemplateCategory,
+  TemplateVisibility,
+  TemplatePlaceholder,
   CreateWorkspaceRequest,
   AddMemberRequest,
   UpdateMemberRoleRequest,
@@ -126,6 +134,21 @@ class ApiService {
     return response.json();
   }
 
+  /* ---------- Auth ---------- */
+  async login(email: string, password: string): Promise<LoginResponse> {
+    return this.request('/api/users/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  }
+
+  async register(email: string, password: string, name: string): Promise<RegisterResponse> {
+    return this.request('/api/users/register', {
+      method: 'POST',
+      body: JSON.stringify({ email, password, name }),
+    });
+  }
+
   /* ---------- Workspaces ---------- */
   async getWorkspacesForUser(userId: string): Promise<Workspace[]> {
     return this.request(`/api/workspaces/user/${userId}`);
@@ -193,6 +216,10 @@ class ApiService {
     return this.request(`/api/notes/${id}`);
   }
 
+  async getNoteVersions(noteId: string): Promise<NoteVersion[]> {
+    return this.request(`/api/notes/${noteId}/versions`);
+  }
+
   async createNote(data: CreateNoteRequest): Promise<Note> {
     return this.request("/api/notes", {
       method: "POST",
@@ -214,30 +241,220 @@ class ApiService {
     });
   }
 
+
+  async pinNote(id: string, isPinned: boolean): Promise<Note> {
+    return this.request(`/api/notes/${id}/pin`, {
+      method: "PATCH",
+      body: JSON.stringify({ isPinned }),
+    });
+  }
+
+  async restoreNoteVersion(
+    noteId: string,
+    versionNumber: number,
+    authorId: string
+  ): Promise<{ note: Note }> {
+    return this.request(`/api/notes/${noteId}/restore`, {
+      method: "POST",
+      body: JSON.stringify({ versionNumber, authorId }),
+    });
+  }
+
+  async forkNote(noteId: string, data: ForkNoteRequest): Promise<Note> {
+    return this.request(`/api/notes/${noteId}/fork`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async mergeNote(noteId: string, data: MergeNoteRequest): Promise<Note> {
+    return this.request(`/api/notes/${noteId}/merge`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
   /* ---------- Users ---------- */
-  async register(
-    email: string,
-    password: string,
-    name: string
-  ): Promise<{ userId: string; message: string }> {
-    return this.request("/api/users/register", {
-      method: "POST",
-      body: JSON.stringify({ email, password, name }),
+
+  async getNoteDiff(
+    noteId: string,
+    version1: number,
+    version2: number
+  ): Promise<NoteDiff> {
+    return this.request(
+      `/api/notes/${noteId}/diff?v1=${version1}&v2=${version2}`
+    );
+  }
+
+  /* ---------- Tags ---------- */
+  async getWorkspaceTags(workspaceId: string): Promise<string[]> {
+    return this.request(`/api/notes/workspace/${workspaceId}/tags`);
+  }
+
+  /* ---------- Folders ---------- */
+  async getFolders(workspaceId: string): Promise<Folder[]> {
+    return this.request(`/api/folders/workspace/${workspaceId}`);
+  }
+
+  async createFolder(data: { name: string; workspaceId: string; parentId?: string }): Promise<Folder> {
+    return this.request('/api/folders', {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   }
 
-  async login(
-    email: string,
-    password: string
-  ): Promise<{ token: string; user: User }> {
-    return this.request("/api/users/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
+  async deleteFolder(folderId: string): Promise<void> {
+    return this.request(`/api/folders/${folderId}`, { method: 'DELETE' });
+  }
+
+  /* ---------- Invites ---------- */
+  async getInvites(workspaceId: string): Promise<unknown[]> {
+    return this.request(`/api/workspaces/${workspaceId}/invites`);
+  }
+
+  async getInviteDetails(token: string): Promise<unknown> {
+    return this.request(`/api/invites/${token}`);
+  }
+
+  async createInvite(workspaceId: string, email: string, role: string): Promise<unknown> {
+    return this.request(`/api/workspaces/${workspaceId}/invites`, {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
     });
   }
 
-  async getUser(id: string): Promise<User> {
-    return this.request(`/api/users/${id}`);
+  async revokeInvite(workspaceId: string, inviteId: string): Promise<unknown> {
+    return this.request(`/api/workspaces/${workspaceId}/invites/${inviteId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async acceptInvite(token: string): Promise<unknown> {
+    return this.request('/api/accept-invite', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  }
+
+  /* ---------- Notifications ---------- */
+  async getNotifications(
+    workspaceId?: string,
+    limit: number = 20,
+    skip: number = 0
+  ): Promise<{ notifications: unknown[]; total: number; unreadCount: number }> {
+    const params = new URLSearchParams();
+    if (workspaceId) params.append('workspaceId', workspaceId);
+    params.append('limit', limit.toString());
+    params.append('skip', skip.toString());
+    return this.request(`/api/notifications?${params.toString()}`);
+  }
+
+  async getUnreadNotificationCount(): Promise<{ unreadCount: number }> {
+    return this.request('/api/notifications/count');
+  }
+
+  async markNotificationAsRead(notificationId: string): Promise<unknown> {
+    return this.request(`/api/notifications/${notificationId}/read`, {
+      method: 'PATCH',
+    });
+  }
+
+  async dismissNotification(notificationId: string): Promise<{ message: string }> {
+    return this.request(`/api/notifications/${notificationId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async markAllNotificationsAsRead(workspaceId?: string): Promise<{ message: string; modifiedCount: number }> {
+    return this.request('/api/notifications/read-all', {
+      method: 'PATCH',
+      body: JSON.stringify({ workspaceId }),
+    });
+  }
+
+  /* ---------- Activity Feed ---------- */
+  async getWorkspaceActivity(
+    workspaceId: string,
+    limit: number = 30,
+    skip: number = 0
+  ): Promise<{ activities: unknown[]; total: number }> {
+    return this.request(
+      `/api/activities/workspace/${workspaceId}?limit=${limit}&skip=${skip}`
+    );
+  }
+
+  async getNoteActivity(
+    noteId: string,
+    limit: number = 20,
+    skip: number = 0
+  ): Promise<{ activities: unknown[]; total: number }> {
+    return this.request(
+      `/api/activities/note/${noteId}?limit=${limit}&skip=${skip}`
+    );
+  }
+  /* ---------- Templates ---------- */
+  async getBuiltInTemplates(): Promise<{ templates: Template[] }> {
+    return this.request('/api/templates/builtin');
+  }
+
+  async getWorkspaceTemplates(
+    workspaceId: string,
+    params?: { category?: string; tags?: string; search?: string; visibility?: string }
+  ): Promise<{ templates: Template[] }> {
+    const q = new URLSearchParams(params as Record<string, string> || {}).toString();
+    return this.request(`/api/templates/workspace/${workspaceId}${q ? `?${q}` : ''}`);
+  }
+
+  async getTemplate(id: string): Promise<{ template: Template }> {
+    return this.request(`/api/templates/${id}`);
+  }
+
+  async createTemplate(
+    workspaceId: string,
+    data: Omit<Partial<Template>, '_id' | 'usageCount' | 'isBuiltIn' | 'version'>
+  ): Promise<{ template: Template }> {
+    return this.request(`/api/templates/workspace/${workspaceId}`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateTemplate(
+    id: string,
+    data: Partial<Template>
+  ): Promise<{ template: Template }> {
+    return this.request(`/api/templates/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteTemplate(id: string): Promise<{ deleted: boolean; id: string }> {
+    return this.request(`/api/templates/${id}`, { method: 'DELETE' });
+  }
+
+  async copyTemplate(
+    id: string,
+    targetWorkspaceId?: string,
+    visibility?: string
+  ): Promise<{ template: Template }> {
+    return this.request(`/api/templates/${id}/copy`, {
+      method: 'POST',
+      body: JSON.stringify({ targetWorkspaceId, visibility }),
+    });
+  }
+
+  async useTemplate(
+    id: string,
+    values: Record<string, string>
+  ): Promise<{ title: string; body: string }> {
+    return this.request(`/api/templates/${id}/use`, {
+      method: 'POST',
+      body: JSON.stringify({ values }),
+    });
+  }
+
+  async seedBuiltInTemplates(workspaceId: string): Promise<{ seeded: number; total: number }> {
+    return this.request(`/api/templates/seed/${workspaceId}`, { method: 'POST' });
   }
 }
 

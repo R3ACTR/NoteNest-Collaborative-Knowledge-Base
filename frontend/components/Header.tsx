@@ -1,16 +1,15 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import WorkspaceSelector from "@/components/WorkspaceSelector";
 import { useUserRole } from "@/contexts/UserRoleContext";
 import Button from "@/components/Button";
+import NotificationCenter from "@/components/NotificationCenter";
 
 interface HeaderProps {
   title?: string;
-  /** When true, shows a search input that can be focused with / shortcut */
   showSearch?: boolean;
-  /** Optional node rendered on the right (e.g. Create Note button) */
   action?: React.ReactNode;
 }
 
@@ -20,19 +19,29 @@ function HeaderInner({
   action,
 }: HeaderProps) {
   const { isAuthenticated, logout } = useUserRole();
-const handleLogoutClick = () => {
-  const confirmed = window.confirm("Are you sure you want to log out?");
-  if (!confirmed) return;
-
-  logout();
-};
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
+  const [workspaceId, setWorkspaceId] = useState<string>("");
+
+  // 🔐 Logout confirmation
+  const handleLogoutClick = () => {
+    const confirmed = window.confirm("Are you sure you want to log out?");
+    if (!confirmed) return;
+    logout();
+  };
+
+  // Load workspace id for notifications
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("currentWorkspaceId");
+      if (stored) setWorkspaceId(stored);
+    }
+  }, []);
 
   return (
     <>
-      {/* Skip to main content link for keyboard users */}
+      {/* Skip to main content (a11y) */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -40,10 +49,10 @@ const handleLogoutClick = () => {
         Skip to main content
       </a>
 
-<header
-  className="sticky top-0 z-40 flex items-center gap-4 border-b px-6 py-4 bg-[#F3F0E6]/90 backdrop-blur-sm border-stone-200/50"
-  role="banner"
->
+      <header
+        className="sticky top-0 z-40 flex items-center gap-4 border-b px-6 py-4 bg-[#F3F0E6]/90 backdrop-blur-sm border-stone-200/50"
+        role="banner"
+      >
         <WorkspaceSelector />
 
         <h1
@@ -58,11 +67,9 @@ const handleLogoutClick = () => {
             <label htmlFor="search-input" className="sr-only">
               Search notes
             </label>
-
             <input
               id="search-input"
               type="search"
-              data-shortcut="search"
               placeholder="Search notes…"
               aria-label="Search notes"
               value={search}
@@ -70,15 +77,12 @@ const handleLogoutClick = () => {
                 const value = e.target.value;
                 const params = new URLSearchParams(searchParams.toString());
 
-                if (value) {
-                  params.set("search", value);
-                } else {
-                  params.delete("search");
-                }
+                if (value) params.set("search", value);
+                else params.delete("search");
 
                 router.replace(`?${params.toString()}`);
               }}
-              className="w-full rounded-full border border-stone-200 bg-white px-4 py-2 text-sm transition-colors placeholder:text-stone-400 text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 shadow-sm"
+              className="w-full rounded-full border border-stone-200 bg-white px-4 py-2 text-sm placeholder:text-stone-400 text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400"
             />
           </div>
         )}
@@ -88,15 +92,18 @@ const handleLogoutClick = () => {
           aria-label="User actions"
         >
           {isAuthenticated && (
-           <Button
-  onClick={handleLogoutClick}
-  variant="secondary"
-  size="sm"
-  aria-label="Logout from your account"
-  title="Sign out of your account"
->
-  Logout
-</Button>
+            <>
+              <NotificationCenter workspaceId={workspaceId} />
+              <Button
+                onClick={handleLogoutClick}
+                variant="secondary"
+                size="sm"
+                aria-label="Logout from your account"
+                title="Sign out of your account"
+              >
+                Logout
+              </Button>
+            </>
           )}
           {action}
         </nav>

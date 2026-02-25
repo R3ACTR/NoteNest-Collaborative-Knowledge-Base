@@ -54,7 +54,7 @@ export default function setupSocketHandlers(io: SocketIOServer) {
             console.log(`User ${socket.userId} joined note ${noteId}`);
 
             // Initialize Y.js Doc
-            const doc = await getYDoc(noteId);
+            const doc = await getYDoc(noteId, io);
 
             // Send initial sync step 1 to client so they can respond with their state
             const encoder = encoding.createEncoder();
@@ -70,11 +70,11 @@ export default function setupSocketHandlers(io: SocketIOServer) {
             await handleYjsMessage(data.noteId, message, (response) => {
                 // Send response back to sender
                 socket.emit("yjs-sync", response);
-            });
+            }, io);
         });
 
         socket.on("yjs-update", async (data: { noteId: string, update: Uint8Array }) => {
-            const doc = await getYDoc(data.noteId);
+            const doc = await getYDoc(data.noteId, io);
             const update = new Uint8Array(data.update);
 
             try {

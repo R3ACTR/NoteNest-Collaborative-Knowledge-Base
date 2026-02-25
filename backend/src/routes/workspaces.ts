@@ -73,8 +73,11 @@ router.post('/accept-invite', authenticateToken, async (req: AuthRequest, res: R
 });
 
 // Get workspaces for a user
-router.get('/user/:userId', authenticateToken, async (req: Request, res: Response) => {
+router.get('/user/:userId', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
+    if (req.user._id.toString() !== req.params.userId && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
     const cacheService = getCacheService();
     const cacheKey = CacheKeys.userWorkspaces(req.params.userId);
 
@@ -100,9 +103,10 @@ router.get('/user/:userId', authenticateToken, async (req: Request, res: Respons
 });
 
 // Create a new workspace
-router.post('/', authenticateToken, async (req: Request, res: Response) => {
+router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
   try {
-    const { name, description, ownerId } = req.body;
+    const { name, description } = req.body;
+    const ownerId = req.user!._id.toString();
     const workspace = new Workspace({ name, description, owner: ownerId });
     await workspace.save();
 
