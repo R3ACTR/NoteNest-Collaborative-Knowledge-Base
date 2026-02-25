@@ -81,7 +81,7 @@ export default function NotesPage() {
   >([]);
   const [totalNotes, setTotalNotes] = useState(0);
   const [pinnedNotes, setPinnedNotes] = useState(0);
-const [pinsHydrated, setPinsHydrated] = useState(false);
+  const [pinsHydrated, setPinsHydrated] = useState(false);
   /* ---------- Load note stats ---------- */
   const loadNoteStats = () => {
     try {
@@ -112,24 +112,24 @@ const [pinsHydrated, setPinsHydrated] = useState(false);
 
   /* ---------- Initial load ---------- */
   useEffect(() => {
-  // Load notes
-  const stored = loadNotesFromStorage();
-  setNotes(stored);
+    // Load notes
+    const stored = loadNotesFromStorage();
+    setNotes(stored);
 
-  // Load pinned notes
-  const rawPinned = localStorage.getItem(PINNED_KEY);
-if (rawPinned) {
-  try {
-    const parsed = JSON.parse(rawPinned);
-    // 🔑 convert all pinned IDs to numbers
-    setPinnedNoteIds(parsed.map((id: any) => Number(id)));
-  } catch {}
-}
+    // Load pinned notes
+    const rawPinned = localStorage.getItem(PINNED_KEY);
+    if (rawPinned) {
+      try {
+        const parsed = JSON.parse(rawPinned);
+        // 🔑 convert all pinned IDs to numbers
+        setPinnedNoteIds(parsed.map((id: any) => Number(id)));
+      } catch { }
+    }
 
-  // Mark loading complete
-  setIsLoading(false);
-}, []);
-  
+    // Mark loading complete
+    setIsLoading(false);
+  }, []);
+
   /* ---------- Sync search ---------- */
   useEffect(() => {
     setSearchQuery(search);
@@ -169,21 +169,21 @@ if (rawPinned) {
   }, [createTitle, createContent, showCreateModal]);
 
   /* ---------- Filter & sort ---------- */
- const filteredNotes = notes.filter((note) => {
-  // ✅ pinned-only view
-  if (pinnedOnly) {
-    return pinnedNoteIds.includes(note.id);
-  }
+  const filteredNotes = notes.filter((note) => {
+    // ✅ pinned-only view
+    if (pinnedOnly) {
+      return pinnedNoteIds.includes(note.id);
+    }
 
-  // 🔍 normal search view
-  if (!searchQuery.trim()) return true;
+    // 🔍 normal search view
+    if (!searchQuery.trim()) return true;
 
-  const q = searchQuery.toLowerCase();
-  return (
-    note.title.toLowerCase().includes(q) ||
-    note.content?.toLowerCase().includes(q)
-  );
-});
+    const q = searchQuery.toLowerCase();
+    return (
+      note.title.toLowerCase().includes(q) ||
+      note.content?.toLowerCase().includes(q)
+    );
+  });
   const sortedNotes = [...filteredNotes].sort((a, b) => {
     const aPinned = pinnedNoteIds.includes(a.id);
     const bPinned = pinnedNoteIds.includes(b.id);
@@ -260,19 +260,19 @@ if (rawPinned) {
 
   /* ---------- Delete with undo ---------- */
   const handleDeleteNote = (note: Note) => {
-  const confirmed = window.confirm("Are you sure you want to delete this note?");
-  if (!confirmed) return;
+    const confirmed = window.confirm("Are you sure you want to delete this note?");
+    if (!confirmed) return;
 
-  setNotes((prev) => prev.filter((n) => n.id !== note.id));
+    setNotes((prev) => prev.filter((n) => n.id !== note.id));
 
-  // keep pinned storage in sync
-  setPinnedNoteIds((prev) =>
-    prev.filter((id) => id !== note.id)
-  );
+    // keep pinned storage in sync
+    setPinnedNoteIds((prev) =>
+      prev.filter((id) => id !== note.id)
+    );
 
-  setRecentlyDeleted(note);
-  setShowUndoToast(true);
-};
+    setRecentlyDeleted(note);
+    setShowUndoToast(true);
+  };
   /* ---------- Bulk select ---------- */
   const toggleSelectNote = (id: number) => {
     setSelectedNoteIds((prev) =>
@@ -378,24 +378,24 @@ if (rawPinned) {
                 </select>
               </div>
 
-{isLoading ? (  <SkeletonList count={4} />
-) : sortedNotes.length === 0 ? (
-  <EmptyState
-    title={pinnedOnly ? "No pinned notes" : "No results found"}
-    description={
-      pinnedOnly
-        ? "You haven’t pinned any notes yet."
-        : "Try adjusting your search keywords."
-    }
-  />
-) : (
-  <ul className="space-y-3">
-    {sortedNotes.map((note) => (
-      <li
-        key={note.id}
-        className="border rounded-xl p-4 bg-white flex justify-between"
-      >
-        <div className="flex items-start gap-3">
+              {isLoading ? (<SkeletonList count={4} />
+              ) : sortedNotes.length === 0 ? (
+                <EmptyState
+                  title={pinnedOnly ? "No pinned notes" : "No results found"}
+                  description={
+                    pinnedOnly
+                      ? "You haven’t pinned any notes yet."
+                      : "Try adjusting your search keywords."
+                  }
+                />
+              ) : (
+                <ul className="space-y-3">
+                  {sortedNotes.map((note) => (
+                    <li
+                      key={note.id}
+                      className="border rounded-xl p-4 bg-white flex justify-between"
+                    >
+                      <div className="flex items-start gap-3">
                         {!isViewer && isSelectionMode && (
                           <input
                             type="checkbox"
@@ -418,26 +418,63 @@ if (rawPinned) {
 
                       {!isViewer && (
                         <div className="flex gap-2">
-                          <button
-                            title={pinnedNoteIds.includes(note.id) ? "Unpin note" : "Pin note"}
-                            onClick={() => togglePin(note.id)}
-                          >
-                            {pinnedNoteIds.includes(note.id) ? "📌" : "📍"}
-                          </button>
-                          <button
-                            title="Edit note"
-                            onClick={() => handleEditNote(note)}
-                            className="text-blue-600"
-                          >
-                            ✏️
-                          </button>
-                          <button
-                            title="Delete note"
-                            onClick={() => handleDeleteNote(note)}
-                            className="text-red-600"
-                          >
-                            🗑️
-                          </button>
+                          <div className="relative group">
+  <button
+    aria-label={pinnedNoteIds.includes(note.id) ? "Unpin note" : "Pin note"}
+    onClick={() => togglePin(note.id)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        togglePin(note.id);
+      }
+    }}
+    className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+  >
+    {pinnedNoteIds.includes(note.id) ? "📌" : "📍"}
+  </button>
+
+  <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
+    {pinnedNoteIds.includes(note.id) ? "Unpin note" : "Pin note"}
+  </span>
+</div>
+                          <div className="relative group">
+  <button
+    aria-label="Edit note"
+    onClick={() => handleEditNote(note)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleEditNote(note);
+      }
+    }}
+    className="text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+  >
+    ✏️
+  </button>
+
+  <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
+    Edit note
+  </span>
+</div>
+                        <div className="relative group">
+  <button
+    aria-label="Delete note"
+    onClick={() => handleDeleteNote(note)}
+    onKeyDown={(e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleDeleteNote(note);
+      }
+    }}
+    className="text-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+  >
+    🗑️
+  </button>
+
+  <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-black px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100">
+    Delete note
+  </span>
+</div>
                         </div>
                       )}
                     </li>
