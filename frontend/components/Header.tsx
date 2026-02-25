@@ -20,7 +20,12 @@ function HeaderInner({
   action,
 }: HeaderProps) {
   const { isAuthenticated, logout } = useUserRole();
+const handleLogoutClick = () => {
+  const confirmed = window.confirm("Are you sure you want to log out?");
+  if (!confirmed) return;
 
+  logout();
+};
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
@@ -83,15 +88,15 @@ function HeaderInner({
           aria-label="User actions"
         >
           {isAuthenticated && (
-            <Button
-              onClick={logout}
-              variant="secondary"
-              size="sm"
-              aria-label="Logout from your account"
-              title="Sign out of your account"
-            >
-              Logout
-            </Button>
+           <Button
+  onClick={handleLogoutClick}
+  variant="secondary"
+  size="sm"
+  aria-label="Logout from your account"
+  title="Sign out of your account"
+>
+  Logout
+</Button>
           )}
           {action}
         </nav>
