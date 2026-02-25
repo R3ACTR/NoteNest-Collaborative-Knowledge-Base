@@ -150,7 +150,7 @@ export default function CommandPalette({ commands: customCommands }: CommandPale
         closePalette();
         return;
       }
-      if (isTypingElement(e.target)) return;
+      // Allow Ctrl+K to work even when focused in an input/editor (standard behavior for command palettes)
       e.preventDefault();
       openPalette();
     };
