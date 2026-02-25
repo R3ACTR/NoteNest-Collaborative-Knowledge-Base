@@ -3,6 +3,10 @@ import { getCacheService, CacheKeys } from './cacheService';
 import { getEventBus } from './eventBus';
 import { EVENT_NAMES, DomainEvent } from '../types/events';
 import logger from '../utils/logger';
+import ActivityFeed from '../models/ActivityFeed';
+import Notification from '../models/Notification';
+import Workspace from '../models/Workspace';
+import User from '../models/User';
 
 // Audit Logging Listener
 async function auditLoggingListener(event: DomainEvent): Promise<void> {
@@ -99,11 +103,127 @@ async function cacheInvalidationListener(event: DomainEvent): Promise<void> {
   }
 }
 
-// Activity Feed Listener (placeholder for future implementation)
+// Activity Feed Listener - Record activities for workspace activity feed
 async function activityFeedListener(event: DomainEvent): Promise<void> {
-  // Placeholder: In a real implementation, this would update an activity feed
-  // For now, just log the activity
-  logger.info(`Activity: ${event.timestamp} - ${JSON.stringify(event)}`);
+  try {
+    let action: string;
+    let target: string;
+    let targetType: string;
+    let targetTitle: string | undefined;
+    let metadata: Record<string, any> = {};
+
+    switch (event.type) {
+      case EVENT_NAMES.NOTE_CREATED:
+        const noteCreated = event as any;
+        action = 'note_created';
+        target = noteCreated.noteId;
+        targetType = 'note';
+        targetTitle = noteCreated.title;
+        metadata = { title: noteCreated.title };
+        break;
+      case EVENT_NAMES.NOTE_UPDATED:
+        const noteUpdated = event as any;
+        action = 'note_updated';
+        target = noteUpdated.noteId;
+        targetType = 'note';
+        targetTitle = noteUpdated.title;
+        metadata = { title: noteUpdated.title, changes: noteUpdated.changes };
+        break;
+      case EVENT_NAMES.NOTE_DELETED:
+        const noteDeleted = event as any;
+        action = 'note_deleted';
+        target = noteDeleted.noteId;
+        targetType = 'note';
+        targetTitle = noteDeleted.title;
+        metadata = { title: noteDeleted.title };
+        break;
+      case EVENT_NAMES.MEMBER_ADDED_TO_WORKSPACE:
+        const memberAdded = event as any;
+        action = 'member_added';
+        target = memberAdded.userId;
+        targetType = 'user';
+        metadata = { role: memberAdded.role };
+        break;
+      case EVENT_NAMES.MEMBER_REMOVED_FROM_WORKSPACE:
+        const memberRemoved = event as any;
+        action = 'member_removed';
+        target = memberRemoved.userId;
+        targetType = 'user';
+        metadata = { role: memberRemoved.role };
+        break;
+      case EVENT_NAMES.MEMBER_ROLE_UPDATED:
+        const roleUpdated = event as any;
+        action = 'member_role_updated';
+        target = roleUpdated.userId;
+        targetType = 'user';
+        metadata = { oldRole: roleUpdated.oldRole, newRole: roleUpdated.newRole };
+        break;
+      default:
+        logger.warn(`Unknown event type for activity feed: ${event.type}`);
+        return;
+    }
+
+    const activity = new ActivityFeed({
+      workspaceId: event.workspaceId,
+      actorId: event.actorId,
+      action,
+      target,
+      targetType,
+      targetTitle,
+      metadata,
+    });
+
+    await activity.save();
+    logger.info(`📊 Activity recorded: ${action} by ${event.actorId} in workspace ${event.workspaceId}`);
+  } catch (error) {
+    logger.error('Failed to record activity feed:', error);
+  }
+}
+
+// Notification Listener - Create notifications for relevant events
+async function notificationListener(event: DomainEvent): Promise<void> {
+  try {
+    switch (event.type) {
+      case EVENT_NAMES.MEMBER_ADDED_TO_WORKSPACE:
+        const memberAdded = event as any;
+        // Notify the added user
+        const newNotif = new Notification({
+          recipientId: memberAdded.userId,
+          type: 'member_added',
+          title: 'Added to Workspace',
+          message: `You have been added to a workspace with role: ${memberAdded.role}`,
+          relatedWorkspaceId: memberAdded.workspaceId,
+          relatedUserId: event.actorId,
+          isRead: false,
+        });
+        await newNotif.save();
+        logger.info(`🔔 Notification created: member_added for user ${memberAdded.userId}`);
+        break;
+
+      case EVENT_NAMES.MEMBER_ROLE_UPDATED:
+        const roleUpdated = event as any;
+        // Notify the user whose role was updated
+        const roleNotif = new Notification({
+          recipientId: roleUpdated.userId,
+          type: 'permission_invite',
+          title: 'Role Updated',
+          message: `Your role has been updated from ${roleUpdated.oldRole} to ${roleUpdated.newRole}`,
+          relatedWorkspaceId: roleUpdated.workspaceId,
+          relatedUserId: event.actorId,
+          isRead: false,
+        });
+        await roleNotif.save();
+        logger.info(`🔔 Notification created: member_role_updated for user ${roleUpdated.userId}`);
+        break;
+
+      // Add more notification types as needed
+      default:
+        // Silent pass - not all events generate notifications
+        break;
+    }
+  } catch (error) {
+    logger.error('Failed to create notification:', error);
+  }
 }
 
 // Register all listeners
@@ -136,6 +256,10 @@ export function registerEventListeners(): void {
   eventBus.subscribe(EVENT_NAMES.MEMBER_ADDED_TO_WORKSPACE, activityFeedListener);
   eventBus.subscribe(EVENT_NAMES.MEMBER_REMOVED_FROM_WORKSPACE, activityFeedListener);
   eventBus.subscribe(EVENT_NAMES.MEMBER_ROLE_UPDATED, activityFeedListener);
+
+  // Notification creation for relevant events
+  eventBus.subscribe(EVENT_NAMES.MEMBER_ADDED_TO_WORKSPACE, notificationListener);
+  eventBus.subscribe(EVENT_NAMES.MEMBER_ROLE_UPDATED, notificationListener);
 
   logger.info('Event listeners registered successfully');
 }

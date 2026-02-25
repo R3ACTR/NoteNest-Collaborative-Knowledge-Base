@@ -109,6 +109,33 @@ export default function Sidebar() {
           {collapsed && <span className="text-sm">N</span>}
         </Link>
 
+        <Link
+          href={`/workspace/${activeWorkspace.id}/templates`}
+          className={`${linkBase} flex items-center ${
+            collapsed ? "justify-center" : "gap-2"
+          } ${
+            pathname === `/workspace/${activeWorkspace.id}/templates`
+              ? activeClass
+              : ""
+          }`}
+        >
+          <svg
+            className="w-4 h-4 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+          {!collapsed && "Templates"}
+          {collapsed && <span className="text-sm">T</span>}
+        </Link>
+
         {canAccessManagement && (
           <Link
             href="/management"

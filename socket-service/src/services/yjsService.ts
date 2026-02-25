@@ -17,7 +17,7 @@ const docs: Map<string, Y.Doc> = new Map();
  * Gets or creates a Y.Doc for a specific note.
  * If creating, it tries to load state from MongoDB.
  */
-export const getYDoc = async (noteId: string): Promise<Y.Doc> => {
+export const getYDoc = async (noteId: string, io?: any): Promise<Y.Doc> => {
     if (docs.has(noteId)) {
         return docs.get(noteId)!;
     }
@@ -61,6 +61,9 @@ export const getYDoc = async (noteId: string): Promise<Y.Doc> => {
                     updatedAt: new Date()
                 });
                 console.log(`Saved Y.js state for note ${noteId}`);
+                if (io) {
+                    io.to(`note-${noteId}`).emit('note-saved', { noteId, timestamp: Date.now() });
+                }
             } catch (err) {
                 console.error("Error saving Y.js state", err);
             }
@@ -75,8 +78,8 @@ export const getYDoc = async (noteId: string): Promise<Y.Doc> => {
 /**
  * Processes a Y.js update message from a client
  */
-export const handleYjsMessage = async (noteId: string, message: Uint8Array, socketCallback: (response: Uint8Array) => void) => {
-    const doc = await getYDoc(noteId);
+export const handleYjsMessage = async (noteId: string, message: Uint8Array, socketCallback: (response: Uint8Array) => void, io?: any) => {
+    const doc = await getYDoc(noteId, io);
 
     const encoder = encoding.createEncoder();
     const decoder = decoding.createDecoder(message);
