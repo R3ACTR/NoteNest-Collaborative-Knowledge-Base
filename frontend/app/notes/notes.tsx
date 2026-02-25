@@ -333,6 +333,8 @@ if (rawPinned) {
         ? prev.filter((id) => id !== noteId)
         : [...prev, noteId]
     );
+  };
+
   /* ---------- Export ---------- */
   const handleExportNote = (note: Note) => {
     const title = note.title || "untitled";
@@ -419,7 +421,6 @@ if (rawPinned) {
                 </select>
               </div>
 
-<<<<<<< HEAD
               {isLoading ? (
                 <SkeletonList count={4} />
               ) : sortedNotes.length === 0 ? (
@@ -442,32 +443,6 @@ if (rawPinned) {
                     ) : undefined
                   }
                   size="large"
-                />
-              ) : (
-                <ul className="space-y-3">
-                  {sortedNotes.map((note) => (
-                    <li
-                      key={note.id}
-                      className="border rounded-xl p-4 bg-white flex justify-between"
-                    >
-                      <div className="flex items-start gap-3">
-                       {!isViewer && isSelectionMode && (
-  <input
-    type="checkbox"
-    checked={selectedNoteIds.includes(note.id)}
-    onChange={() => toggleSelectNote(note.id)}
-    className="mt-1"
-=======
-{isLoading ? (  <SkeletonList count={4} />
-) : sortedNotes.length === 0 ? (
-  <EmptyState
-    title={pinnedOnly ? "No pinned notes" : "No results found"}
-    description={
-      pinnedOnly
-        ? "You haven’t pinned any notes yet."
-        : "Try adjusting your search keywords."
-    }
->>>>>>> upstream/main
   />
 ) : (
   <ul className="space-y-3">
@@ -629,5 +604,4 @@ if (rawPinned) {
       )}
     </>
   );
-}
 }

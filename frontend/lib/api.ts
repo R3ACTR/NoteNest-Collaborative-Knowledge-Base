@@ -341,20 +341,6 @@ class ApiService {
     return this.request(`/api/workspaces/${workspaceId}/invites`);
   }
 
-  /* ---------- Authentication ---------- */
-  async register(data: RegisterRequest): Promise<RegisterResponse> {
-    return this.request("/api/auth/register", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async login(data: LoginRequest): Promise<LoginResponse> {
-    return this.request("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
 
   async getProfile(): Promise<UserProfileResponse> {
     return this.request("/api/auth/profile");

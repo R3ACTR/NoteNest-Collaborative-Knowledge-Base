@@ -157,9 +157,9 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <div className="space-y-3">
-                    {recentNotes.map((note) => (
+                    {recentNotes.map((note, index) => (
                       <div
-                        key={note.id}
+                        key={note.id || index}
                         className="border border-gray-800 rounded-xl p-4 bg-[#0f0f0f]"
                       >
                         <div className="text-white font-semibold">
