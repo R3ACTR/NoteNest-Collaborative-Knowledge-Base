@@ -4,12 +4,14 @@ import Link from "next/link";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function WorkspaceHome({
   params,
 }: {
   params: { id: string };
 }) {
+  const router = useRouter();
   const [noteCount, setNoteCount] = useState(0);
   useEffect(() => {
   try {
@@ -35,24 +37,42 @@ export default function WorkspaceHome({
           <p className="text-gray-500 mb-6">
             This is your personal workspace. Use quick actions to get started.
           </p>
-          <p className="text-sm text-gray-600 mb-6">
-  You have <span className="font-semibold">{noteCount}</span> notes
+        <p className="text-sm text-gray-600 mb-6">
+  You have{" "}
+  <span
+    className="font-semibold cursor-pointer hover:underline"
+    onClick={() => router.push(`/workspace/${params.id}/notes`)}
+  >
+    {noteCount}
+  </span>{" "}
+  notes
 </p>
-
           <div className="flex gap-4">
-            <Link
-              href={`/workspace/${params.id}/notes?new=1`}
-              className="px-4 py-2 bg-black text-white rounded"
-            >
-              Create Note
-            </Link>
+           <div className="relative group inline-block">
+  <Link
+    href={`/workspace/${params.id}/notes?new=1`}
+    className="px-4 py-2 bg-black text-white rounded"
+  >
+    Create Note
+  </Link>
 
-            <Link
-              href={`/workspace/${params.id}/dashboard`}
-              className="px-4 py-2 border rounded"
-            >
-              Go to Dashboard
-            </Link>
+  <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black px-3 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
+    Create a new note in this workspace
+  </span>
+</div>
+
+           <div className="relative group inline-block">
+  <Link
+    href={`/workspace/${params.id}/dashboard`}
+    className="px-4 py-2 border rounded"
+  >
+    Go to Dashboard
+  </Link>
+
+  <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black px-3 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
+    View your pinned notes, stats, and quick actions
+  </span>
+</div>
           </div>
         </main>
       </div>

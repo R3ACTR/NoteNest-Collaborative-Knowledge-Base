@@ -22,9 +22,40 @@ export default function WorkspaceDashboardPage({ workspaceId }: { workspaceId: s
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
+  const [pinnedPreviewNotes, setPinnedPreviewNotes] = useState<
+  Array<{ id: number; title: string }>
+>([]);
   const [totalNotes, setTotalNotes] = useState(0);
 const [pinnedNotes, setPinnedNotes] = useState(0);
 
+/* ---------- Load note stats ---------- */
+const loadNoteStats = () => {
+  try {
+    const rawNotes = localStorage.getItem("notenest-notes");
+    const rawPinned = localStorage.getItem("notenest-pinned-notes");
+
+    const notes = rawNotes ? JSON.parse(rawNotes) : [];
+const pinned = rawPinned
+  ? JSON.parse(rawPinned).map((id: any) => Number(id))
+  : [];
+    setTotalNotes(Array.isArray(notes) ? notes.length : 0);
+    setPinnedNotes(Array.isArray(pinned) ? pinned.length : 0);
+
+    const preview = notes
+      .filter((note: any) => pinned.includes(note.id))
+      .slice(0, 3)
+      .map((note: any) => ({
+        id: note.id,
+        title: note.title,
+      }));
+
+    setPinnedPreviewNotes(preview);
+  } catch {
+    setTotalNotes(0);
+    setPinnedNotes(0);
+    setPinnedPreviewNotes([]);
+  }
+};
   const workspace = workspaces.find((w) => w.id === workspaceId);
 
   useEffect(() => {
@@ -47,21 +78,18 @@ const [pinnedNotes, setPinnedNotes] = useState(0);
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-  try {
-    const rawNotes = localStorage.getItem("notenest-notes");
-    const rawPinned = localStorage.getItem("notenest-pinned-notes");
+  
+useEffect(() => {
+  loadNoteStats();
 
-    const notes = rawNotes ? JSON.parse(rawNotes) : [];
-    const pinned = rawPinned ? JSON.parse(rawPinned) : [];
+  const onFocus = () => loadNoteStats();
+  window.addEventListener("focus", onFocus);
 
-    setTotalNotes(Array.isArray(notes) ? notes.length : 0);
-    setPinnedNotes(Array.isArray(pinned) ? pinned.length : 0);
-  } catch {
-    setTotalNotes(0);
-    setPinnedNotes(0);
-  }
+  return () => {
+    window.removeEventListener("focus", onFocus);
+  };
 }, []);
+  
 
   const retryLoad = () => {
     setLoadError(null);
@@ -193,7 +221,40 @@ const [pinnedNotes, setPinnedNotes] = useState(0);
     }
   />
 )}
+{pinnedPreviewNotes.length > 0 && (
+  <section
+    className={sectionCardClass}
+    style={{ ...cardStyle }}
+  >
+    <div
+      className="flex items-center justify-between px-5 py-4"
+      style={{ borderBottom: "1px solid var(--color-border-light)" }}
+    >
+      <h3 className="text-base font-semibold">
+        Pinned Notes
+      </h3>
 
+     <Link
+  href={`/workspace/${workspaceId}/notes?pinned=1`}
+  className="text-sm text-blue-600 hover:underline"
+>
+  View all pinned
+</Link>
+    </div>
+
+    <ul className="px-5 py-4 space-y-2">
+      {pinnedPreviewNotes.map((note) => (
+        <li
+          key={note.id}
+          className="text-sm text-stone-700 truncate"
+          title={note.title}
+        >
+          📌 {note.title}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
             {/* Quick Actions — card */}
             <div>
               <section

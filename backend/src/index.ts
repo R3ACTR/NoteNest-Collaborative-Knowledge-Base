@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import { createServer } from "http";
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import jwt from 'jsonwebtoken';
 import workspaceRoutes from './routes/workspaces';
 import noteRoutes from './routes/notes';
@@ -12,6 +13,7 @@ import groupRoutes from './routes/groups';
 import permissionRoutes from './routes/permissions';
 import notificationRoutes from './routes/notifications';
 import activityRoutes from './routes/activity';
+import templateRoutes from './routes/templates';
 import { requestLoggingMiddleware } from './middleware/logging';
 import { authenticateToken } from './middleware/auth';
 import { initializeCache, getCacheService, CacheKeys } from './services/cacheService';
@@ -21,7 +23,7 @@ import { metrics } from './utils/metrics';
 dotenv.config();
 
 // Validate required environment variables
-const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET'];
+const requiredEnvVars = ['JWT_SECRET'];
 const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
 if (missingVars.length > 0 && process.env.NODE_ENV !== 'test') {
   console.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
@@ -39,21 +41,52 @@ app.use(requestLoggingMiddleware);
 
 // Initializations (only if not in test environment)
 if (process.env.NODE_ENV !== 'test') {
-  // Connect to MongoDB
-  const MONGO_URI = process.env.MONGO_URI!;
-  mongoose.connect(MONGO_URI)
-    .then(() => console.log("📊 Connected to MongoDB"))
-    .catch(err => console.error("MongoDB connection error:", err));
+  (async () => {
+    // Determine Mongo URI: prefer provided, otherwise start an in-memory mongo for local dev
+    let mongoUri = process.env.MONGO_URI;
 
-  // Initialize Redis cache
-  initializeCache().then(() => {
-    console.log("🔄 Redis cache initialized");
-  }).catch((err: unknown) => {
-    console.warn("⚠️  Redis cache initialization failed, continuing without cache:", err instanceof Error ? err.message : String(err));
-  });
+    if (!mongoUri) {
+      console.warn('MONGO_URI not set — starting mongodb-memory-server for development');
+      try {
+        const mongod = await MongoMemoryServer.create();
+        mongoUri = mongod.getUri();
+        // persist the uri for other modules
+        process.env.MONGO_URI = mongoUri;
+        console.log(`🧪 mongodb-memory-server running at ${mongoUri}`);
+      } catch (err) {
+        console.error('Failed to start mongodb-memory-server:', err);
+      }
+    }
 
-  // Register event listeners
-  registerEventListeners();
+    if (mongoUri) {
+      try {
+        await mongoose.connect(mongoUri);
+        console.log('📊 Connected to MongoDB');
+      } catch (err) {
+        console.error('MongoDB connection error:', err);
+        console.warn('Attempting to start mongodb-memory-server as a fallback');
+        try {
+          const mongod = await MongoMemoryServer.create();
+          const fallbackUri = mongod.getUri();
+          process.env.MONGO_URI = fallbackUri;
+          await mongoose.connect(fallbackUri);
+          console.log('📊 Connected to fallback in-memory MongoDB');
+        } catch (err2) {
+          console.error('Fallback in-memory MongoDB failed:', err2);
+        }
+      }
+    }
+
+    // Initialize Redis cache
+    initializeCache().then(() => {
+      console.log('🔄 Redis cache initialized');
+    }).catch((err: unknown) => {
+      console.warn('⚠️  Redis cache initialization failed, continuing without cache:', err instanceof Error ? err.message : String(err));
+    });
+
+    // Register event listeners
+    registerEventListeners();
+  })();
 }
 
 // Routes
@@ -65,6 +98,7 @@ app.use('/api/groups', authenticateToken, groupRoutes);
 app.use('/api/permissions', authenticateToken, permissionRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/activities', activityRoutes);
+app.use('/api/templates', templateRoutes);
 
 // Endpoint to issue socket tokens
 app.post('/api/socket/token', authenticateToken, (req: Request, res: Response) => {

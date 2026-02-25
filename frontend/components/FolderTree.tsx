@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Folder, ChevronRight, ChevronDown, Plus, MoreHorizontal } from "lucide-react";
+import { Folder, ChevronRight, ChevronDown, Plus, MoreHorizontal, FolderMinus } from "lucide-react";
 import { apiService } from "@/lib/api";
+import EmptyState from "@/components/EmptyState";
 
 interface FolderData {
   _id: string;
   name: string;
   workspaceId: string;
-  parentId: string | null;
+  parentId?: string | null;
   path: string;
   createdBy: string;
 }
@@ -134,7 +135,13 @@ export default function FolderTree({ workspaceId, selectedFolderId, onSelectFold
       {rootFolders.map((folder) => renderFolder(folder))}
 
       {rootFolders.length === 0 && (
-        <p className="text-sm text-gray-400 px-3 py-2">No folders yet</p>
+        <EmptyState
+          icon={FolderMinus}
+          title="No folders"
+          description="Organize your notes into folders."
+          size="compact"
+          className="mt-4"
+        />
       )}
     </div>
   );
