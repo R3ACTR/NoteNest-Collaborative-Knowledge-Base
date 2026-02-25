@@ -1,10 +1,11 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import WorkspaceSelector from "@/components/WorkspaceSelector";
 import { useUserRole } from "@/contexts/UserRoleContext";
 import Button from "@/components/Button";
+import NotificationCenter from "@/components/NotificationCenter";
 
 interface HeaderProps {
   title?: string;
@@ -24,6 +25,15 @@ function HeaderInner({
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
+  const [workspaceId, setWorkspaceId] = useState<string>("");
+
+  // Get workspaceId from localStorage
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("currentWorkspaceId");
+      if (stored) setWorkspaceId(stored);
+    }
+  }, []);
 
   return (
     <>
@@ -83,15 +93,18 @@ function HeaderInner({
           aria-label="User actions"
         >
           {isAuthenticated && (
-            <Button
-              onClick={logout}
-              variant="secondary"
-              size="sm"
-              aria-label="Logout from your account"
-              title="Sign out of your account"
-            >
-              Logout
-            </Button>
+            <>
+              <NotificationCenter workspaceId={workspaceId} />
+              <Button
+                onClick={logout}
+                variant="secondary"
+                size="sm"
+                aria-label="Logout from your account"
+                title="Sign out of your account"
+              >
+                Logout
+              </Button>
+            </>
           )}
           {action}
         </nav>

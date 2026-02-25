@@ -324,7 +324,7 @@ router.post('/:id/restore', authenticateToken, requirePermission('write'), async
 });
 
 // Fork a note to create a divergent copy
-router.post('/:id/fork', async (req: Request, res: Response) => {
+router.post('/:id/fork', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { authorId, branchName } = req.body;
@@ -435,7 +435,7 @@ router.get('/:id/diff', authenticateToken, requirePermission('read'), async (req
 });
 
 // Merge a forked note back into the original
-router.post('/:id/merge', async (req: Request, res: Response) => {
+router.post('/:id/merge', authenticateToken, requirePermission('write'), async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { forkedNoteId, authorId, mergeStrategy = 'overwrite' } = req.body;

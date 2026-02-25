@@ -3,6 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useFeatureFlag } from "@/hooks/useFeatureFlags";
+import { apiService } from "@/lib/api";
+import { useWorkspace } from "@/contexts/WorkspaceContext";
+import { Note } from "../../shared/types";
+import { Search, FileText, Plus, List, Home, Info } from "lucide-react";
 
 export type CommandPaletteCommand = {
   id: string;
@@ -39,8 +43,11 @@ interface CommandPaletteProps {
 
 export default function CommandPalette({ commands: customCommands }: CommandPaletteProps = {}) {
   const router = useRouter();
+  const { activeWorkspace } = useWorkspace();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [isLoadingNotes, setIsLoadingNotes] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const previousActiveRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -51,61 +58,70 @@ export default function CommandPalette({ commands: customCommands }: CommandPale
     {
       id: "create-note",
       label: "Create New Note",
-      keywords: ["new", "add", "note"],
-      action: () => router.push("/notes?new=1"),
+      keywords: ["new", "add", "note", "create"],
+      action: () => router.push(`/workspace/${activeWorkspace.id}/notes?new=1`),
+      icon: <span className="bg-green-100 text-green-700 p-1.5 rounded-lg"><Plus className="w-4 h-4" /></span>
+    },
+    {
+      id: "go-dashboard",
+      label: "Go to Dashboard",
+      keywords: ["dashboard", "home", "stats"],
+      action: () => router.push(`/workspace/${activeWorkspace.id}/dashboard`),
+      icon: <span className="bg-purple-100 text-purple-700 p-1.5 rounded-lg"><Home className="w-4 h-4" /></span>
     },
     {
       id: "go-notes",
-      label: "Go to Notes",
-      keywords: ["notes", "list"],
-      action: () => router.push("/notes"),
-    },
-    {
-      id: "go-folders",
-      label: "Go to Folders",
-      keywords: ["folders", "organize"],
-      action: () => {
-        // Placeholder: Folders not yet implemented
-        router.push("/notes");
-      },
-    },
-    {
-      id: "focus-search",
-      label: "Focus Search",
-      keywords: ["search", "find"],
-      action: () => {
-        setOpen(false);
-        requestAnimationFrame(() => {
-          document.querySelector<HTMLElement>('[data-shortcut="search"]')?.focus();
-        });
-      },
+      label: "Browse All Notes",
+      keywords: ["notes", "list", "all"],
+      action: () => router.push(`/workspace/${activeWorkspace.id}/notes`),
+      icon: <span className="bg-blue-100 text-blue-700 p-1.5 rounded-lg"><List className="w-4 h-4" /></span>
     },
     {
       id: "help-shortcuts",
-      label: "Help / Shortcuts",
-      keywords: ["help", "keyboard", "shortcuts"],
+      label: "Keyboard Shortcuts",
+      keywords: ["help", "kbd", "shortcuts"],
       action: () => {
         setOpen(false);
-        // Placeholder: could open a shortcuts modal later
-        requestAnimationFrame(() => {
-          const search = document.querySelector<HTMLElement>('[data-shortcut="search"]');
-          if (search) search.focus();
-        });
+        // Placeholder for shortcuts modal
+        alert("Keyboard Shortcuts:\nCtrl+K: Open Global Search\nCtrl+S: Save Note\n(More coming soon!)");
       },
+      icon: <span className="bg-gray-100 text-gray-700 p-1.5 rounded-lg"><Info className="w-4 h-4" /></span>
     },
   ];
 
-  const commands = customCommands ?? defaultCommands;
+  const noteCommands: CommandPaletteCommand[] = notes.map(note => ({
+    id: `note-${note._id}`,
+    label: note.title || "Untitled Note",
+    keywords: ["note", ...(note.tags || [])],
+    action: () => router.push(`/workspace/${activeWorkspace.id}/notes?id=${note._id}`),
+    icon: <span className="bg-yellow-100 text-yellow-700 p-1.5 rounded-lg"><FileText className="w-4 h-4" /></span>
+  }));
+
+  const commands = customCommands ?? [...defaultCommands, ...noteCommands];
   const filtered = filterCommands(commands, query);
   const selectedCommand = filtered[selectedIndex] ?? null;
+
+  const fetchNotes = useCallback(async () => {
+    if (!activeWorkspace?.id) return;
+    try {
+      setIsLoadingNotes(true);
+      const data = await apiService.getNotesForWorkspace(activeWorkspace.id);
+      setNotes(data);
+    } catch (err) {
+      console.error("Failed to fetch notes for search:", err);
+    } finally {
+      setIsLoadingNotes(false);
+    }
+  }, [activeWorkspace?.id]);
 
   const openPalette = useCallback(() => {
     previousActiveRef.current = document.activeElement as HTMLElement | null;
     setOpen(true);
     setQuery("");
     setSelectedIndex(0);
+    fetchNotes();
     requestAnimationFrame(() => inputRef.current?.focus());
-  }, []);
+  }, [fetchNotes]);
 
   const closePalette = useCallback(() => {
     setOpen(false);

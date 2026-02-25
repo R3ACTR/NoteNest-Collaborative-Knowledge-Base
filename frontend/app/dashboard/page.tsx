@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
+import ActivityFeed from "@/components/ActivityFeed";
 import { usePermissions } from "@/hooks/usePermissions";
 import RouteGuard from "@/components/RouteGuard";
 
@@ -50,10 +51,16 @@ export default function DashboardPage() {
   const router = useRouter();
   const { canCreateNote } = usePermissions();
   const [notes, setNotes] = useState<any[]>([]);
+  const [workspaceId, setWorkspaceId] = useState<string>("");
 
   /* Load notes safely */
   useEffect(() => {
     setNotes(loadNotesSafely());
+
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("currentWorkspaceId");
+      if (stored) setWorkspaceId(stored);
+    }
   }, []);
 
   /* Recent notes (latest 5) */
@@ -74,7 +81,10 @@ export default function DashboardPage() {
           <Header title="Dashboard" showSearch />
 
           <main className="flex-1 overflow-auto p-6">
-            <div className="max-w-4xl mx-auto space-y-8">
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main content */}
+                <div className="lg:col-span-2 space-y-8">
 
               {/* Welcome */}
               <section className="bg-[#0b0b0b] border border-[#1f1f1f] rounded-2xl p-6">
@@ -169,6 +179,17 @@ export default function DashboardPage() {
                 )}
               </section>
 
+                </div>
+
+                {/* Activity Feed Sidebar */}
+                {workspaceId && (
+                  <div className="lg:col-span-1">
+                    <div className="bg-[#0b0b0b] border border-[#1f1f1f] rounded-2xl overflow-hidden">
+                      <ActivityFeed workspaceId={workspaceId} limit={10} showTitle={true} />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </main>
         </div>
