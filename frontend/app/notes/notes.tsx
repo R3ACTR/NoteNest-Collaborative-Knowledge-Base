@@ -62,6 +62,9 @@ export default function NotesPage() {
     useState<"newest" | "oldest" | "az">("newest");
 
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingNoteId, setEditingNoteId] = useState<number | null>(null);
+  const [createTitle, setCreateTitle] = useState("");
+  const [createContent, setCreateContent] = useState("");
 
   /* ---------- Initial load ---------- */
   useEffect(() => {
@@ -115,9 +118,31 @@ export default function NotesPage() {
     return a.title.localeCompare(b.title);
   });
 
-  /* ---------- Create ---------- */
+  /* ---------- Actions ---------- */
+  const togglePin = (id: number) => {
+    setPinnedNoteIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleEditNote = (note: Note) => {
+    setEditingNoteId(note.id);
+    setCreateTitle(note.title);
+    setCreateContent(note.content || "");
+    setShowCreateModal(true);
+  };
+
+  const handleDeleteNote = (note: Note) => {
+    if (!confirm("Are you sure you want to delete this note?")) return;
+    setNotes((prev) => prev.filter((n) => n.id !== note.id));
+    setPinnedNoteIds((prev) => prev.filter((id) => id !== note.id));
+  };
+
   const handleCreateNote = () => {
     if (!canCreateNote) return;
+    setEditingNoteId(null);
+    setCreateTitle("");
+    setCreateContent("");
     setShowCreateModal(true);
   };
 
@@ -170,15 +195,70 @@ export default function NotesPage() {
                 {sortedNotes.map((note) => (
                   <li
                     key={note.id}
-                    className="border rounded-xl p-4 bg-white"
+                    className="border rounded-xl p-4 bg-white flex justify-between"
                   >
-                    <h4 className="font-semibold">{note.title}</h4>
-                    <p className="text-xs text-gray-500">
-                      {formatRelativeTime(note.createdAt)}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {note.content || "No content"}
-                    </p>
+                    <div>
+                      <h4 className="font-semibold">{note.title}</h4>
+                      <p className="text-xs text-gray-500">
+                        {formatRelativeTime(note.createdAt)}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {note.content || "No content"}
+                      </p>
+                    </div>
+
+                    {!isViewer && (
+                      <div className="flex gap-2">
+                        {/* Pin */}
+                        <button
+                          aria-label={
+                            pinnedNoteIds.includes(note.id)
+                              ? "Unpin note"
+                              : "Pin note"
+                          }
+                          onClick={() => togglePin(note.id)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              togglePin(note.id);
+                            }
+                          }}
+                          className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        >
+                          {pinnedNoteIds.includes(note.id) ? "📌" : "📍"}
+                        </button>
+
+                        {/* Edit */}
+                        <button
+                          aria-label="Edit note"
+                          onClick={() => handleEditNote(note)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleEditNote(note);
+                            }
+                          }}
+                          className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                        >
+                          ✏️
+                        </button>
+
+                        {/* Delete */}
+                        <button
+                          aria-label="Delete note"
+                          onClick={() => handleDeleteNote(note)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              handleDeleteNote(note);
+                            }
+                          }}
+                          className="focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
