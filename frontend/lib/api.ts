@@ -207,33 +207,6 @@ class ApiService {
     );
   }
 
-  async getInviteDetails(token: string): Promise<any> {
-    return this.request(`/api/workspaces/invite/${token}`);
-  }
-
-  async acceptInvite(token: string): Promise<any> {
-    return this.request(`/api/workspaces/invite/${token}/accept`, {
-      method: "POST",
-    });
-  }
-
-  async getInvites(workspaceId: string): Promise<any[]> {
-    return this.request(`/api/workspaces/${workspaceId}/invites`);
-  }
-
-  async createInvite(workspaceId: string, email: string, role: string): Promise<any> {
-    return this.request(`/api/workspaces/${workspaceId}/invites`, {
-      method: "POST",
-      body: JSON.stringify({ email, role }),
-    });
-  }
-
-  async revokeInvite(workspaceId: string, inviteId: string): Promise<any> {
-    return this.request(`/api/workspaces/${workspaceId}/invites/${inviteId}`, {
-      method: "DELETE",
-    });
-  }
-
   /* ---------- Notes ---------- */
   async getNotesForWorkspace(workspaceId: string): Promise<Note[]> {
     return this.request(`/api/notes/workspace/${workspaceId}`);
@@ -276,25 +249,11 @@ class ApiService {
     });
   }
 
-  async getNoteVersions(noteId: string): Promise<NoteVersion[]> {
-    return this.request(`/api/notes/${noteId}/versions`);
-  }
-
-  async getNoteDiff(
-    noteId: string,
-    version1: string | number,
-    version2: string | number
-  ): Promise<NoteDiff> {
-    return this.request(
-      `/api/notes/${noteId}/diff?v1=${version1}&v2=${version2}`
-    );
-  }
-
   async restoreNoteVersion(
     noteId: string,
-    versionNumber: number | string,
+    versionNumber: number,
     authorId: string
-  ): Promise<RestoreNoteResponse> {
+  ): Promise<{ note: Note }> {
     return this.request(`/api/notes/${noteId}/restore`, {
       method: "POST",
       body: JSON.stringify({ versionNumber, authorId }),
@@ -314,8 +273,19 @@ class ApiService {
       body: JSON.stringify(data),
     });
   }
+  /* ---------- Users ---------- */
 
-  /* ---------- Tags & Folders ---------- */
+  async getNoteDiff(
+    noteId: string,
+    version1: number,
+    version2: number
+  ): Promise<NoteDiff> {
+    return this.request(
+      `/api/notes/${noteId}/diff?v1=${version1}&v2=${version2}`
+    );
+  }
+
+  /* ---------- Tags ---------- */
   async getWorkspaceTags(workspaceId: string): Promise<string[]> {
     return this.request(`/api/notes/workspace/${workspaceId}/tags`);
   }
@@ -341,9 +311,28 @@ class ApiService {
     return this.request(`/api/workspaces/${workspaceId}/invites`);
   }
 
+  async getInviteDetails(token: string): Promise<unknown> {
+    return this.request(`/api/invites/${token}`);
+  }
 
-  async getProfile(): Promise<UserProfileResponse> {
-    return this.request("/api/auth/profile");
+  async createInvite(workspaceId: string, email: string, role: string): Promise<unknown> {
+    return this.request(`/api/workspaces/${workspaceId}/invites`, {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    });
+  }
+
+  async revokeInvite(workspaceId: string, inviteId: string): Promise<unknown> {
+    return this.request(`/api/workspaces/${workspaceId}/invites/${inviteId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async acceptInvite(token: string): Promise<unknown> {
+    return this.request('/api/accept-invite', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
   }
 
   /* ---------- Notifications ---------- */
@@ -351,37 +340,33 @@ class ApiService {
     workspaceId?: string,
     limit: number = 20,
     skip: number = 0
-  ): Promise<{ notifications: any[]; total: number; unreadCount: number }> {
+  ): Promise<{ notifications: unknown[]; total: number; unreadCount: number }> {
     const params = new URLSearchParams();
-    if (workspaceId) params.append("workspaceId", workspaceId);
-    params.append("limit", limit.toString());
-    params.append("skip", skip.toString());
+    if (workspaceId) params.append('workspaceId', workspaceId);
+    params.append('limit', limit.toString());
+    params.append('skip', skip.toString());
     return this.request(`/api/notifications?${params.toString()}`);
   }
 
   async getUnreadNotificationCount(): Promise<{ unreadCount: number }> {
-    return this.request("/api/notifications/count");
+    return this.request('/api/notifications/count');
   }
 
-  async markNotificationAsRead(notificationId: string): Promise<any> {
+  async markNotificationAsRead(notificationId: string): Promise<unknown> {
     return this.request(`/api/notifications/${notificationId}/read`, {
-      method: "PATCH",
+      method: 'PATCH',
     });
   }
 
-  async dismissNotification(
-    notificationId: string
-  ): Promise<{ message: string }> {
+  async dismissNotification(notificationId: string): Promise<{ message: string }> {
     return this.request(`/api/notifications/${notificationId}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
   }
 
-  async markAllNotificationsAsRead(
-    workspaceId?: string
-  ): Promise<{ message: string; modifiedCount: number }> {
-    return this.request("/api/notifications/read-all", {
-      method: "PATCH",
+  async markAllNotificationsAsRead(workspaceId?: string): Promise<{ message: string; modifiedCount: number }> {
+    return this.request('/api/notifications/read-all', {
+      method: 'PATCH',
       body: JSON.stringify({ workspaceId }),
     });
   }
@@ -391,7 +376,7 @@ class ApiService {
     workspaceId: string,
     limit: number = 30,
     skip: number = 0
-  ): Promise<{ activities: any[]; total: number }> {
+  ): Promise<{ activities: unknown[]; total: number }> {
     return this.request(
       `/api/activities/workspace/${workspaceId}?limit=${limit}&skip=${skip}`
     );
@@ -401,7 +386,7 @@ class ApiService {
     noteId: string,
     limit: number = 20,
     skip: number = 0
-  ): Promise<{ activities: any[]; total: number }> {
+  ): Promise<{ activities: unknown[]; total: number }> {
     return this.request(
       `/api/activities/note/${noteId}?limit=${limit}&skip=${skip}`
     );
