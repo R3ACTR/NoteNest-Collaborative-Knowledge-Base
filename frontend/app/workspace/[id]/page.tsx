@@ -48,19 +48,31 @@ export default function WorkspaceHome({
   notes
 </p>
           <div className="flex gap-4">
-            <Link
-              href={`/workspace/${params.id}/notes?new=1`}
-              className="px-4 py-2 bg-black text-white rounded"
-            >
-              Create Note
-            </Link>
+           <div className="relative group inline-block">
+  <Link
+    href={`/workspace/${params.id}/notes?new=1`}
+    className="px-4 py-2 bg-black text-white rounded"
+  >
+    Create Note
+  </Link>
 
-            <Link
-              href={`/workspace/${params.id}/dashboard`}
-              className="px-4 py-2 border rounded"
-            >
-              Go to Dashboard
-            </Link>
+  <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black px-3 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
+    Create a new note in this workspace
+  </span>
+</div>
+
+           <div className="relative group inline-block">
+  <Link
+    href={`/workspace/${params.id}/dashboard`}
+    className="px-4 py-2 border rounded"
+  >
+    Go to Dashboard
+  </Link>
+
+  <span className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black px-3 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
+    View your pinned notes, stats, and quick actions
+  </span>
+</div>
           </div>
         </main>
       </div>

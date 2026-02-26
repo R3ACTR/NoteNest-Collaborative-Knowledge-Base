@@ -9,9 +9,7 @@ import NotificationCenter from "@/components/NotificationCenter";
 
 interface HeaderProps {
   title?: string;
-  /** When true, shows a search input that can be focused with / shortcut */
   showSearch?: boolean;
-  /** Optional node rendered on the right (e.g. Create Note button) */
   action?: React.ReactNode;
 }
 
@@ -21,13 +19,19 @@ function HeaderInner({
   action,
 }: HeaderProps) {
   const { isAuthenticated, logout } = useUserRole();
-
   const router = useRouter();
   const searchParams = useSearchParams();
   const search = searchParams.get("search") || "";
   const [workspaceId, setWorkspaceId] = useState<string>("");
 
-  // Get workspaceId from localStorage
+  // 🔐 Logout confirmation
+  const handleLogoutClick = () => {
+    const confirmed = window.confirm("Are you sure you want to log out?");
+    if (!confirmed) return;
+    logout();
+  };
+
+  // Load workspace ID for notifications
   useEffect(() => {
     if (typeof window !== "undefined") {
       const stored = localStorage.getItem("currentWorkspaceId");
@@ -37,7 +41,7 @@ function HeaderInner({
 
   return (
     <>
-      {/* Skip to main content link for keyboard users */}
+      {/* Skip to main content (accessibility) */}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -45,10 +49,10 @@ function HeaderInner({
         Skip to main content
       </a>
 
-<header
-  className="sticky top-0 z-40 flex items-center gap-4 border-b px-6 py-4 bg-[#F3F0E6]/90 backdrop-blur-sm border-stone-200/50"
-  role="banner"
->
+      <header
+        className="sticky top-0 z-40 flex items-center gap-4 border-b px-6 py-4 bg-[#F3F0E6]/90 backdrop-blur-sm border-stone-200/50"
+        role="banner"
+      >
         <WorkspaceSelector />
 
         <h1
@@ -63,11 +67,9 @@ function HeaderInner({
             <label htmlFor="search-input" className="sr-only">
               Search notes
             </label>
-
             <input
               id="search-input"
               type="search"
-              data-shortcut="search"
               placeholder="Search notes…"
               aria-label="Search notes"
               value={search}
@@ -83,7 +85,7 @@ function HeaderInner({
 
                 router.replace(`?${params.toString()}`);
               }}
-              className="w-full rounded-full border border-stone-200 bg-white px-4 py-2 text-sm transition-colors placeholder:text-stone-400 text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400 focus:border-stone-400 shadow-sm"
+              className="w-full rounded-full border border-stone-200 bg-white px-4 py-2 text-sm placeholder:text-stone-400 text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400"
             />
           </div>
         )}
@@ -96,7 +98,7 @@ function HeaderInner({
             <>
               <NotificationCenter workspaceId={workspaceId} />
               <Button
-                onClick={logout}
+                onClick={handleLogoutClick}
                 variant="secondary"
                 size="sm"
                 aria-label="Logout from your account"
