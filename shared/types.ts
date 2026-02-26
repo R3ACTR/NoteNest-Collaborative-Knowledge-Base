@@ -253,3 +253,32 @@ export interface Template {
   updatedAt: string;
 }
 
+// Real-time Presence & Cursors
+export interface Presence {
+  userId: string;
+  displayName: string;
+  avatarUrl?: string;
+  color: string; // Hex color for cursor & selection
+  status: 'active' | 'idle' | 'away';
+  cursor?: {
+    line: number;
+    index: number;
+  } | null; // Text index position
+  selection?: {
+    from: number;
+    to: number;
+  } | null; // Selection range
+  updatedAt: number; // Timestamp
+}
+
+export interface PresenceUpdate {
+  userId: string;
+  displayName: string;
+  avatarUrl?: string;
+  color: string;
+  status: 'active' | 'idle' | 'away';
+  cursor?: { line: number; index: number } | null;
+  selection?: { from: number; to: number } | null;
+  updatedAt: number;
+}
+

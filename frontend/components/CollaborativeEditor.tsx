@@ -5,17 +5,22 @@ import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import * as Y from 'yjs';
-import { useEffect, useState } from 'react';
-import TurndownService from 'turndown';
+
 import { socket } from '@/lib/api'; // Assume we have a socket singleton or similar
 import { YSocketIOProvider } from '@/lib/yjs-provider';
+import PresenceList from './PresenceList';
+import CursorOverlay from './CursorOverlay';
+import { Presence } from '@/types/types';
 
 
-const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentUser: any }) => {
+const CollaborativeEditor = ({ noteId, workspaceId, currentUser }: { noteId: string; workspaceId: string; currentUser: any }) => {
     const [ydoc] = useState(() => new Y.Doc());
     const [provider, setProvider] = useState<YSocketIOProvider | null>(null);
     const [copied, setCopied] = useState(false);
     const [lastSaved, setLastSaved] = useState<number | null>(null);
+    const [presences, setPresences] = useState<Presence[]>([]);
+    const [highlightedUserId, setHighlightedUserId] = useState<string | null>(null);
+    const editorContainerRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleNoteSaved = (data: { noteId: string, timestamp: number }) => {
@@ -30,6 +35,37 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
             socket.off('note-saved', handleNoteSaved);
         };
     }, [noteId]);
+
+    // Handle presence updates
+    useEffect(() => {
+        const handlePresenceList = (data: { presences: Presence[] }) => {
+            setPresences(data.presences.filter(p => p.userId !== currentUser?.id));
+        };
+
+        const handlePresenceUpdated = (data: { presence: Presence }) => {
+            setPresences((prev) => {
+                const updated = prev.filter(p => p.userId !== data.presence.userId);
+                if (data.presence.userId !== currentUser?.id) {
+                  return [...updated, data.presence];
+                }
+                return updated;
+            });
+        };
+
+        const handlePresenceRemoved = (data: { userId: string }) => {
+            setPresences((prev) => prev.filter(p => p.userId !== data.userId));
+        };
+
+        socket.on('presence:list', handlePresenceList);
+        socket.on('presence:updated', handlePresenceUpdated);
+        socket.on('presence:removed', handlePresenceRemoved);
+
+        return () => {
+            socket.off('presence:list', handlePresenceList);
+            socket.off('presence:updated', handlePresenceUpdated);
+            socket.off('presence:removed', handlePresenceRemoved);
+        };
+    }, [currentUser?.id]);
 
     const handleCopyNote = () => {
         if (!editor) return;
@@ -59,12 +95,29 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
     useEffect(() => {
         const prov = new YSocketIOProvider(socket, noteId, ydoc);
         setProvider(prov);
-        
+
+        // Join note and send presence
+        const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+        socket.emit('join-note', {
+            noteId,
+            workspaceId,
+            displayName: currentUser?.name || `User-${currentUser?.id}`,
+            avatarUrl: currentUser?.avatarUrl,
+            color,
+        });
+
+        // Send presence updates (e.g., on cursor movement)
+        const presenceHeartbeat = setInterval(() => {
+            socket.emit('presence:heartbeat', { noteId });
+        }, 30000); // Heartbeat every 30 seconds
+
         return () => {
+            clearInterval(presenceHeartbeat);
+            socket.emit('leave-note', noteId);
             prov.destroy();
             ydoc.destroy();
         }
-    }, [noteId, ydoc]);
+    }, [noteId, workspaceId, ydoc, currentUser]);
 
     const editor = useEditor({
         extensions: [
@@ -82,8 +135,8 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
     if (!provider) return <div>Connecting...</div>;
 
     return (
-        <div>
-            <div className="flex justify-between items-center mb-2">
+        <div className="flex flex-col gap-3">
+            <div className="flex justify-between items-center">
                 <div className="text-xs text-gray-400">
                     {lastSaved ? `Last saved at ${new Date(lastSaved).toLocaleTimeString()}` : 'Saving...'}
                 </div>
@@ -121,8 +174,24 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
                     </button>
                 </div>
             </div>
-            <div className="prose prose-lg max-w-none w-full p-4 border rounded-xl min-h-[300px] focus-within:ring-2 ring-blue-500/20 transition-all">
-                <EditorContent editor={editor} />
+
+            {/* Presence List */}
+            <PresenceList 
+                presences={presences} 
+                currentUserId={currentUser?.id}
+                onPresenceHover={setHighlightedUserId}
+            />
+
+            <div className="relative" ref={editorContainerRef}>
+                <div className="prose prose-lg max-w-none w-full p-4 border rounded-xl min-h-[300px] focus-within:ring-2 ring-blue-500/20 transition-all">
+                    <EditorContent editor={editor} />
+                </div>
+                {/* Cursor Overlay */}
+                <CursorOverlay 
+                    presences={presences} 
+                    currentUserId={currentUser?.id}
+                    editorContainer={editorContainerRef.current}
+                />
             </div>
         </div>
     );
