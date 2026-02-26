@@ -16,6 +16,13 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
     const [provider, setProvider] = useState<YSocketIOProvider | null>(null);
     const [copied, setCopied] = useState(false);
     const [lastSaved, setLastSaved] = useState<number | null>(null);
+    const [wordCount, setWordCount] = useState(0);
+
+    const calculateStats = (editorInstance: any) => {
+        const text = editorInstance.getText() || "";
+        const words = text.trim().split(/\s+/).filter((word: string) => word.length > 0);
+        setWordCount(words.length);
+    };
 
     useEffect(() => {
         const handleNoteSaved = (data: { noteId: string, timestamp: number }) => {
@@ -77,6 +84,12 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
                 user: currentUser,
             })
         ],
+        onCreate: ({ editor }) => {
+            calculateStats(editor);
+        },
+        onUpdate: ({ editor }) => {
+            calculateStats(editor);
+        },
     }, [provider]); // Re-create editor when provider is ready? No,// Verified imports. No changes needed.
 
     if (!provider) return <div>Connecting...</div>;
@@ -84,8 +97,16 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
     return (
         <div>
             <div className="flex justify-between items-center mb-2">
-                <div className="text-xs text-gray-400">
-                    {lastSaved ? `Last saved at ${new Date(lastSaved).toLocaleTimeString()}` : 'Saving...'}
+                <div className="flex items-center gap-4 text-xs text-gray-400">
+                    <span>{lastSaved ? `Last saved at ${new Date(lastSaved).toLocaleTimeString()}` : 'Saving...'}</span>
+                    <span className="flex items-center gap-1 border-l border-gray-300 dark:border-stone-600 pl-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                        {wordCount} words
+                    </span>
+                    <span className="flex items-center gap-1 border-l border-gray-300 dark:border-stone-600 pl-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        {Math.ceil(wordCount / 200)} min read
+                    </span>
                 </div>
                 <div className="flex gap-2">
                     <button

@@ -422,6 +422,16 @@ export default function NotesPage() {
               <h3 className="text-xl font-bold text-stone-900">
                 {editingNoteId ? "Edit Note" : "Create New Note"}
               </h3>
+              <div className="flex items-center gap-4 text-xs text-stone-500">
+                <span className="flex items-center gap-1 border-stone-200 pl-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                  {createContent.trim().split(/\s+/).filter(w => w.length > 0).length} words
+                </span>
+                <span className="flex items-center gap-1 border-l border-stone-200 pl-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {Math.ceil(createContent.trim().split(/\s+/).filter(w => w.length > 0).length / 200)} min read
+                </span>
+              </div>
             </div>
             <div className="p-6 space-y-4">
               <input
