@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import EmptyState from "@/components/EmptyState";
 import { SkeletonList } from "@/components/Skeleton";
 import { usePermissions } from "@/hooks/usePermissions";
-import { FileX, Search as SearchIcon, Copy, Check, Download, Trash2, Pin, PinOff, Edit3 } from "lucide-react";
+import { FileX, Search as SearchIcon, Copy, Check, Download, Trash2, Pin, PinOff, Edit3, CopyPlus } from "lucide-react";
 
 const STORAGE_KEY = "notenest-notes";
 const PINNED_KEY = "notenest-pinned-notes";
@@ -168,6 +168,18 @@ export default function NotesPage() {
     setCreateTitle("");
     setCreateContent("");
     setShowCreateModal(true);
+  };
+  
+  const handleDuplicateNote = (note: Note) => {
+    if (!canCreateNote) return;
+    const newNote: Note = {
+      id: Date.now(),
+      title: `${note.title} (Copy)`,
+      content: note.content,
+      createdAt: Date.now(),
+    };
+    setNotes((prev) => [newNote, ...prev]);
+    // Optionally trigger a toast or notification here
   };
 
   /* ---------- Bulk select ---------- */
@@ -383,6 +395,16 @@ export default function NotesPage() {
                           }`}
                         >
                           {pinnedNoteIds.includes(note.id) ? <PinOff size={18} /> : <Pin size={18} />}
+                        </button>
+                        
+                        {/* Duplicate */}
+                        <button
+                          title="Duplicate note"
+                          aria-label="Duplicate note"
+                          onClick={() => handleDuplicateNote(note)}
+                          className="p-2 text-stone-500 hover:bg-stone-100 hover:text-stone-900 rounded-lg transition-colors"
+                        >
+                          <CopyPlus size={18} />
                         </button>
 
                         {/* Edit */}
