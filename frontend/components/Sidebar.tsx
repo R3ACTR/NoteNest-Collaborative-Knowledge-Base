@@ -30,15 +30,15 @@ export default function Sidebar() {
     >
       {/* HEADER */}
       <header className="flex items-center justify-between p-5 border-b border-stone-200/50">
-        {!collapsed && (
-          <Link
-            href="/"
-            className="flex items-center gap-2 font-display text-2xl font-bold tracking-tight text-stone-900 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded-md px-2 py-1"
-          >
-            <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-display text-xl pt-1">N</div>
+        <Link
+          href="/"
+          className={`flex items-center gap-2 font-display text-2xl font-bold tracking-tight text-stone-900 hover:opacity-80 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-400 rounded-md px-2 py-1 ${collapsed ? "justify-center" : ""}`}
+        >
+          <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center text-white font-display text-xl pt-1 shrink-0">N</div>
+          <span className={`transition-all duration-300 origin-left whitespace-nowrap overflow-hidden ${collapsed ? "w-0 opacity-0" : "w-[124px] opacity-100"}`}>
             NoteNest
-          </Link>
-        )}
+          </span>
+        </Link>
 
         {/* TOGGLE BUTTON */}
         <button
@@ -78,7 +78,9 @@ export default function Sidebar() {
               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
             />
           </svg>
-          {!collapsed && "Home"}
+          <span className={`transition-all duration-300 origin-left whitespace-nowrap overflow-hidden ${collapsed ? "w-0 opacity-0" : "w-10 opacity-100"}`}>
+            Home
+          </span>
         </Link>
 
         <Link
@@ -91,8 +93,10 @@ export default function Sidebar() {
               : ""
           }`}
         >
-          {!collapsed && "Dashboard"}
-          {collapsed && <span className="text-sm">D</span>}
+          <span className={`transition-all duration-300 origin-left whitespace-nowrap overflow-hidden ${collapsed ? "w-0 opacity-0" : "w-20 opacity-100"}`}>
+            Dashboard
+          </span>
+          {collapsed && <span className="text-sm absolute">D</span>}
         </Link>
 
         <Link
@@ -105,8 +109,10 @@ export default function Sidebar() {
               : ""
           }`}
         >
-          {!collapsed && "Notes"}
-          {collapsed && <span className="text-sm">N</span>}
+          <span className={`transition-all duration-300 origin-left whitespace-nowrap overflow-hidden ${collapsed ? "w-0 opacity-0" : "w-[42px] opacity-100"}`}>
+            Notes
+          </span>
+          {collapsed && <span className="text-sm absolute">N</span>}
         </Link>
 
         <Link
@@ -132,8 +138,10 @@ export default function Sidebar() {
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
             />
           </svg>
-          {!collapsed && "Templates"}
-          {collapsed && <span className="text-sm">T</span>}
+          <span className={`transition-all duration-300 origin-left whitespace-nowrap overflow-hidden ${collapsed ? "w-0 opacity-0" : "w-[72px] opacity-100"}`}>
+            Templates
+          </span>
+          {collapsed && <span className="text-sm absolute">T</span>}
         </Link>
 
         {canAccessManagement && (
@@ -156,7 +164,9 @@ export default function Sidebar() {
                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0..."
               />
             </svg>
-            {!collapsed && "Management"}
+            <span className={`transition-all duration-300 origin-left whitespace-nowrap overflow-hidden ${collapsed ? "w-0 opacity-0" : "w-[92px] opacity-100"}`}>
+              Management
+            </span>
           </Link>
         )}
       </nav>
