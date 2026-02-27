@@ -222,7 +222,7 @@ export default function SignupPage() {
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (errors.email) setErrors({ ...errors, email: undefined }); }}
                   placeholder="you@example.com"
-                  className="login-input w-full rounded-xl border pl-12 pr-5 py-3.5 text-base outline-none box-border transition-colors focus:ring-2 focus:ring-offset-1 focus:ring-[var(--color-info)]"
+                  className="login-input w-full rounded-xl border pl-12 pr-10 py-3.5 text-base outline-none box-border transition-colors focus:ring-2 focus:ring-offset-1 focus:ring-[var(--color-info)]"
                   style={{
                     borderColor: errors.email ? "var(--color-error)" : "var(--color-border-light)",
                     color: "var(--color-text-primary)",
@@ -230,6 +230,16 @@ export default function SignupPage() {
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? "email-error" : undefined}
                 />
+                {email.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => { setEmail(""); if (errors.email) setErrors({ ...errors, email: undefined }); }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-full hover:bg-slate-100 transition-colors"
+                    aria-label="Clear email"
+                  >
+                    <span className="text-slate-400 text-sm font-bold leading-none">✕</span>
+                  </button>
+                )}
               </div>
               {errors.email && (
                 <p id="email-error" className="flex items-center gap-2 mt-2 text-sm" style={{ color: "var(--color-error)" }}>
