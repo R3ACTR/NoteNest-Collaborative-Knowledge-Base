@@ -456,13 +456,19 @@ export default function NotesPage() {
               </div>
             </div>
             <div className="p-6 space-y-4">
-              <input
-                type="text"
-                placeholder="Note Title"
-                value={createTitle}
-                onChange={(e) => setCreateTitle(e.target.value)}
-                className="w-full text-lg font-bold border-none focus:ring-0 placeholder:text-stone-300"
-              />
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  placeholder="Note Title"
+                  value={createTitle}
+                  maxLength={100}
+                  onChange={(e) => setCreateTitle(e.target.value)}
+                  className="flex-1 text-lg font-bold border-none focus:ring-0 placeholder:text-stone-300"
+                />
+                <div className={`text-xs ml-2 ${createTitle.length >= 100 ? 'text-red-500 font-bold' : createTitle.length >= 80 ? 'text-orange-500' : 'text-stone-400'}`}>
+                  {createTitle.length}/100
+                </div>
+              </div>
               <textarea
                 placeholder="Start writing..."
                 value={createContent}
