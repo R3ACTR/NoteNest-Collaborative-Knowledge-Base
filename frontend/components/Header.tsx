@@ -39,6 +39,12 @@ function HeaderInner({
     }
   }, []);
 
+  const handleClearSearch = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("search");
+    router.replace(`?${params.toString()}`);
+  };
+
   return (
     <>
       {/* Skip to main content (accessibility) */}
@@ -63,7 +69,7 @@ function HeaderInner({
         </h1>
 
         {showSearch && (
-          <div className="flex-1 max-w-md">
+          <div className="flex-1 max-w-md relative">
             <label htmlFor="search-input" className="sr-only">
               Search notes
             </label>
@@ -85,8 +91,18 @@ function HeaderInner({
 
                 router.replace(`?${params.toString()}`);
               }}
-              className="w-full rounded-full border border-stone-200 bg-white px-4 py-2 text-sm placeholder:text-stone-400 text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400"
+              className="w-full rounded-full border border-stone-200 bg-white pl-4 pr-10 py-2 text-sm placeholder:text-stone-400 text-stone-900 focus:outline-none focus:ring-2 focus:ring-stone-400"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 focus:outline-none focus:text-stone-600 p-1"
+                aria-label="Clear search"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            )}
           </div>
         )}
 

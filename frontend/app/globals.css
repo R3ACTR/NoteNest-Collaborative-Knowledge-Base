@@ -13,19 +13,47 @@
   --color-surface-dark: #1e1e21;
 
   --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-sans: var(--font-inter), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    var(--font-inter), var(--font-geist-sans), ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
   --font-display: var(--font-instrument-serif), serif;
 }
 
+@layer base {
+  body {
+    @apply antialiased font-sans text-stone-900 bg-[#FAF9F6];
+  }
+
+  /* Hide the native WebKit clear button in search inputs */
+  input[type="search"]::-webkit-search-decoration,
+  input[type="search"]::-webkit-search-cancel-button,
+  input[type="search"]::-webkit-search-results-button,
+  input[type="search"]::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+  }
+}
+
 :root {
-  --color-background: #F3F0E6;
-  --color-foreground: #1A1A1A;
+  --color-background: #f3f0e6;
+  --color-foreground: #1a1a1a;
 }
 
 @layer utilities {
   .mask-linear-fade {
-    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent 0%,
+      black 10%,
+      black 90%,
+      transparent 100%
+    );
   }
 }
