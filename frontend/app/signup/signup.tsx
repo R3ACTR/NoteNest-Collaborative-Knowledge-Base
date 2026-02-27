@@ -189,6 +189,7 @@ export default function SignupPage() {
                 <input
                   id="name"
                   type="text"
+                  autoFocus
                   value={name}
                   onChange={(e) => { setName(e.target.value); if (errors.name) setErrors({ ...errors, name: undefined }); }}
                   placeholder="John Doe"
