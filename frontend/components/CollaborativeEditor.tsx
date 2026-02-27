@@ -5,8 +5,8 @@ import StarterKit from '@tiptap/starter-kit';
 import Collaboration from '@tiptap/extension-collaboration';
 import CollaborationCursor from '@tiptap/extension-collaboration-cursor';
 import * as Y from 'yjs';
-import { useEffect, useState } from 'react';
 import TurndownService from 'turndown';
+import { Trash2 } from 'lucide-react';
 import { socket } from '@/lib/api'; // Assume we have a socket singleton or similar
 import { YSocketIOProvider } from '@/lib/yjs-provider';
 
@@ -44,6 +44,13 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
         navigator.clipboard.writeText(text);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleClearContent = () => {
+        if (!editor) return;
+        if (confirm("Are you sure you want to clear the entire note? This cannot be undone.")) {
+            editor.commands.clearContent(true);
+        }
     };
 
     const handleExportMarkdown = () => {
@@ -139,6 +146,14 @@ const CollaborativeEditor = ({ noteId, currentUser }: { noteId: string, currentU
                             <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <span>Export MD</span>
+                    </button>
+                    <button
+                        onClick={handleClearContent}
+                        className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 rounded-md transition-colors"
+                        title="Clear Note Content"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                        <span>Clear</span>
                     </button>
                 </div>
             </div>
